@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GameReaderCommon;
@@ -52,9 +53,23 @@ namespace PitWall
         public ImageSource PictureIcon => null;
 
         /// <summary>
-        /// IWPFSettingsV2: Settings panel control
+        /// IWPFSettingsV2: Settings panel control (hosts WinForms UI inside WPF container)
         /// </summary>
-        public Control GetSettingsControl() => new UserControl();
+        public Control GetSettingsControl()
+        {
+            if (_settingsControl == null)
+            {
+                _settingsControl = new SettingsControl(_settings ?? new PitWallSettings(),
+                    (SQLiteProfileDatabase)(_profileDatabase ?? new SQLiteProfileDatabase()));
+            }
+
+            var host = new WindowsFormsHost
+            {
+                Child = _settingsControl
+            };
+
+            return new UserControl { Content = host };
+        }
 
         /// <summary>
         /// IWPFSettings: GetWPFSettingsControl (legacy method, required by base interface)
