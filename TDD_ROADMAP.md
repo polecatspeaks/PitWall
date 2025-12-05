@@ -598,22 +598,61 @@ public enum Priority
 - Day 1: Audio interfaces and mock implementations
 - Day 2: Message queue with priority and cooldown
 - Day 3: SimHub audio integration
-- Day 4: Record/source audio samples (or use TTS temporarily)
+- Day 4: Generate audio samples with 11labs TTS
 - Day 5: Integration testing with real SimHub
 - Day 6: Polish and edge case handling
 
 ### Dependencies
 - Phase 1 complete (strategy engine working)
-- Audio sample files (can use placeholder TTS initially)
+- 11labs API access (or similar TTS service)
+
+### Audio Generation with 11labs
+
+**Setup**:
+1. Sign up for 11labs account (free tier sufficient for initial set)
+2. Choose voice: Recommend professional, neutral tone (e.g., "Adam" or "Antoni")
+3. Generate ~20-30 core messages as .wav files
+4. Store in `PluginData/PitWall/Audio/default/`
+
+**Script for Batch Generation**:
+```python
+# tools/generate_audio.py
+import requests
+
+ELEVENLABS_API_KEY = "your_api_key"
+VOICE_ID = "pNInz6obpgDQGcFmaJgB"  # Adam voice
+
+messages = [
+    ("box_now.wav", "Box this lap"),
+    ("fuel_critical_2laps.wav", "Fuel critical, 2 laps remaining"),
+    ("tyres_going_off.wav", "Tyres are going off"),
+    ("wait_for_lmp2.wav", "Wait for LMP2 train"),
+    # ... add more
+]
+
+for filename, text in messages:
+    # Call 11labs API to generate .wav
+    # Save to PluginData/PitWall/Audio/default/
+```
+
+**User Customization**:
+- Users can replace files in `Audio/custom/` folder
+- Plugin checks `custom/` first, falls back to `default/`
+- Setting: "Use custom audio files" (bool, default: true)
 
 ### Audio Sample Checklist
 ```
 Audio/
-├── box_now.wav              # "Box this lap"
-├── fuel_critical.wav        # "Fuel critical, 2 laps remaining"
-├── fuel_ok.wav              # "Fuel looks good"
-├── pit_window_open.wav      # "Pit window is open"
-└── [more as needed]
+├── default/                 # 11labs-generated (shipped with plugin)
+│   ├── box_now.wav
+│   ├── fuel_critical_2laps.wav
+│   ├── fuel_ok.wav
+│   ├── tyres_going_off.wav
+│   ├── wait_for_lmp2.wav
+│   ├── undercut_available.wav
+│   └── [20-30 total messages]
+└── custom/                  # User-provided (optional)
+    └── [user can override any message]
 ```
 
 ---
@@ -1440,11 +1479,12 @@ jobs:
 
 ### MVP Ready (Phase 3 Complete)
 - ✅ Plugin loads in SimHub without errors
-- ✅ Fuel and tyre strategy recommendations work
+- ✅ Fuel and tyre strategy recommendations work in iRacing
 - ✅ Audio messages play at correct times
 - ✅ <5% CPU usage during race
 - ✅ Unit test coverage >80%
-- ✅ Works in at least 2 sims (ACC, iRacing)
+- ✅ Validated with real iRacing telemetry (IMSA multiclass preferred)
+- ✅ Works with iRacing's limited telemetry (no tyre temps)
 
 ### Production Ready (Phase 8 Complete)
 - ✅ All above, plus:
@@ -1488,16 +1528,223 @@ jobs:
 
 ---
 
-## Questions for Consideration
+## Project Decisions
 
-1. **Audio Assets**: Will you record voice samples, use TTS, or hire voice talent?
-2. **Test Data**: Do you have saved telemetry files from real races?
-3. **Target Sims**: Priority order for sim support? (ACC, iRacing, RF2, R3E?)
-4. **UI Preference**: Minimal overlay or detailed dashboard?
-5. **Community**: Open beta testers available?
+### ✅ Audio Strategy
+**Decision**: Use 11labs TTS for initial audio generation, then allow users to customize with their own samples.
+
+**Implementation Plan**:
+- Phase 2: Create audio files using 11labs API (one-time generation)
+- Store generated .wav files in `PluginData/PitWall/Audio/`
+- Phase 2+: Add setting for custom audio folder path
+- Users can replace files with their own voice/style
+
+**Audio File Naming Convention**:
+```
+box_now.wav                    # "Box this lap"
+fuel_critical_2laps.wav        # "Fuel critical, 2 laps remaining"
+tyres_going_off.wav            # "Tyres are going off"
+wait_for_lmp2.wav              # "Wait for LMP2 train"
+undercut_available.wav         # "Box for undercut"
+```
+
+### ✅ Test Data
+**Decision**: Leverage existing telemetry files and race replays for integration testing.
+
+**Testing Approach**:
+- Phase 1: Create telemetry export tool from SimHub logs
+- Phase 2: Build replay framework for integration tests
+- Phase 3+: Use real race data to validate strategy recommendations
+- Store anonymized test data in `PitWall.Tests/TestData/iRacing/`
+
+**Test Data Structure**:
+```
+PitWall.Tests/TestData/
+├── iRacing/
+│   ├── IMSA/
+│   │   ├── watkins_glen_lmp2_90min.json
+│   │   ├── sebring_gt3_6hr.json
+│   │   └── daytona_multiclass_24hr.json
+│   ├── Formula/
+│   │   └── montreal_ir18_60min.json
+│   └── RoadRacing/
+│       └── spa_gt3_60min.json
+└── MockData/
+    └── synthetic_race_scenarios.json
+```
+
+### ✅ Target Simulator
+**Decision**: iRacing first, expand to other sims later.
+
+**iRacing-Specific Considerations**:
+
+#### Telemetry Limitations
+- **No real-time tyre temps** - iRacing hides internal tyre model
+- **No real-time tyre wear** - Must infer from lap time degradation
+- **No brake temps** - Cannot detect brake fade directly
+- **Fuel is accurate** - Can rely on fuel telemetry
+
+#### SimHub Properties for iRacing
+```csharp
+// Available in iRacing
+"DataCorePlugin.GameData.Fuel"              // ✅ Reliable
+"DataCorePlugin.GameData.FuelCapacity"      // ✅ Reliable
+"DataCorePlugin.GameData.FuelPerLap"        // ✅ Calculated by SimHub
+"DataCorePlugin.GameData.LapTime"           // ✅ Accurate
+"DataCorePlugin.GameData.TrackTemp"         // ✅ Available
+
+// NOT available in iRacing
+"DataCorePlugin.GameData.TyreTemp*"         // ❌ Hidden
+"DataCorePlugin.GameData.TyreWear*"         // ❌ Hidden
+"DataCorePlugin.GameData.BrakeTemp*"        // ❌ Hidden
+```
+
+#### Strategy Adaptations for iRacing
+1. **Tyre Strategy**: Use lap time delta analysis (Phase 3)
+   - Track lap time degradation as proxy for tyre wear
+   - Compare to baseline pace from first 3 laps
+   - More conservative recommendations due to uncertainty
+
+2. **Multi-Class**: iRacing has excellent class data
+   - IMSA: LMP2, LMP3, GT3, GT4
+   - Use `Opponents[].CarClass` property
+   - Critical for endurance races (Daytona, Sebring, Spa)
+
+3. **Fuel Strategy**: Most accurate part
+   - iRacing provides precise fuel data
+   - Can calculate to the lap for endurance stints
+
+#### Phase 0 Addition: iRacing Test Setup
+```csharp
+// PitWall.Tests/Mocks/iRacingMockData.cs
+public static class iRacingMockData
+{
+    public static PluginData CreateIMSA_GT3()
+    {
+        return new MockPluginDataBuilder()
+            .WithGame("IRacing")
+            .WithCar("Porsche 911 GT3 R")
+            .WithTrack("Watkins Glen")
+            .WithFuelCapacity(120.0)  // Liters
+            .WithOpponentClasses(CarClass.GT3, CarClass.LMP2)
+            .Build();
+    }
+}
+```
+
+### ✅ UI Design
+**Decision**: Minimal overlay, audio-first experience. Visualization for pre/post-race analysis only.
+
+**Implementation**:
+- Phase 0-3: No UI, pure audio
+- Phase 5: Post-race analysis JSON export (for external tools)
+- Phase 10 (Optional): Simple overlay showing:
+  - Current recommendation (text only)
+  - Pit countdown (e.g., "Box in 2 laps")
+  - Fuel laps remaining
+  - No graphs, no gauges, no distractions
+
+**Philosophy**: The driver should focus on driving, not reading dashboards. Audio keeps eyes on the track.
+
+### ✅ Community Testing
+**Decision**: Open beta program available.
+
+**Beta Testing Plan**:
+- **Phase 1-2**: Internal testing only (you + replays)
+- **Phase 3**: Invite 3-5 trusted testers
+  - Provide pre-built DLL + installation guide
+  - Collect telemetry logs for validation
+  - Weekly feedback sessions
+- **Phase 5**: Expand to 10-15 beta testers
+  - Focus on different car classes (GT3, LMP2, Formula)
+  - Different track types (road courses, ovals)
+- **Phase 8**: Public beta release
+  - GitHub Releases with changelog
+  - Issue tracker for bug reports
+
+**Beta Tester Requirements**:
+- Active iRacing subscription
+- SimHub installed and configured
+- Willingness to run dev builds
+- Able to export telemetry logs for debugging
 
 ---
 
-*This roadmap is a living document. Update as you complete phases and learn more about SimHub's capabilities.*
+## iRacing-Specific Testing Strategy
+
+### Phase 1: Fuel Strategy Tests with Real iRacing Data
+
+```csharp
+// PitWall.Tests/Integration/iRacingFuelTests.cs
+public class iRacingFuelTests
+{
+    [Fact]
+    public async Task WatkinsGlen_GT3_60MinRace_RecommendsOnePitStop()
+    {
+        // Real telemetry from Watkins Glen 60min race
+        var telemetry = LoadiRacingReplay("watkins_glen_gt3_60min.json");
+        var engine = new StrategyEngine();
+
+        int pitStops = 0;
+        foreach (var lap in telemetry.Laps)
+        {
+            var recommendation = engine.GetRecommendation(lap);
+            if (recommendation.ShouldPit && !lap.IsInPit)
+            {
+                pitStops++;
+            }
+        }
+
+        Assert.Equal(1, pitStops); // 60min race = 1 stop for GT3
+    }
+
+    [Theory]
+    [InlineData("daytona_lmp2_24hr.json", 17)] // ~17 stops for 24hr LMP2
+    [InlineData("sebring_gt3_12hr.json", 11)]  // ~11 stops for 12hr GT3
+    public async Task EnduranceRace_RecommendsCorrectPitStopCount(
+        string replayFile, int expectedStops)
+    {
+        var telemetry = LoadiRacingReplay(replayFile);
+        var engine = new StrategyEngine();
+
+        var pitStops = CountRecommendedPitStops(engine, telemetry);
+
+        Assert.InRange(pitStops, expectedStops - 1, expectedStops + 1);
+    }
+}
+```
+
+### Phase 3: Tyre Degradation Without Tyre Temps
+
+Since iRacing hides tyre temps, use lap time analysis:
+
+```csharp
+public class iRacingTyreInferenceTests
+{
+    [Fact]
+    public void InferTyreDegradation_FromLapTimeIncrease()
+    {
+        var strategy = new iRacingTyreStrategy();
+
+        // Simulate 20-lap stint with gradual degradation
+        for (int i = 1; i <= 20; i++)
+        {
+            double lapTime = 120.0 + (i * 0.1); // 0.1s per lap degradation
+            strategy.RecordLap(lapTime, isClear: true);
+        }
+
+        var degradation = strategy.GetEstimatedTyreDegradation();
+
+        // After 20 laps, ~2s slower (conservative)
+        Assert.InRange(degradation, 1.8, 2.2);
+    }
+}
+```
+
+---
+
+*This roadmap is a living document. Updated with project decisions on 2025-12-05.*
 
 **Remember**: Ship small, test everything, iterate fast. Better to have a working fuel strategy than a half-built everything.
+
+**iRacing First**: Optimize for iRacing telemetry limitations. Expand to other sims once core strategy is proven.
