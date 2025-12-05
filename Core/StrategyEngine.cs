@@ -13,9 +13,11 @@ namespace PitWall.Core
         private readonly FuelStrategy _fuelStrategy;
         private readonly TyreDegradation _tyreDegradation;
         private readonly TrafficAnalyzer _trafficAnalyzer;
+        private readonly UndercutStrategy _undercutStrategy;
         private readonly IProfileDatabase? _profileDatabase;
         private DriverProfile? _currentProfile;
         private const double TyreThreshold = 30.0; // percent wear remaining trigger
+        private const double PitStopDuration = 25.0; // Default pit stop time in seconds
 
         public StrategyEngine(FuelStrategy fuelStrategy) : this(fuelStrategy, new TyreDegradation(), new TrafficAnalyzer(), null)
         {
@@ -36,6 +38,7 @@ namespace PitWall.Core
             _fuelStrategy = fuelStrategy;
             _tyreDegradation = tyreDegradation;
             _trafficAnalyzer = trafficAnalyzer;
+            _undercutStrategy = new UndercutStrategy();
             _profileDatabase = profileDatabase;
         }
 
@@ -67,6 +70,7 @@ namespace PitWall.Core
                 ? (int)Math.Floor(telemetry.FuelRemaining / avgFuelPerLap)
                 : _fuelStrategy.PredictLapsRemaining(telemetry.FuelRemaining);
 
+            // CRITICAL: Fuel below 2 laps - must pit immediately
             if (lapsRemaining < 2)
             {
                 // Check if pit entry is safe before critical fuel call
@@ -90,7 +94,7 @@ namespace PitWall.Core
                 };
             }
 
-            // Tyre logic: pit if any tyre at/below threshold or projected under threshold within 2 laps
+            // WARNING: Tyre critical - pit if any tyre at/below threshold or projected under threshold within 2 laps
             if (IsTyrePitRecommended(out var tyreMessage))
             {
                 // Check if pit entry is safe
@@ -112,6 +116,13 @@ namespace PitWall.Core
                     Priority = Priority.Warning,
                     Message = tyreMessage
                 };
+            }
+
+            // TACTICAL: Check for undercut/overcut opportunities when fuel/tyres are not critical
+            var undercutRec = CheckUndercutOpportunity(telemetry, lapsRemaining);
+            if (undercutRec != null)
+            {
+                return undercutRec;
             }
 
             return new Recommendation
@@ -171,6 +182,130 @@ namespace PitWall.Core
             }
 
             return false;
+        }
+
+        private Recommendation? CheckUndercutOpportunity(Telemetry telemetry, int lapsRemaining)
+        {
+            // Need opponent data and at least 5 laps of fuel remaining to consider undercut
+            if (telemetry.Opponents == null || telemetry.Opponents.Count == 0 || lapsRemaining < 5)
+            {
+                return null;
+            }
+
+            // Find car directly ahead and behind
+            var carAhead = FindCarAhead(telemetry);
+            var carBehind = FindCarBehind(telemetry);
+
+            if (carAhead == null && carBehind == null)
+            {
+                return null; // No cars nearby to race
+            }
+
+            // Calculate tyre age and advantage
+            int currentTyreLaps = telemetry.CurrentLap; // Simplified: assume tyres from start
+            double tyreDegPerLap = _currentProfile?.TypicalTyreDegradation ?? 0.15;
+            double freshTyreAdvantage = _undercutStrategy.EstimateFreshTyreAdvantage(currentTyreLaps, tyreDegPerLap);
+
+            // Check undercut opportunity
+            if (carAhead != null)
+            {
+                // GapSeconds is negative for car ahead, take absolute value
+                double gapAhead = Math.Abs(carAhead.GapSeconds);
+                
+                if (gapAhead > 0)
+                {
+                    var situation = new RaceSituation
+                    {
+                        GapToCarAhead = gapAhead,
+                        PitStopDuration = PitStopDuration,
+                        FreshTyreAdvantage = freshTyreAdvantage,
+                        CurrentTyreLaps = currentTyreLaps,
+                        OpponentTyreAge = carAhead.TyreAge > 0 ? carAhead.TyreAge : currentTyreLaps
+                    };
+
+                    if (_undercutStrategy.CanUndercut(situation))
+                    {
+                        int positionGain = _undercutStrategy.CalculatePositionGain(situation);
+                        return new Recommendation
+                        {
+                            ShouldPit = true,
+                            Type = RecommendationType.Undercut,
+                            Priority = Priority.Warning,
+                            Message = $"Box for undercut - can gain P{telemetry.PlayerPosition - positionGain}"
+                        };
+                    }
+                }
+            }
+
+            // Check overcut opportunity
+            if (carBehind != null)
+            {
+                // GapSeconds is positive for car behind
+                double gapBehind = Math.Abs(carBehind.GapSeconds);
+                
+                if (gapBehind > 0)
+                {
+                    var situation = new RaceSituation
+                    {
+                        GapToCarBehind = gapBehind,
+                        PitStopDuration = PitStopDuration,
+                        FreshTyreAdvantage = freshTyreAdvantage,
+                        CurrentTyreLaps = currentTyreLaps,
+                        OpponentTyreAge = carBehind.TyreAge > 0 ? carBehind.TyreAge : currentTyreLaps
+                    };
+
+                    if (_undercutStrategy.CanOvercut(situation))
+                    {
+                        return new Recommendation
+                        {
+                            ShouldPit = false,
+                            Type = RecommendationType.Overcut,
+                            Priority = Priority.Info,
+                            Message = $"Stay out - defend P{telemetry.PlayerPosition} with overcut"
+                        };
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private OpponentData? FindCarAhead(Telemetry telemetry)
+        {
+            if (telemetry.Opponents == null || telemetry.PlayerPosition <= 1)
+            {
+                return null; // Already in P1
+            }
+
+            // Find opponent in position directly ahead
+            foreach (var opponent in telemetry.Opponents)
+            {
+                if (opponent.Position == telemetry.PlayerPosition - 1)
+                {
+                    return opponent;
+                }
+            }
+
+            return null;
+        }
+
+        private OpponentData? FindCarBehind(Telemetry telemetry)
+        {
+            if (telemetry.Opponents == null)
+            {
+                return null;
+            }
+
+            // Find opponent in position directly behind
+            foreach (var opponent in telemetry.Opponents)
+            {
+                if (opponent.Position == telemetry.PlayerPosition + 1)
+                {
+                    return opponent;
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -18,7 +18,9 @@ namespace PitWall.Models
         Tyres,
         Damage,
         Traffic,
-        Weather
+        Weather,
+        Undercut,
+        Overcut
     }
 
     public enum Priority

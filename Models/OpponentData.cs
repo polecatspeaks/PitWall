@@ -12,5 +12,8 @@ namespace PitWall.Models
         public double GapSeconds { get; set; }
         public bool IsInPitLane { get; set; }
         public double BestLapTime { get; set; }
+        public int CurrentLap { get; set; }
+        public int TyreAge { get; set; } // Laps on current tyres
+        public int PitStopCount { get; set; }
     }
 }
