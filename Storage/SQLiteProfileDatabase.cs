@@ -18,7 +18,14 @@ namespace PitWall.Storage
 
         public SQLiteProfileDatabase(string dataDirectory = "")
         {
-            string dbPath = Path.Combine(string.IsNullOrEmpty(dataDirectory) ? Environment.CurrentDirectory : dataDirectory, DB_FILE);
+            // Default to per-user LocalAppData to avoid locks/permissions under Program Files
+            var baseDir = string.IsNullOrEmpty(dataDirectory)
+                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PitWall")
+                : dataDirectory;
+
+            Directory.CreateDirectory(baseDir);
+
+            string dbPath = Path.Combine(baseDir, DB_FILE);
             _connectionString = $"Data Source={dbPath};Version=3;";
             InitializeDatabase();
         }
