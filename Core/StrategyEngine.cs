@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using PitWall.Models;
+using PitWall.Storage;
 
 namespace PitWall.Core
 {
@@ -11,22 +13,38 @@ namespace PitWall.Core
         private readonly FuelStrategy _fuelStrategy;
         private readonly TyreDegradation _tyreDegradation;
         private readonly TrafficAnalyzer _trafficAnalyzer;
+        private readonly IProfileDatabase? _profileDatabase;
+        private DriverProfile? _currentProfile;
         private const double TyreThreshold = 30.0; // percent wear remaining trigger
 
-        public StrategyEngine(FuelStrategy fuelStrategy) : this(fuelStrategy, new TyreDegradation(), new TrafficAnalyzer())
+        public StrategyEngine(FuelStrategy fuelStrategy) : this(fuelStrategy, new TyreDegradation(), new TrafficAnalyzer(), null)
         {
         }
 
         public StrategyEngine(FuelStrategy fuelStrategy, TyreDegradation tyreDegradation) 
-            : this(fuelStrategy, tyreDegradation, new TrafficAnalyzer())
+            : this(fuelStrategy, tyreDegradation, new TrafficAnalyzer(), null)
         {
         }
 
         public StrategyEngine(FuelStrategy fuelStrategy, TyreDegradation tyreDegradation, TrafficAnalyzer trafficAnalyzer)
+            : this(fuelStrategy, tyreDegradation, trafficAnalyzer, null)
+        {
+        }
+
+        public StrategyEngine(FuelStrategy fuelStrategy, TyreDegradation tyreDegradation, TrafficAnalyzer trafficAnalyzer, IProfileDatabase? profileDatabase)
         {
             _fuelStrategy = fuelStrategy;
             _tyreDegradation = tyreDegradation;
             _trafficAnalyzer = trafficAnalyzer;
+            _profileDatabase = profileDatabase;
+        }
+
+        public async Task LoadProfile(string driver, string track, string car)
+        {
+            if (_profileDatabase != null)
+            {
+                _currentProfile = await _profileDatabase.GetProfile(driver, track, car);
+            }
         }
 
         public Recommendation GetRecommendation(Telemetry telemetry)
@@ -43,7 +61,12 @@ namespace PitWall.Core
                     telemetry.TyreWearRearRight);
             }
 
-            int lapsRemaining = _fuelStrategy.PredictLapsRemaining(telemetry.FuelRemaining);
+            // Use profile data for improved predictions if available
+            double avgFuelPerLap = _currentProfile?.AverageFuelPerLap ?? _fuelStrategy.GetAverageFuelPerLap();
+            int lapsRemaining = avgFuelPerLap > 0 
+                ? (int)Math.Floor(telemetry.FuelRemaining / avgFuelPerLap)
+                : _fuelStrategy.PredictLapsRemaining(telemetry.FuelRemaining);
+
             if (lapsRemaining < 2)
             {
                 // Check if pit entry is safe before critical fuel call
