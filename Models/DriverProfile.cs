@@ -16,6 +16,11 @@ namespace PitWall.Models
         public DrivingStyle Style { get; set; }
         public DateTime LastUpdated { get; set; }
         public int SessionsCompleted { get; set; }
+        
+        // Phase 5A: Confidence and recency tracking
+        public double Confidence { get; set; } = 0.0;
+        public bool IsStale { get; set; } = false;
+        public DateTime? LastSessionDate { get; set; }
     }
 
     public enum DrivingStyle

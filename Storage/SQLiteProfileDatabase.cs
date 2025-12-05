@@ -39,6 +39,9 @@ namespace PitWall.Storage
                     Style INTEGER NOT NULL,
                     SessionsCompleted INTEGER NOT NULL,
                     LastUpdated TEXT NOT NULL,
+                    Confidence REAL DEFAULT 0.0,
+                    IsStale INTEGER DEFAULT 0,
+                    LastSessionDate TEXT,
                     UNIQUE(DriverName, TrackName, CarName)
                 )";
 
@@ -69,6 +72,31 @@ namespace PitWall.Storage
                     FOREIGN KEY(SessionId) REFERENCES Sessions(Id)
                 )";
 
+            string timeSeriesTable = @"
+                CREATE TABLE IF NOT EXISTS ProfileTimeSeries (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    DriverName TEXT NOT NULL,
+                    TrackName TEXT NOT NULL,
+                    CarName TEXT NOT NULL,
+                    SessionDate TEXT NOT NULL,
+                    SessionId TEXT,
+                    SessionType TEXT,
+                    LapCount INTEGER NOT NULL,
+                    FuelPerLap REAL NOT NULL,
+                    AvgLapTime REAL NOT NULL,
+                    LapTimeStdDev REAL,
+                    ProcessedDate TEXT NOT NULL,
+                    ReplayFilePath TEXT
+                )";
+
+            string timeSeriesIndex = @"
+                CREATE INDEX IF NOT EXISTS idx_timeseries_track_car 
+                ON ProfileTimeSeries(DriverName, TrackName, CarName)";
+
+            string timeSeriesDateIndex = @"
+                CREATE INDEX IF NOT EXISTS idx_timeseries_date 
+                ON ProfileTimeSeries(SessionDate)";
+
             using var command = new SQLiteCommand(profilesTable, connection);
             command.ExecuteNonQuery();
 
@@ -76,6 +104,15 @@ namespace PitWall.Storage
             command.ExecuteNonQuery();
 
             command.CommandText = lapsTable;
+            command.ExecuteNonQuery();
+
+            command.CommandText = timeSeriesTable;
+            command.ExecuteNonQuery();
+
+            command.CommandText = timeSeriesIndex;
+            command.ExecuteNonQuery();
+
+            command.CommandText = timeSeriesDateIndex;
             command.ExecuteNonQuery();
         }
 
@@ -86,7 +123,8 @@ namespace PitWall.Storage
 
             string query = @"
                 SELECT DriverName, TrackName, CarName, AverageFuelPerLap, 
-                       TypicalTyreDegradation, Style, SessionsCompleted, LastUpdated
+                       TypicalTyreDegradation, Style, SessionsCompleted, LastUpdated,
+                       Confidence, IsStale, LastSessionDate
                 FROM Profiles
                 WHERE DriverName = @driver AND TrackName = @track AND CarName = @car";
 
@@ -110,7 +148,10 @@ namespace PitWall.Storage
                 TypicalTyreDegradation = reader.GetDouble(4),
                 Style = (DrivingStyle)reader.GetInt32(5),
                 SessionsCompleted = reader.GetInt32(6),
-                LastUpdated = DateTime.Parse(reader.GetString(7))
+                LastUpdated = DateTime.Parse(reader.GetString(7)),
+                Confidence = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
+                IsStale = reader.IsDBNull(9) ? false : reader.GetInt32(9) == 1,
+                LastSessionDate = reader.IsDBNull(10) ? null : DateTime.Parse(reader.GetString(10))
             };
         }
 
@@ -121,14 +162,19 @@ namespace PitWall.Storage
 
             string upsert = @"
                 INSERT INTO Profiles (DriverName, TrackName, CarName, AverageFuelPerLap, 
-                                      TypicalTyreDegradation, Style, SessionsCompleted, LastUpdated)
-                VALUES (@driver, @track, @car, @fuel, @tyre, @style, @sessions, @updated)
+                                      TypicalTyreDegradation, Style, SessionsCompleted, LastUpdated,
+                                      Confidence, IsStale, LastSessionDate)
+                VALUES (@driver, @track, @car, @fuel, @tyre, @style, @sessions, @updated,
+                        @confidence, @stale, @lastSession)
                 ON CONFLICT(DriverName, TrackName, CarName) DO UPDATE SET
                     AverageFuelPerLap = @fuel,
                     TypicalTyreDegradation = @tyre,
                     Style = @style,
                     SessionsCompleted = @sessions,
-                    LastUpdated = @updated";
+                    LastUpdated = @updated,
+                    Confidence = @confidence,
+                    IsStale = @stale,
+                    LastSessionDate = @lastSession";
 
             using var command = new SQLiteCommand(upsert, connection);
             command.Parameters.AddWithValue("@driver", profile.DriverName);
@@ -139,6 +185,9 @@ namespace PitWall.Storage
             command.Parameters.AddWithValue("@style", (int)profile.Style);
             command.Parameters.AddWithValue("@sessions", profile.SessionsCompleted);
             command.Parameters.AddWithValue("@updated", profile.LastUpdated.ToString("o"));
+            command.Parameters.AddWithValue("@confidence", profile.Confidence);
+            command.Parameters.AddWithValue("@stale", profile.IsStale ? 1 : 0);
+            command.Parameters.AddWithValue("@lastSession", profile.LastSessionDate?.ToString("o") ?? string.Empty);
 
             await command.ExecuteNonQueryAsync();
         }
@@ -269,6 +318,120 @@ namespace PitWall.Storage
             }
 
             return laps;
+        }
+
+        /// <summary>
+        /// Store time-series session data for replay processing
+        /// </summary>
+        public async Task StoreTimeSeriesSession(
+            string driver, 
+            string track, 
+            string car,
+            DateTime sessionDate,
+            string sessionId,
+            string sessionType,
+            int lapCount,
+            double fuelPerLap,
+            double avgLapTime,
+            double lapTimeStdDev,
+            string? replayFilePath = null)
+        {
+            using var connection = new SQLiteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            string insert = @"
+                INSERT INTO ProfileTimeSeries 
+                (DriverName, TrackName, CarName, SessionDate, SessionId, SessionType,
+                 LapCount, FuelPerLap, AvgLapTime, LapTimeStdDev, ProcessedDate, ReplayFilePath)
+                VALUES (@driver, @track, @car, @date, @sessionId, @type,
+                        @lapCount, @fuel, @avgLap, @stdDev, @processed, @replay)";
+
+            using var command = new SQLiteCommand(insert, connection);
+            command.Parameters.AddWithValue("@driver", driver);
+            command.Parameters.AddWithValue("@track", track);
+            command.Parameters.AddWithValue("@car", car);
+            command.Parameters.AddWithValue("@date", sessionDate.ToString("o"));
+            command.Parameters.AddWithValue("@sessionId", sessionId ?? string.Empty);
+            command.Parameters.AddWithValue("@type", sessionType);
+            command.Parameters.AddWithValue("@lapCount", lapCount);
+            command.Parameters.AddWithValue("@fuel", fuelPerLap);
+            command.Parameters.AddWithValue("@avgLap", avgLapTime);
+            command.Parameters.AddWithValue("@stdDev", lapTimeStdDev);
+            command.Parameters.AddWithValue("@processed", DateTime.Now.ToString("o"));
+            command.Parameters.AddWithValue("@replay", replayFilePath ?? string.Empty);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        /// <summary>
+        /// Get all time-series sessions for a driver/track/car combination
+        /// Ordered chronologically (oldest to newest)
+        /// </summary>
+        public async Task<List<(DateTime Date, int LapCount, double FuelPerLap, double TyreDeg)>> GetTimeSeries(
+            string driver, 
+            string track, 
+            string car)
+        {
+            using var connection = new SQLiteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            string query = @"
+                SELECT SessionDate, LapCount, FuelPerLap, AvgLapTime
+                FROM ProfileTimeSeries
+                WHERE DriverName = @driver AND TrackName = @track AND CarName = @car
+                ORDER BY SessionDate ASC";
+
+            using var command = new SQLiteCommand(query, connection);
+            command.Parameters.AddWithValue("@driver", driver);
+            command.Parameters.AddWithValue("@track", track);
+            command.Parameters.AddWithValue("@car", car);
+
+            var series = new List<(DateTime, int, double, double)>();
+            using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var date = DateTime.Parse(reader.GetString(0));
+                var lapCount = reader.GetInt32(1);
+                var fuelPerLap = reader.GetDouble(2);
+                var avgLapTime = reader.GetDouble(3);
+
+                series.Add((date, lapCount, fuelPerLap, avgLapTime));
+            }
+
+            return series;
+        }
+
+        /// <summary>
+        /// Update profile with confidence and staleness information
+        /// </summary>
+        public async Task UpdateProfileMetadata(
+            string driver,
+            string track,
+            string car,
+            double confidence,
+            bool isStale,
+            DateTime lastSessionDate)
+        {
+            using var connection = new SQLiteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            string update = @"
+                UPDATE Profiles
+                SET Confidence = @confidence,
+                    IsStale = @stale,
+                    LastSessionDate = @lastSession
+                WHERE DriverName = @driver AND TrackName = @track AND CarName = @car";
+
+            using var command = new SQLiteCommand(update, connection);
+            command.Parameters.AddWithValue("@confidence", confidence);
+            command.Parameters.AddWithValue("@stale", isStale ? 1 : 0);
+            command.Parameters.AddWithValue("@lastSession", lastSessionDate.ToString("o"));
+            command.Parameters.AddWithValue("@driver", driver);
+            command.Parameters.AddWithValue("@track", track);
+            command.Parameters.AddWithValue("@car", car);
+
+            await command.ExecuteNonQueryAsync();
         }
     }
 }
