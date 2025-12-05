@@ -94,6 +94,15 @@ namespace PitWall.Replay
                 return;
             }
 
+            // Notify UI we’ve scanned the folder and have a work count
+            OnProgressChanged(new ReplayProcessingProgressEventArgs
+            {
+                CurrentFile = $"Found {replays.Count} replays...",
+                CurrentIndex = 0,
+                TotalFiles = replays.Count,
+                SessionDate = replays.First().SessionDate
+            });
+
             int processed = 0;
             int skipped = 0;
             var trackCarCombos = new HashSet<(string track, string car)>();
