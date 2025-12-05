@@ -17,6 +17,8 @@ namespace PitWall
         private ITelemetryProvider? _telemetryProvider;
         private StrategyEngine? _strategyEngine;
         private FuelStrategy? _fuelStrategy;
+        private AudioMessageQueue? _audioQueue;
+        private AudioPlayer? _audioPlayer;
 
         /// <summary>
         /// Plugin display name
@@ -36,15 +38,8 @@ namespace PitWall
                 ?? new PluginManagerPropertyProvider(pluginManager);
             _telemetryProvider = new SimHubTelemetryProvider(propertyProvider);
             _strategyEngine = new StrategyEngine(_fuelStrategy);
-        }
-
-        /// <summary>
-        /// Called when the plugin is being unloaded
-        /// </summary>
-        public void End(PluginManager pluginManager)
-        {
-            // TODO: Cleanup resources
-            // Log: Plugin shutting down
+            _audioQueue = new AudioMessageQueue();
+            _audioPlayer = new AudioPlayer(_audioQueue);
         }
 
         /// <summary>
@@ -62,10 +57,24 @@ namespace PitWall
             // Record lap progression data
             _strategyEngine.RecordLap(telemetry);
 
-            // Generate recommendation (future: push to audio/queue)
-            _ = _strategyEngine.GetRecommendation(telemetry);
+            var recommendation = _strategyEngine.GetRecommendation(telemetry);
+            if (_audioQueue != null && recommendation != null && !string.IsNullOrEmpty(recommendation.Message))
+            {
+                _audioQueue.Enqueue(recommendation);
+                _audioPlayer?.PlayNext();
+            }
 
             // NOTE: Keep this loop <10ms; do not allocate excessively
+        }
+
+        /// <summary>
+        /// Called when the plugin is being unloaded
+        /// </summary>
+        public void End(PluginManager pluginManager)
+        {
+            // TODO: Cleanup resources
+            // Log: Plugin shutting down
+            _audioQueue?.Clear();
         }
     }
 }
