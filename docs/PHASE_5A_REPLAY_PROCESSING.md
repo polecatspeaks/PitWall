@@ -21,6 +21,7 @@ This feature is OPTIONAL - users can choose to seed from replays or build profil
 - Progress indicator: Shows "Processing [N/Total]: filename (date)"
 - Summary report: Shows profiles created, confidence scores, and stale data warnings
 - Totally optional: Works without replay processing, builds profiles from live sessions
+- One-click SimHub deploy: run `scripts\install-simhub-plugin.ps1` (defaults to Debug build and copies DLLs to SimHub\Plugins)
 
 ### Technical Constraints
 - Must handle two replay filename patterns:
