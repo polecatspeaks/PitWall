@@ -5,7 +5,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
-    <AssemblyName>PitWall</AssemblyName>
+    <AssemblyName>SimHub.Plugins.PitWall</AssemblyName>
     <RootNamespace>PitWall</RootNamespace>
   </PropertyGroup>
 
@@ -33,6 +33,11 @@
 
   <ItemGroup>
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+  </ItemGroup>
+
+  <!-- Copy PluginManifest.json to output for SimHub to discover plugin -->
+  <ItemGroup>
+    <None Include="PluginManifest.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

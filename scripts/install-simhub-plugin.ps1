@@ -1,5 +1,5 @@
 param(
-    [string]$SimHubPluginsPath = "C:\\Program Files (x86)\\SimHub\\Plugins\\PitWall",
+    [string]$SimHubPath = "C:\\Program Files (x86)\\SimHub",
     [ValidateSet("Debug", "Release")][string]$Configuration = "Debug",
     [switch]$NoBuild,
     [switch]$IncludePdb
@@ -8,6 +8,7 @@ param(
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $solutionPath = Join-Path $repoRoot "PitWall.sln"
 $buildOutput = Join-Path $repoRoot "bin\$Configuration\net48"
+$SimHubPluginsPath = Join-Path $SimHubPath "Plugins"
 
 Write-Host "SimHub plugin install" -ForegroundColor Cyan
 Write-Host "Target folder: $SimHubPluginsPath"
@@ -32,20 +33,21 @@ if (-not (Test-Path $buildOutput)) {
     exit 1
 }
 
-$files = @("PitWall.dll", "System.Data.SQLite.dll", "PluginManifest.json")
+$files = @("SimHub.Plugins.PitWall.dll", "System.Data.SQLite.dll", "PluginManifest.json")
 if ($IncludePdb) { $files += "PitWall.pdb" }
 
-Write-Host "Ensuring target directory exists..."
+Write-Host "Ensuring plugins directory exists..."
 New-Item -ItemType Directory -Force -Path $SimHubPluginsPath | Out-Null
 
+Write-Host "Copying plugin files to $SimHubPluginsPath..."
 foreach ($file in $files) {
     $src = Join-Path $buildOutput $file
     if (Test-Path $src) {
         Copy-Item $src -Destination $SimHubPluginsPath -Force
-        Write-Host "Copied $file"
+        Write-Host "  + $file"
     }
     else {
-        Write-Warning "Missing $file in build output; skipping"
+        Write-Warning "  - Missing $file in build output; skipping"
     }
 }
 
@@ -53,9 +55,12 @@ foreach ($file in $files) {
 foreach ($arch in @("x86", "x64")) {
     $srcDir = Join-Path $buildOutput $arch
     if (Test-Path $srcDir) {
-        Copy-Item $srcDir -Destination $SimHubPluginsPath -Recurse -Force
-        Write-Host "Copied $arch/"
+        $destDir = Join-Path $SimHubPluginsPath $arch
+        Copy-Item $srcDir -Destination $destDir -Recurse -Force
+        Write-Host "  + $arch/ native interop"
     }
 }
 
-Write-Host "Done. Restart SimHub and open Settings > Pit Wall Race Engineer to verify the panel loads." -ForegroundColor Green
+Write-Host ""
+Write-Host "Installation complete!" -ForegroundColor Green
+Write-Host "Next: Restart SimHub and look for 'Pit Wall Race Engineer' in the Plugins list (left sidebar)." -ForegroundColor Green
