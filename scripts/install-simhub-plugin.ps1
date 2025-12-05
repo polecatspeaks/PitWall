@@ -8,10 +8,9 @@ param(
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $solutionPath = Join-Path $repoRoot "PitWall.sln"
 $buildOutput = Join-Path $repoRoot "bin\$Configuration\net48"
-$SimHubPluginsPath = Join-Path $SimHubPath "Plugins"
 
 Write-Host "SimHub plugin install" -ForegroundColor Cyan
-Write-Host "Target folder: $SimHubPluginsPath"
+Write-Host "Target folder: $SimHubPath"
 Write-Host "Configuration: $Configuration"
 
 $simHubRunning = Get-Process -Name "SimHub" -ErrorAction SilentlyContinue
@@ -33,17 +32,14 @@ if (-not (Test-Path $buildOutput)) {
     exit 1
 }
 
-$files = @("SimHub.Plugins.PitWall.dll", "System.Data.SQLite.dll", "PluginManifest.json")
+$files = @("SimHub.Plugins.PitWall.dll", "System.Data.SQLite.dll")
 if ($IncludePdb) { $files += "PitWall.pdb" }
 
-Write-Host "Ensuring plugins directory exists..."
-New-Item -ItemType Directory -Force -Path $SimHubPluginsPath | Out-Null
-
-Write-Host "Copying plugin files to $SimHubPluginsPath..."
+Write-Host "Copying plugin files to $SimHubPath..."
 foreach ($file in $files) {
     $src = Join-Path $buildOutput $file
     if (Test-Path $src) {
-        Copy-Item $src -Destination $SimHubPluginsPath -Force
+        Copy-Item $src -Destination $SimHubPath -Force
         Write-Host "  + $file"
     }
     else {
@@ -55,7 +51,7 @@ foreach ($file in $files) {
 foreach ($arch in @("x86", "x64")) {
     $srcDir = Join-Path $buildOutput $arch
     if (Test-Path $srcDir) {
-        $destDir = Join-Path $SimHubPluginsPath $arch
+        $destDir = Join-Path $SimHubPath $arch
         Copy-Item $srcDir -Destination $destDir -Recurse -Force
         Write-Host "  + $arch/ native interop"
     }
@@ -63,4 +59,4 @@ foreach ($arch in @("x86", "x64")) {
 
 Write-Host ""
 Write-Host "Installation complete!" -ForegroundColor Green
-Write-Host "Next: Restart SimHub and look for 'Pit Wall Race Engineer' in the Plugins list (left sidebar)." -ForegroundColor Green
+Write-Host "Restart SimHub and check 'Additional plugins' for 'Pit Wall Race Engineer'." -ForegroundColor Green
