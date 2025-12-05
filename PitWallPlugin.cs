@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using GameReaderCommon;
 using PitWall.Core;
 using PitWall.Models;
@@ -17,7 +19,7 @@ namespace PitWall
     [PluginDescription("AI race engineer providing real-time strategy recommendations")]
     [PluginAuthor("PitWall Team")]
     [PluginName("Pit Wall Race Engineer")]
-    public class PitWallPlugin : IPlugin, IDataPlugin
+    public class PitWallPlugin : IPlugin, IDataPlugin, IWPFSettingsV2
     {
         public PluginManager? PluginManager { get; set; }
 
@@ -38,6 +40,50 @@ namespace PitWall
         /// Plugin display name
         /// </summary>
         public string Name => "Pit Wall Race Engineer";
+
+        /// <summary>
+        /// IWPFSettingsV2: Left menu title for settings panel
+        /// </summary>
+        public string LeftMenuTitle => "Pit Wall";
+
+        /// <summary>
+        /// IWPFSettingsV2: Icon for settings panel menu (null = default)
+        /// </summary>
+        public ImageSource PictureIcon => null;
+
+        /// <summary>
+        /// IWPFSettingsV2: Settings panel control
+        /// </summary>
+        public Control GetSettingsControl() => new UserControl();
+
+        /// <summary>
+        /// IWPFSettings: GetWPFSettingsControl (legacy method, required by base interface)
+        /// </summary>
+        public Control GetWPFSettingsControl(PluginManager pluginManager) => GetSettingsControl();
+
+        /// <summary>
+        /// IWPFSettingsV2: Help/description text
+        /// </summary>
+        public string GetInfoText() => 
+            "Pit Wall Race Engineer - AI-powered race strategy assistant\n" +
+            "\n" +
+            "Features:\n" +
+            "• Real-time fuel and tyre strategy recommendations\n" +
+            "• AI learning from historical replay data\n" +
+            "• Personalized driver profiles per track/car\n" +
+            "• Audio alerts for critical pit strategy moments\n" +
+            "\n" +
+            "Getting Started:\n" +
+            "1. Click 'Browse' to select your iRacing replay folder\n" +
+            "2. Click 'Import Historical Data' to seed profiles\n" +
+            "3. Data will update automatically during races\n" +
+            "\n" +
+            "iRacing Replays Location: Documents\\iRacing\\replays";
+
+        /// <summary>
+        /// IWPFSettingsV2: Plugin header text for settings panel
+        /// </summary>
+        public string GetHeaderText() => "Pit Wall Race Engineer";
 
         /// <summary>
         /// Called when the plugin is initialized
@@ -72,19 +118,12 @@ namespace PitWall
 
             // Load profile asynchronously (non-blocking)
             // Driver/track/car info will be available after first DataUpdate
-        }
-
-        /// <summary>
-        /// Returns the settings control for SimHub UI
-        /// </summary>
-        public Control GetSettingsControl(PluginManager pluginManager)
-        {
-            if (_settingsControl == null && _profileDatabase != null && _settings != null)
+            
+            // Initialize settings UI
+            if (_profileDatabase != null && _settings != null)
             {
                 _settingsControl = new SettingsControl(_settings, (SQLiteProfileDatabase)_profileDatabase);
             }
-
-            return _settingsControl ?? new Control();
         }
 
         /// <summary>
