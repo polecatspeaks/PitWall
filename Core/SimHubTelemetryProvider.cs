@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using GameReaderCommon;
 using PitWall.Models;
 
@@ -35,7 +37,10 @@ namespace PitWall.Core
                 TyreWearFrontLeft = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearFrontLeft"),
                 TyreWearFrontRight = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearFrontRight"),
                 TyreWearRearLeft = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearRearLeft"),
-                TyreWearRearRight = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearRearRight")
+                TyreWearRearRight = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearRearRight"),
+
+                Opponents = ReadOpponents(),
+                PlayerPosition = (int)ReadDouble("DataCorePlugin.GameData.NewData.Position")
             };
         }
 
@@ -64,6 +69,27 @@ namespace PitWall.Core
         private object? GetPropertyValue(string propertyName)
         {
             return _propertyProvider.GetPropertyValue(propertyName);
+        }
+
+        private List<OpponentData> ReadOpponents()
+        {
+            var opponents = new List<OpponentData>();
+            // Read up to 10 nearest opponents (SimHub exposes Opponents.0 to Opponents.59)
+            for (int i = 0; i < 10; i++)
+            {
+                var carName = ReadString($"Opponents.{i}.CarName");
+                if (string.IsNullOrEmpty(carName)) continue;
+
+                opponents.Add(new OpponentData
+                {
+                    Position = (int)ReadDouble($"Opponents.{i}.Position"),
+                    CarName = carName,
+                    GapSeconds = ReadDouble($"Opponents.{i}.GapSeconds"),
+                    IsInPitLane = ReadBool($"Opponents.{i}.IsInPitLane"),
+                    BestLapTime = ReadDouble($"Opponents.{i}.BestLapTime")
+                });
+            }
+            return opponents;
         }
     }
 }

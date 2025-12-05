@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace PitWall.Models
 {
     /// <summary>
@@ -21,5 +23,9 @@ namespace PitWall.Models
         public double TyreWearFrontRight { get; set; }
         public double TyreWearRearLeft { get; set; }
         public double TyreWearRearRight { get; set; }
+
+        // Opponent data for traffic and multi-class awareness
+        public List<OpponentData> Opponents { get; set; } = new();
+        public int PlayerPosition { get; set; }
     }
 }

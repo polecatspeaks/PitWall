@@ -10,16 +10,23 @@ namespace PitWall.Core
     {
         private readonly FuelStrategy _fuelStrategy;
         private readonly TyreDegradation _tyreDegradation;
+        private readonly TrafficAnalyzer _trafficAnalyzer;
         private const double TyreThreshold = 30.0; // percent wear remaining trigger
 
-        public StrategyEngine(FuelStrategy fuelStrategy) : this(fuelStrategy, new TyreDegradation())
+        public StrategyEngine(FuelStrategy fuelStrategy) : this(fuelStrategy, new TyreDegradation(), new TrafficAnalyzer())
         {
         }
 
-        public StrategyEngine(FuelStrategy fuelStrategy, TyreDegradation tyreDegradation)
+        public StrategyEngine(FuelStrategy fuelStrategy, TyreDegradation tyreDegradation) 
+            : this(fuelStrategy, tyreDegradation, new TrafficAnalyzer())
+        {
+        }
+
+        public StrategyEngine(FuelStrategy fuelStrategy, TyreDegradation tyreDegradation, TrafficAnalyzer trafficAnalyzer)
         {
             _fuelStrategy = fuelStrategy;
             _tyreDegradation = tyreDegradation;
+            _trafficAnalyzer = trafficAnalyzer;
         }
 
         public Recommendation GetRecommendation(Telemetry telemetry)
@@ -39,6 +46,18 @@ namespace PitWall.Core
             int lapsRemaining = _fuelStrategy.PredictLapsRemaining(telemetry.FuelRemaining);
             if (lapsRemaining < 2)
             {
+                // Check if pit entry is safe before critical fuel call
+                if (_trafficAnalyzer.IsPitEntryUnsafe(telemetry.BestLapTime, telemetry.Opponents))
+                {
+                    return new Recommendation
+                    {
+                        ShouldPit = false,
+                        Type = RecommendationType.Traffic,
+                        Priority = Priority.Warning,
+                        Message = _trafficAnalyzer.GetTrafficMessage(telemetry.BestLapTime, telemetry.Opponents)
+                    };
+                }
+
                 return new Recommendation
                 {
                     ShouldPit = true,
@@ -51,6 +70,18 @@ namespace PitWall.Core
             // Tyre logic: pit if any tyre at/below threshold or projected under threshold within 2 laps
             if (IsTyrePitRecommended(out var tyreMessage))
             {
+                // Check if pit entry is safe
+                if (_trafficAnalyzer.IsPitEntryUnsafe(telemetry.BestLapTime, telemetry.Opponents))
+                {
+                    return new Recommendation
+                    {
+                        ShouldPit = false,
+                        Type = RecommendationType.Traffic,
+                        Priority = Priority.Info,
+                        Message = _trafficAnalyzer.GetTrafficMessage(telemetry.BestLapTime, telemetry.Opponents) + " (tyres need service)"
+                    };
+                }
+
                 return new Recommendation
                 {
                     ShouldPit = true,
