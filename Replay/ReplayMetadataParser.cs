@@ -137,6 +137,20 @@ namespace PitWall.Replay
                 throw new InvalidDataException($"Failed to parse replay metadata from {filePath}: {ex.Message}", ex);
             }
 
+            // Fallbacks when replay header does not expose these fields (common for .rpy without YAML)
+            if (string.IsNullOrWhiteSpace(metadata.TrackName))
+            {
+                metadata.TrackName = "Unknown Track";
+            }
+            if (string.IsNullOrWhiteSpace(metadata.CarName))
+            {
+                metadata.CarName = "Unknown Car";
+            }
+            if (string.IsNullOrWhiteSpace(metadata.SessionType))
+            {
+                metadata.SessionType = "Replay";
+            }
+
             return metadata;
         }
 
