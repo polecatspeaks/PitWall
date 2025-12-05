@@ -18,7 +18,7 @@ namespace PitWall.Tests
             var mockPluginManager = new MockPluginManager();
             mockPluginManager.GameName = "IRacing";
             mockPluginManager.SetPropertyValue("DataCorePlugin.GameRunning", true);
-            mockPluginManager.SetPropertyValue("DataCorePlugin.GameData.Fuel", 50.0);
+            mockPluginManager.SetPropertyValue("DataCorePlugin.GameData.NewData.Fuel", 50.0);
 
             var plugin = new PitWallPlugin();
             plugin.Init(mockPluginManager);

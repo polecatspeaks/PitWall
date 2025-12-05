@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GameReaderCommon;
+using PitWall.Core;
 using SimHub.Plugins;
 
 namespace PitWall.Tests.Mocks
@@ -7,7 +8,7 @@ namespace PitWall.Tests.Mocks
     /// <summary>
     /// Mock implementation of PluginManager for testing
     /// </summary>
-    public class MockPluginManager : PluginManager
+    public class MockPluginManager : PluginManager, IPluginPropertyProvider
     {
         private readonly Dictionary<string, object?> _properties = new();
 

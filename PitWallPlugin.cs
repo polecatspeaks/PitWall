@@ -1,4 +1,5 @@
 using GameReaderCommon;
+using PitWall.Core;
 using SimHub.Plugins;
 
 namespace PitWall
@@ -13,6 +14,10 @@ namespace PitWall
     {
         public PluginManager? PluginManager { get; set; }
 
+        private ITelemetryProvider? _telemetryProvider;
+        private StrategyEngine? _strategyEngine;
+        private FuelStrategy? _fuelStrategy;
+
         /// <summary>
         /// Plugin display name
         /// </summary>
@@ -24,9 +29,13 @@ namespace PitWall
         public void Init(PluginManager pluginManager)
         {
             PluginManager = pluginManager;
-            
-            // TODO: Initialize strategy engine, audio system, etc.
-            // Log: Plugin initialized v0.1.0
+
+            // Phase 1: initialize fuel-focused strategy stack
+            _fuelStrategy = new FuelStrategy();
+            IPluginPropertyProvider propertyProvider = pluginManager as IPluginPropertyProvider
+                ?? new PluginManagerPropertyProvider(pluginManager);
+            _telemetryProvider = new SimHubTelemetryProvider(propertyProvider);
+            _strategyEngine = new StrategyEngine(_fuelStrategy);
         }
 
         /// <summary>
@@ -43,8 +52,20 @@ namespace PitWall
         /// </summary>
         public void DataUpdate(PluginManager pluginManager, ref GameData data)
         {
-            // TODO: Process telemetry and generate recommendations
-            // This is called very frequently - must be fast (<10ms)
+            if (_telemetryProvider == null || _strategyEngine == null)
+            {
+                return; // Not initialized
+            }
+
+            var telemetry = _telemetryProvider.GetCurrentTelemetry();
+
+            // Record lap progression data
+            _strategyEngine.RecordLap(telemetry);
+
+            // Generate recommendation (future: push to audio/queue)
+            _ = _strategyEngine.GetRecommendation(telemetry);
+
+            // NOTE: Keep this loop <10ms; do not allocate excessively
         }
     }
 }
