@@ -21,6 +21,7 @@ namespace PitWall.Replay
         private readonly RecencyWeightCalculator _weightCalculator;
         private readonly ConfidenceCalculator _confidenceCalculator;
         private readonly SQLiteProfileDatabase _database;
+        private const int MinReplayDurationSeconds = 600; // 10 minutes
 
         public event EventHandler<ReplayProcessingProgressEventArgs>? ProgressChanged;
         public event EventHandler<ReplayProcessingCompleteEventArgs>? ProcessingComplete;
@@ -115,6 +116,13 @@ namespace PitWall.Replay
                     });
 
                     var metadata = _metadataParser.ParseMetadata(replay.FilePath);
+
+                    // Skip junk/short replays (<10 minutes)
+                    if (metadata.SessionLength > 0 && metadata.SessionLength < MinReplayDurationSeconds)
+                    {
+                        skipped++;
+                        continue;
+                    }
                     
                     // For now, we can't extract full telemetry from .rpy files without iRacing SDK
                     // Instead, store minimal metadata for future enhancement

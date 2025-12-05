@@ -14,6 +14,7 @@ This feature is OPTIONAL - users can choose to seed from replays or build profil
 4. **Recency Weighting**: Weight recent sessions higher than old sessions (90-day half-life)
 5. **Confidence Scoring**: Calculate confidence based on recency, sample size, and consistency
 6. **Time-Series Storage**: Store session data with timestamps, not flat averages
+7. **Junk Filtering**: Skip replay files shorter than 10 minutes to avoid skewing profiles
 
 ### User Experience
 - Command-line tool: `PitWall.Tools.exe process-replays --input "path/to/replays"`
