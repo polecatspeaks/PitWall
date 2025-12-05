@@ -27,7 +27,8 @@
       <HintPath>SimHub\GameReaderCommon.dll</HintPath>
       <Private>false</Private>
     </Reference>
-      <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>

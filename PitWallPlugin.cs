@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using GameReaderCommon;
 using PitWall.Core;
 using PitWall.Models;
 using PitWall.Storage;
+using PitWall.UI;
 using SimHub.Plugins;
 
 namespace PitWall
@@ -27,6 +29,8 @@ namespace PitWall
         private TyreDegradation? _tyreDegradation;
         private ProfileAnalyzer? _profileAnalyzer;
         private IProfileDatabase? _profileDatabase;
+        private PitWallSettings? _settings;
+        private SettingsControl? _settingsControl;
         private List<LapData> _sessionLaps = new List<LapData>();
         private int _lastLapNumber = 0;
 
@@ -41,6 +45,17 @@ namespace PitWall
         public void Init(PluginManager pluginManager)
         {
             PluginManager = pluginManager;
+
+            // Phase 5A.1: Load settings (only in SimHub environment, not tests)
+            try
+            {
+                _settings = this.ReadCommonSettings("PitWallSettings", () => new PitWallSettings());
+            }
+            catch
+            {
+                // ReadCommonSettings requires Newtonsoft.Json which is only available in SimHub
+                _settings = new PitWallSettings();
+            }
 
             // Phase 1-5: initialize strategy stack with profile learning
             _fuelStrategy = new FuelStrategy();
@@ -57,6 +72,19 @@ namespace PitWall
 
             // Load profile asynchronously (non-blocking)
             // Driver/track/car info will be available after first DataUpdate
+        }
+
+        /// <summary>
+        /// Returns the settings control for SimHub UI
+        /// </summary>
+        public Control GetSettingsControl(PluginManager pluginManager)
+        {
+            if (_settingsControl == null && _profileDatabase != null && _settings != null)
+            {
+                _settingsControl = new SettingsControl(_settings, (SQLiteProfileDatabase)_profileDatabase);
+            }
+
+            return _settingsControl ?? new Control();
         }
 
         /// <summary>
@@ -164,6 +192,19 @@ namespace PitWall
             _audioQueue?.Clear();
             _sessionLaps.Clear();
             _lastLapNumber = 0;
+
+            // Phase 5A.1: Save settings (only in SimHub environment, not tests)
+            try
+            {
+                if (_settings != null)
+                {
+                    this.SaveCommonSettings("PitWallSettings", _settings);
+                }
+            }
+            catch
+            {
+                // SaveCommonSettings requires Newtonsoft.Json which is only available in SimHub
+            }
         }
     }
 }
