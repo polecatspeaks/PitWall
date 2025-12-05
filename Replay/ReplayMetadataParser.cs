@@ -56,26 +56,32 @@ namespace PitWall.Replay
 
         /// <summary>
         /// Parse full metadata from iRacing YAML header
+        /// Reads only a small portion of the file to avoid walking the entire binary replay
         /// </summary>
         public ReplayMetadata ParseMetadata(string filePath)
         {
+            const int maxLines = 500;       // cap header reads to avoid scanning huge files
+            const int maxBytes = 1_000_000; // ~1MB safety limit
+
             var metadata = new ReplayMetadata
             {
                 SessionDate = ExtractSessionDate(filePath)
             };
 
-            // Read YAML header from .rpy file
-            // iRacing replay files start with YAML header followed by binary telemetry data
             try
             {
                 using var stream = File.OpenRead(filePath);
                 using var reader = new StreamReader(stream);
 
                 string? line;
+                int linesRead = 0;
+
                 while ((line = reader.ReadLine()) != null)
                 {
-                    // YAML header ends at "---" marker
-                    if (line.Trim() == "---")
+                    linesRead++;
+
+                    // stop early if we've read enough of the header or hit our byte guardrail
+                    if (line.Trim() == "---" || linesRead > maxLines || reader.BaseStream.Position > maxBytes)
                     {
                         break;
                     }
@@ -116,7 +122,6 @@ namespace PitWall.Replay
                                     break;
                                 case "session_start_time":
                                 case "SessionStartTime":
-                                    // Try to parse ISO 8601 format
                                     if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out DateTime startTime))
                                     {
                                         metadata.SessionDate = startTime;
@@ -140,15 +145,22 @@ namespace PitWall.Replay
         /// </summary>
         private DateTime ParseSessionDateFromYaml(string filePath)
         {
+            const int maxLines = 200;
+            const int maxBytes = 512_000; // ~0.5MB guardrail
+
             try
             {
                 using var stream = File.OpenRead(filePath);
                 using var reader = new StreamReader(stream);
 
                 string? line;
+                int linesRead = 0;
+
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (line.Trim() == "---")
+                    linesRead++;
+
+                    if (line.Trim() == "---" || linesRead > maxLines || reader.BaseStream.Position > maxBytes)
                     {
                         break;
                     }
