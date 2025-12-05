@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
+    <AssemblyName>PitWall</AssemblyName>
+    <RootNamespace>PitWall</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Explicitly exclude test files from this project -->
+  <ItemGroup>
+    <Compile Remove="PitWall.Tests\**" />
+    <None Remove="PitWall.Tests\**" />
+    <EmbeddedResource Remove="PitWall.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- SimHub SDK DLLs - These will need to be copied from SimHub install directory -->
+    <!-- Path typically: C:\Program Files (x86)\SimHub\ -->
+    <Reference Include="SimHub.Plugins">
+      <HintPath>SimHub\SimHub.Plugins.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="GameReaderCommon">
+      <HintPath>SimHub\GameReaderCommon.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

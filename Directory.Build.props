@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable nullable reference types for all projects -->
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!-- Exclude test files from main project compilation -->
+  <ItemGroup>
+    <Compile Remove="PitWall.Tests\**\*.cs" />
+  </ItemGroup>
+</Project>

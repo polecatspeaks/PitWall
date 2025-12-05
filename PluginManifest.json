@@ -1,0 +1,8 @@
+{
+  "Name": "Pit Wall Race Engineer",
+  "Author": "PitWall Team",
+  "Description": "AI-powered race engineer providing real-time strategy recommendations through audio messages",
+  "Version": "0.1.0",
+  "SDKVersion": "9.0.0",
+  "PluginType": "DataPlugin"
+}
