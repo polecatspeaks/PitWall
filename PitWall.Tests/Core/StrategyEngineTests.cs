@@ -33,7 +33,14 @@ namespace PitWall.Tests.Core
             var fuelStrategy = new FuelStrategy();
             fuelStrategy.RecordLap(1, 50.0, 45.0); // 5.0 per lap
             var engine = new StrategyEngine(fuelStrategy);
-            var telemetry = new Telemetry { FuelRemaining = 20.0 };
+            var telemetry = new Telemetry
+            {
+                FuelRemaining = 20.0,
+                TyreWearFrontLeft = 90,
+                TyreWearFrontRight = 90,
+                TyreWearRearLeft = 90,
+                TyreWearRearRight = 90
+            };
 
             // Act
             Recommendation rec = engine.GetRecommendation(telemetry);

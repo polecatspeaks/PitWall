@@ -30,7 +30,12 @@ namespace PitWall.Core
                 IsLapValid = ReadBool("DataCorePlugin.GameData.NewData.CurrentLapIsValid"),
                 TrackName = ReadString("DataCorePlugin.GameData.NewData.TrackName"),
                 CarName = ReadString("DataCorePlugin.GameData.NewData.CarName"),
-                IsGameRunning = IsGameRunning
+                IsGameRunning = IsGameRunning,
+
+                TyreWearFrontLeft = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearFrontLeft"),
+                TyreWearFrontRight = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearFrontRight"),
+                TyreWearRearLeft = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearRearLeft"),
+                TyreWearRearRight = ReadDouble("DataCorePlugin.GameData.NewData.TyreWearRearRight")
             };
         }
 

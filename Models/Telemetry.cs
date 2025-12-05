@@ -15,5 +15,11 @@ namespace PitWall.Models
         public string TrackName { get; set; } = string.Empty;
         public string CarName { get; set; } = string.Empty;
         public bool IsGameRunning { get; set; }
+
+        // Tyre wear percentages (0-100, where lower means more worn)
+        public double TyreWearFrontLeft { get; set; }
+        public double TyreWearFrontRight { get; set; }
+        public double TyreWearRearLeft { get; set; }
+        public double TyreWearRearRight { get; set; }
     }
 }

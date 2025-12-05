@@ -19,6 +19,7 @@ namespace PitWall
         private FuelStrategy? _fuelStrategy;
         private AudioMessageQueue? _audioQueue;
         private AudioPlayer? _audioPlayer;
+        private TyreDegradation? _tyreDegradation;
 
         /// <summary>
         /// Plugin display name
@@ -34,10 +35,11 @@ namespace PitWall
 
             // Phase 1: initialize fuel-focused strategy stack
             _fuelStrategy = new FuelStrategy();
+            _tyreDegradation = new TyreDegradation();
             IPluginPropertyProvider propertyProvider = pluginManager as IPluginPropertyProvider
                 ?? new PluginManagerPropertyProvider(pluginManager);
             _telemetryProvider = new SimHubTelemetryProvider(propertyProvider);
-            _strategyEngine = new StrategyEngine(_fuelStrategy);
+            _strategyEngine = new StrategyEngine(_fuelStrategy, _tyreDegradation);
             _audioQueue = new AudioMessageQueue();
             _audioPlayer = new AudioPlayer(_audioQueue);
         }
