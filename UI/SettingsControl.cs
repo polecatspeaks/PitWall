@@ -270,7 +270,7 @@ namespace PitWall.UI
                 // - Parse header and 60Hz samples
                 // - Build hierarchical profiles (Driver -> Car -> Track)
                 // - Apply recency weighting and confidence scoring
-                
+
                 await Task.Delay(1000); // Placeholder delay
 
                 _progressBar.Visible = false;
@@ -317,7 +317,7 @@ namespace PitWall.UI
             {
                 // Get all profiles from database
                 var profiles = _database.GetRecentSessions(100).Result;
-                
+
                 if (profiles.Count == 0)
                 {
                     _profileListBox.Items.Add("No profiles found. Import replays or race to build profiles.");

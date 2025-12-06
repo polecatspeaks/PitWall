@@ -23,7 +23,7 @@ namespace PitWall.Core
         {
         }
 
-        public StrategyEngine(FuelStrategy fuelStrategy, TyreDegradation tyreDegradation) 
+        public StrategyEngine(FuelStrategy fuelStrategy, TyreDegradation tyreDegradation)
             : this(fuelStrategy, tyreDegradation, new TrafficAnalyzer(), null)
         {
         }
@@ -66,7 +66,7 @@ namespace PitWall.Core
 
             // Use profile data for improved predictions if available
             double avgFuelPerLap = _currentProfile?.AverageFuelPerLap ?? _fuelStrategy.GetAverageFuelPerLap();
-            int lapsRemaining = avgFuelPerLap > 0 
+            int lapsRemaining = avgFuelPerLap > 0
                 ? (int)Math.Floor(telemetry.FuelRemaining / avgFuelPerLap)
                 : _fuelStrategy.PredictLapsRemaining(telemetry.FuelRemaining);
 
@@ -211,7 +211,7 @@ namespace PitWall.Core
             {
                 // GapSeconds is negative for car ahead, take absolute value
                 double gapAhead = Math.Abs(carAhead.GapSeconds);
-                
+
                 if (gapAhead > 0)
                 {
                     var situation = new RaceSituation
@@ -242,7 +242,7 @@ namespace PitWall.Core
             {
                 // GapSeconds is positive for car behind
                 double gapBehind = Math.Abs(carBehind.GapSeconds);
-                
+
                 if (gapBehind > 0)
                 {
                     var situation = new RaceSituation
