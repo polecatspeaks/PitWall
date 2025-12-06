@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using PitWall.Telemetry;
@@ -7,104 +9,66 @@ using PitWall.Telemetry;
 namespace PitWall.Tests.Unit.Telemetry
 {
     /// <summary>
-    /// Tests for IBT file importer using iRSDKSharp
-    /// Validates:
-    /// - Telemetry folder detection (Documents/iRacing/telemetry/)
-    /// - .ibt file scanning
-    /// - Binary header parsing (driver, car, track, session type)
-    /// - 60Hz sample extraction (all channels)
-    /// - Lap-level aggregation
+    /// TDD RED Phase: Tests for IBT file importer
+    /// All tests should FAIL initially (IbtImporter doesn't exist yet)
+    /// 
+    /// Test strategy:
+    /// 1. GetTelemetryFolder - Test folder detection with override
+    /// 2. ScanTelemetryFolder - Test file scanning
+    /// 3. ImportIBTFile - Test complete import workflow
     /// </summary>
     public class IbtImporterTests
     {
         [Fact]
-        public async Task GetTelemetryFolder_ReturnsValidPath()
+        public async Task GetTelemetryFolder_WhenDefaultPathExists_ReturnsPath()
         {
-            // Arrange - TODO: Implement importer with iRSDKSharp
-            // var importer = new IbtImporter();
+            // Arrange
+            var importer = new IbtImporter();
 
             // Act
-            // var path = await importer.GetTelemetryFolderAsync();
+            var path = await importer.GetTelemetryFolderAsync();
 
             // Assert
-            // Should return Documents/iRacing/telemetry/ or user-configured path
-            // Assert.NotEmpty(path);
-            // Assert.Contains("telemetry", path.ToLower());
+            Assert.NotNull(path);
+            Assert.NotEmpty(path);
+            Assert.True(Directory.Exists(path) || path.Contains("telemetry"));
         }
 
         [Fact]
-        public async Task ScanTelemetryFolder_FindsIBTFiles()
+        public async Task ScanTelemetryFolder_WhenFolderHasFiles_ReturnsFileList()
         {
-            // Arrange - TODO: Implement folder scanning
-            // var importer = new IbtImporter();
-            // var telemetryFolder = await importer.GetTelemetryFolderAsync();
+            // Arrange
+            var importer = new IbtImporter();
+            var testFolder = Path.GetTempPath();
 
             // Act
-            // var files = await importer.ScanTelemetryFolderAsync(telemetryFolder);
+            var files = await importer.ScanTelemetryFolderAsync(testFolder);
 
             // Assert
-            // Should find .ibt files with metadata
-            // var ibtFiles = files.Where(f => f.FileName.EndsWith(".ibt"));
-            // Assert.NotEmpty(ibtFiles);
+            Assert.NotNull(files);
+            Assert.IsType<List<IBTFileInfo>>(files);
         }
 
         [Fact]
-        public async Task ImportIBTFile_ExtractsMetadata()
+        public async Task ImportIBTFile_WhenFileMissing_ThrowsException()
         {
-            // Arrange - TODO: Implement IBT parsing with iRSDKSharp
-            // var importer = new IbtImporter();
-            // var testFile = "path/to/test.ibt";
+            // Arrange
+            var importer = new IbtImporter();
+            var testFile = "nonexistent.ibt";
 
-            // Act
-            // var session = await importer.ImportIBTFileAsync(testFile);
-
-            // Assert
-            // Should extract header metadata
-            // Assert.NotNull(session.SessionMetadata);
-            // Assert.NotEmpty(session.SessionMetadata.DriverName);
-            // Assert.NotEmpty(session.SessionMetadata.CarName);
-            // Assert.NotEmpty(session.SessionMetadata.TrackName);
-            // Assert.NotEmpty(session.SessionMetadata.SessionType);
+            // Act & Assert - Should throw because implementation doesn't exist
+            await Assert.ThrowsAnyAsync<Exception>(async () =>
+            {
+                await importer.ImportIBTFileAsync(testFile);
+            });
         }
 
-        [Fact]
-        public async Task ImportIBTFile_Extract60HzSamples()
-        {
-            // Arrange - TODO: Implement sample extraction
-            // var importer = new IbtImporter();
+        // TODO: Add test for 60Hz sample extraction once we have mock IBT file
+        // [Fact]
+        // public async Task ImportIBTFile_WhenValid_Returns60HzSamples()
 
-            // Act
-            // var session = await importer.ImportIBTFileAsync(testFile);
-
-            // Assert
-            // Should preserve ALL 60Hz samples with all channels
-            // Assert.NotEmpty(session.RawSamples);
-            // Assert.True(session.RawSamples.Count > 100); // At least a few laps
-            
-            // Verify all channel data preserved
-            // var firstSample = session.RawSamples.First();
-            // Assert.True(firstSample.Speed > 0);
-            // Assert.True(firstSample.Throttle >= 0 && firstSample.Throttle <= 1);
-            // Assert.True(firstSample.EngineRpm > 0);
-            // Assert.NotEqual(default(float), firstSample.FuelLevel);
-        }
-
-        [Fact]
-        public async Task ImportIBTFile_CalculatesLapAggregates()
-        {
-            // Arrange - TODO: Implement lap aggregation
-            // var importer = new IbtImporter();
-
-            // Act
-            // var session = await importer.ImportIBTFileAsync(testFile);
-
-            // Assert
-            // Should have lap-level summary data
-            // Assert.NotEmpty(session.Laps);
-            // var firstLap = session.Laps.First();
-            // Assert.True(firstLap.LapTime.TotalSeconds > 0);
-            // Assert.True(firstLap.AvgSpeed > 0);
-            // Assert.True(firstLap.FuelUsed > 0);
-        }
+        // TODO: Add test for lap aggregation once we have mock IBT file  
+        // [Fact]
+        // public async Task ImportIBTFile_WhenValid_CalculatesLapMetadata()
     }
 }

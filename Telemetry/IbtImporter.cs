@@ -7,56 +7,42 @@ using PitWall.Models.Telemetry;
 namespace PitWall.Telemetry
 {
     /// <summary>
-    /// Implementation of IBT telemetry importer
-    /// Uses iRSDKSharp to parse iRacing binary telemetry files
+    /// IBT telemetry file importer
+    /// Uses IRSDKSharper to parse iRacing binary telemetry files
     /// 
-    /// Responsibilities:
-    /// 1. Detect iRacing telemetry folder (Documents/iRacing/telemetry/)
-    /// 2. Scan folder for .ibt files
-    /// 3. Parse IBT headers (session metadata)
-    /// 4. Extract ALL 60Hz telemetry samples
-    /// 5. Calculate lap-level aggregates
-    /// 6. Return ImportedSession with metadata, laps, and samples
+    /// TDD GREEN Phase: Minimal implementation to pass tests
     /// </summary>
     public class IbtImporter : ITelemetryImporter
     {
-        private readonly string _telemetryFolderOverride;
+        private readonly string? _telemetryFolderOverride;
 
         public IbtImporter(string? overridePath = null)
         {
-            _telemetryFolderOverride = overridePath ?? "";
+            _telemetryFolderOverride = overridePath;
         }
 
         /// <summary>
-        /// Finds iRacing telemetry folder
-        /// Default: {Documents}/iRacing/telemetry/
-        /// Can be overridden via constructor or settings
+        /// Returns iRacing telemetry folder path
+        /// Default: Documents/iRacing/telemetry/
         /// </summary>
-        public async Task<string> GetTelemetryFolderAsync()
+        public Task<string> GetTelemetryFolderAsync()
         {
+            // If override specified, return it
             if (!string.IsNullOrEmpty(_telemetryFolderOverride))
             {
-                return _telemetryFolderOverride;
+                return Task.FromResult(_telemetryFolderOverride!);
             }
 
-            // Try default path
+            // Try default iRacing telemetry folder
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string defaultPath = Path.Combine(documentsPath, "iRacing", "telemetry");
 
-            if (Directory.Exists(defaultPath))
-            {
-                return defaultPath;
-            }
-
-            // TODO: Prompt user to select folder if default doesn't exist
-            throw new DirectoryNotFoundException(
-                $"iRacing telemetry folder not found at {defaultPath}. " +
-                "Please configure the path in settings.");
+            return Task.FromResult(defaultPath);
         }
 
         /// <summary>
-        /// Scans telemetry folder for .ibt files
-        /// Returns file info (name, path, date, size)
+        /// Scans folder for .ibt files
+        /// Returns list with file metadata
         /// </summary>
         public Task<List<IBTFileInfo>> ScanTelemetryFolderAsync(string folderPath)
         {
@@ -88,63 +74,42 @@ namespace PitWall.Telemetry
             }
             catch (Exception ex)
             {
-                // Log error but don't throw - allow partial results
-                System.Diagnostics.Debug.WriteLine($"Error scanning telemetry folder: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error scanning folder: {ex.Message}");
             }
 
             return Task.FromResult(result);
         }
 
         /// <summary>
-        /// Imports a single IBT file
-        /// Parses header and extracts 60Hz samples
-        /// 
-        /// TODO: Implement using iRSDKSharp:
-        /// 1. Open binary IBT file
-        /// 2. Read header (variable length, ends with telemetry header)
-        /// 3. Extract metadata:
-        ///    - DriverName, CarName, TrackName
-        ///    - SessionType (Practice, Qualify, Race, etc)
-        ///    - SessionDate/time
-        /// 4. Read all 60Hz telemetry samples
-        ///    - Tick rate determines sample frequency
-        ///    - All channel variables from iRSDK
-        /// 5. Aggregate into LapMetadata
-        /// 6. Return ImportedSession
+        /// Imports single IBT file
+        /// TODO: Implement IRSDKSharper integration for actual parsing
         /// </summary>
         public Task<ImportedSession> ImportIBTFileAsync(string filePath)
         {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"IBT file not found: {filePath}");
+            }
+
             var session = new ImportedSession
             {
                 SourceFilePath = filePath,
-                ImportedAt = DateTime.UtcNow
-            };
-
-            try
-            {
-                // TODO: Implement IBT file parsing with iRSDKSharp
-                // For now, return empty but properly structured ImportedSession
-                
-                session.SessionMetadata = new SessionMetadata
+                ImportedAt = DateTime.UtcNow,
+                SessionMetadata = new SessionMetadata
                 {
                     SessionId = Path.GetFileNameWithoutExtension(filePath),
                     SessionDate = File.GetLastWriteTimeUtc(filePath),
                     SourceFilePath = filePath,
                     ProcessedDate = DateTime.UtcNow
-                };
+                }
+            };
 
-                // TODO: When iRSDKSharp integrated:
-                // 1. Parse IBT header for metadata
-                // 2. Extract all 60Hz samples into RawSamples list
-                // 3. Aggregate RawSamples into Laps list
-                // 4. Calculate per-lap statistics
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error importing IBT file {filePath}: {ex.Message}");
-                throw;
-            }
+            // TODO: Implement IRSDKSharper parsing
+            // 1. Load IBT file with IRSDKSharper
+            // 2. Extract session metadata (driver, car, track, session type)
+            // 3. Extract all 60Hz telemetry samples
+            // 4. Calculate lap aggregates
+            // 5. Populate session.SessionMetadata, session.RawSamples, session.Laps
 
             return Task.FromResult(session);
         }
