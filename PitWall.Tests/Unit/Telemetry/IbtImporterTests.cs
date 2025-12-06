@@ -68,7 +68,7 @@ namespace PitWall.Tests.Unit.Telemetry
         {
             // Arrange
             string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
-            
+
             // Skip test if file doesn't exist (for CI/CD)
             if (!File.Exists(ibtPath))
             {
@@ -92,7 +92,7 @@ namespace PitWall.Tests.Unit.Telemetry
         {
             // Arrange
             string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
-            
+
             // Skip test if file doesn't exist
             if (!File.Exists(ibtPath))
             {
@@ -106,7 +106,7 @@ namespace PitWall.Tests.Unit.Telemetry
             // Assert
             Assert.NotNull(variables);
             Assert.NotEmpty(variables);
-            
+
             // Should have standard telemetry variables
             Assert.Contains(variables, v => v.Name.Contains("Speed"));
             Assert.Contains(variables, v => v.Name.Contains("RPM") || v.Name.Contains("Rpm"));
@@ -119,7 +119,7 @@ namespace PitWall.Tests.Unit.Telemetry
             // Arrange
             var importer = new IbtImporter();
             string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
-            
+
             // Skip test if file doesn't exist
             if (!File.Exists(ibtPath))
             {
@@ -132,7 +132,7 @@ namespace PitWall.Tests.Unit.Telemetry
             // Assert
             Assert.NotNull(session);
             Assert.NotNull(session.SessionMetadata);
-            
+
             // Should extract metadata from IBT file
             Assert.NotEqual("TODO: Parse from IBT", session.SessionMetadata.DriverName);
             Assert.NotEqual("TODO: Parse from IBT", session.SessionMetadata.CarName);
@@ -146,7 +146,7 @@ namespace PitWall.Tests.Unit.Telemetry
             // Arrange
             var importer = new IbtImporter();
             string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
-            
+
             // Skip test if file doesn't exist
             if (!File.Exists(ibtPath))
             {
@@ -160,20 +160,51 @@ namespace PitWall.Tests.Unit.Telemetry
             Assert.NotNull(session);
             Assert.NotNull(session.RawSamples);
             Assert.NotEmpty(session.RawSamples);
-            
+
             // Should have samples at 60Hz (at least a few seconds worth)
             Assert.True(session.RawSamples.Count >= 60, $"Expected at least 60 samples, got {session.RawSamples.Count}");
-            
+
             // Samples should have valid data
             var firstSample = session.RawSamples[0];
             Assert.True(firstSample.LapNumber >= 0);
-            
+
             // Should have at least some samples with non-zero speed
             Assert.Contains(session.RawSamples, s => s.Speed > 0);
         }
 
-        // TODO: Add test for lap aggregation once we have sample extraction working
-        // [Fact]
-        // public async Task ImportIBTFile_WhenValid_CalculatesLapMetadata()
+        [Fact]
+        public async Task ImportIBTFile_WhenValidFile_CalculatesLapMetadata()
+        {
+            // Arrange
+            var importer = new IbtImporter();
+            string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
+
+            // Skip test if file doesn't exist
+            if (!File.Exists(ibtPath))
+            {
+                return;
+            }
+
+            // Act
+            var session = await importer.ImportIBTFileAsync(ibtPath);
+
+            // Assert
+            Assert.NotNull(session);
+            Assert.NotNull(session.Laps);
+            Assert.NotEmpty(session.Laps);
+
+            // Should have at least one completed lap
+            Assert.True(session.Laps.Count >= 1, $"Expected at least 1 lap, got {session.Laps.Count}");
+
+            // Each lap should have calculated metadata
+            var firstLap = session.Laps[0];
+            Assert.True(firstLap.LapNumber > 0);
+            Assert.True(firstLap.LapTime.TotalSeconds > 0);
+            Assert.True(firstLap.AvgSpeed > 0);
+
+            // Fuel should be calculated
+            Assert.True(firstLap.FuelUsed >= 0);
+        }
     }
 }
+

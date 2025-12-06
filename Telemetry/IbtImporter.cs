@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using PitWall.Models.Telemetry;
 
@@ -103,18 +104,18 @@ namespace PitWall.Telemetry
             {
                 // Use IbtFileReader to parse binary IBT file
                 using var reader = new IbtFileReader(filePath);
-                
+
                 // Parse session info YAML
                 var sessionInfo = reader.ParseSessionInfo();
-                
+
                 // Extract metadata from session info
                 session.SessionMetadata = ExtractSessionMetadata(sessionInfo, filePath);
 
                 // Extract 60Hz telemetry samples
                 session.RawSamples = reader.ReadTelemetrySamples();
 
-                // TODO: Calculate lap-level aggregates
-                // session.Laps = CalculateLapAggregates(session.RawSamples);
+                // Calculate lap-level aggregates
+                session.Laps = CalculateLapAggregates(session.RawSamples);
             }
             catch (Exception ex)
             {
@@ -142,7 +143,7 @@ namespace PitWall.Telemetry
             try
             {
                 // Extract WeekendInfo
-                if (sessionInfo.TryGetValue("WeekendInfo", out var weekendInfoObj) && 
+                if (sessionInfo.TryGetValue("WeekendInfo", out var weekendInfoObj) &&
                     weekendInfoObj is Dictionary<object, object> weekendInfo)
                 {
                     if (weekendInfo.TryGetValue("TrackDisplayName", out var trackName))
@@ -197,5 +198,84 @@ namespace PitWall.Telemetry
 
             return metadata;
         }
+
+        /// <summary>
+        /// Calculates lap-level aggregates from raw 60Hz samples
+        /// Groups samples by lap number and computes fuel, time, speed statistics
+        /// </summary>
+        private List<LapMetadata> CalculateLapAggregates(List<TelemetrySample> samples)
+        {
+            var laps = new List<LapMetadata>();
+
+            if (samples == null || samples.Count == 0)
+            {
+                return laps;
+            }
+
+            // Group samples by lap number
+            var lapGroups = samples
+                .Where(s => s.LapNumber > 0) // Exclude lap 0 (out lap/formation)
+                .GroupBy(s => s.LapNumber)
+                .OrderBy(g => g.Key);
+
+            foreach (var lapGroup in lapGroups)
+            {
+                var lapSamples = lapGroup.ToList();
+
+                if (lapSamples.Count < 10) // Skip laps with too few samples
+                {
+                    continue;
+                }
+
+                var lap = new LapMetadata
+                {
+                    LapNumber = lapGroup.Key,
+                    IsValid = true, // Assume valid unless we detect issues
+                    IsClear = true  // Assume clear unless we detect incidents
+                };
+
+                // Calculate fuel usage
+                var fuelLevels = lapSamples.Select(s => s.FuelLevel).Where(f => f > 0).ToList();
+                if (fuelLevels.Count > 1)
+                {
+                    lap.FuelUsed = fuelLevels.First() - fuelLevels.Last();
+                    lap.FuelRemaining = fuelLevels.Last();
+                }
+
+                // Calculate lap time (approximate from sample count at 60Hz)
+                lap.LapTime = TimeSpan.FromSeconds(lapSamples.Count / 60.0);
+
+                // Calculate speed statistics
+                var speeds = lapSamples.Select(s => s.Speed).Where(s => s > 0).ToList();
+                if (speeds.Count > 0)
+                {
+                    lap.AvgSpeed = speeds.Average();
+                    lap.MaxSpeed = speeds.Max();
+                }
+
+                // Calculate input averages
+                lap.AvgThrottle = lapSamples.Average(s => s.Throttle);
+                lap.AvgBrake = lapSamples.Average(s => s.Brake);
+                lap.AvgSteeringAngle = lapSamples.Average(s => s.SteeringAngle);
+
+                // Calculate engine statistics
+                var rpms = lapSamples.Select(s => s.EngineRpm).Where(r => r > 0).ToList();
+                if (rpms.Count > 0)
+                {
+                    lap.AvgEngineRpm = (int)rpms.Average();
+                }
+
+                var temps = lapSamples.Select(s => s.EngineTemp).Where(t => t > 0).ToList();
+                if (temps.Count > 0)
+                {
+                    lap.AvgEngineTemp = temps.Average();
+                }
+
+                laps.Add(lap);
+            }
+
+            return laps;
+        }
     }
 }
+
