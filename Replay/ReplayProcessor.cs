@@ -81,6 +81,7 @@ namespace PitWall.Replay
             CancellationToken cancellationToken = default)
         {
             var replays = ScanReplayFolder(replayFolder);
+            Logger.Info($"Replay scan: folder={replayFolder}, found={replays.Count}");
 
             if (replays.Count == 0)
             {
@@ -111,6 +112,7 @@ namespace PitWall.Replay
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
+                    Logger.Info("Replay processing cancelled");
                     break;
                 }
 
@@ -125,11 +127,13 @@ namespace PitWall.Replay
                     });
 
                     var metadata = _metadataParser.ParseMetadata(replay.FilePath);
+                    Logger.Info($"Processing replay {processed + skipped + 1}/{replays.Count}: {Path.GetFileName(replay.FilePath)} | Track={metadata.TrackName} Car={metadata.CarName} SessionLen={metadata.SessionLength}");
 
                     // Skip junk/short replays (<10 minutes)
                     if (metadata.SessionLength > 0 && metadata.SessionLength < MinReplayDurationSeconds)
                     {
                         skipped++;
+                        Logger.Info($"Skipped short replay (<10m): {Path.GetFileName(replay.FilePath)} ({metadata.SessionLength}s)");
                         continue;
                     }
                     
@@ -155,9 +159,10 @@ namespace PitWall.Replay
                     trackCarCombos.Add((metadata.TrackName, metadata.CarName));
                     processed++;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     skipped++;
+                    Logger.Error($"Failed processing replay {Path.GetFileName(replay.FilePath)}: {ex.Message}");
                     // Continue processing other replays
                 }
 
@@ -167,6 +172,8 @@ namespace PitWall.Replay
 
             // Generate weighted profiles from time-series data
             await RegenerateProfilesAsync(driverName, trackCarCombos);
+
+            Logger.Info($"Processing complete: processed={processed}, skipped={skipped}, profiles={trackCarCombos.Count}");
 
             OnProcessingComplete(new ReplayProcessingCompleteEventArgs
             {

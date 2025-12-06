@@ -262,6 +262,7 @@ namespace PitWall.UI
             _progressBar.Value = 0;
             _statusLabel.Text = "Scanning replay folder...";
             _statusLabel.ForeColor = Color.Blue;
+            Logger.Info($"Import started. Folder={_replayFolderTextBox.Text}");
 
             try
             {
@@ -288,6 +289,8 @@ namespace PitWall.UI
                         _settings.LastImportDate = DateTime.Now;
                         _settings.ProfilesImported = args.ProfilesCreated;
                         _settings.ReplaysProcessed = args.ReplaysProcessed;
+
+                        Logger.Info($"Import complete. Profiles={args.ProfilesCreated}, ReplaysProcessed={args.ReplaysProcessed}, ReplaysSkipped={args.ReplaysSkipped}");
 
                         LoadSettings();
                         RefreshProfileList();
@@ -319,6 +322,8 @@ namespace PitWall.UI
                 _importButton.Enabled = true;
                 _browseFolderButton.Enabled = true;
                 _isProcessing = false;
+
+                Logger.Error($"Import failed: {ex}");
 
                 MessageBox.Show($"Import failed: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
