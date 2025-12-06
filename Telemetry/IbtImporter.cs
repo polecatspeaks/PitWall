@@ -82,7 +82,15 @@ namespace PitWall.Telemetry
 
         /// <summary>
         /// Imports single IBT file
-        /// TODO: Implement IRSDKSharper integration for actual parsing
+        /// 
+        /// IMPORTANT: IRSDKSharper is for LIVE telemetry, not archived IBT files.
+        /// IBT file parsing requires either:
+        /// 1. Custom binary parser following iRacing IBT format specification
+        /// 2. Different library specifically for IBT file reading
+        /// 3. iRacing SDK with file mode (if available)
+        /// 
+        /// For now, this returns a stub ImportedSession.
+        /// TODO: Implement actual IBT binary format parsing
         /// </summary>
         public Task<ImportedSession> ImportIBTFileAsync(string filePath)
         {
@@ -100,16 +108,27 @@ namespace PitWall.Telemetry
                     SessionId = Path.GetFileNameWithoutExtension(filePath),
                     SessionDate = File.GetLastWriteTimeUtc(filePath),
                     SourceFilePath = filePath,
-                    ProcessedDate = DateTime.UtcNow
+                    ProcessedDate = DateTime.UtcNow,
+
+                    // TODO: Parse from IBT binary format
+                    // The IBT file contains:
+                    // - YAML session header with driver/car/track info
+                    // - Binary telemetry data buffer with variable definitions
+                    // - Sample data at 60Hz
+                    DriverName = "TODO: Parse from IBT",
+                    CarName = "TODO: Parse from IBT",
+                    TrackName = "TODO: Parse from IBT",
+                    SessionType = "Unknown"
                 }
             };
 
-            // TODO: Implement IRSDKSharper parsing
-            // 1. Load IBT file with IRSDKSharper
-            // 2. Extract session metadata (driver, car, track, session type)
-            // 3. Extract all 60Hz telemetry samples
-            // 4. Calculate lap aggregates
-            // 5. Populate session.SessionMetadata, session.RawSamples, session.Laps
+            // TODO: Implement IBT binary format parsing
+            // Step 1: Read file header (first 144 bytes contain offsets)
+            // Step 2: Parse YAML session info from header
+            // Step 3: Parse variable definitions (names, types, offsets)
+            // Step 4: Read all telemetry samples at 60Hz
+            // Step 5: Group samples by lap number
+            // Step 6: Calculate lap-level aggregates
 
             return Task.FromResult(session);
         }

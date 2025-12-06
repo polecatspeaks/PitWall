@@ -63,6 +63,56 @@ namespace PitWall.Tests.Unit.Telemetry
             });
         }
 
+        [Fact]
+        public void IbtFileReader_WhenValidFile_ReadsSessionInfo()
+        {
+            // Arrange
+            string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
+            
+            // Skip test if file doesn't exist (for CI/CD)
+            if (!File.Exists(ibtPath))
+            {
+                return;
+            }
+
+            // Act
+            using var reader = new IbtFileReader(ibtPath);
+            string yaml = reader.ReadSessionInfoYaml();
+            var sessionInfo = reader.ParseSessionInfo();
+
+            // Assert
+            Assert.NotNull(yaml);
+            Assert.NotEmpty(yaml);
+            Assert.NotNull(sessionInfo);
+            Assert.NotEmpty(sessionInfo);
+        }
+
+        [Fact]
+        public void IbtFileReader_WhenValidFile_ReadsVariableHeaders()
+        {
+            // Arrange
+            string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
+            
+            // Skip test if file doesn't exist
+            if (!File.Exists(ibtPath))
+            {
+                return;
+            }
+
+            // Act
+            using var reader = new IbtFileReader(ibtPath);
+            var variables = reader.ReadVariableHeaders();
+
+            // Assert
+            Assert.NotNull(variables);
+            Assert.NotEmpty(variables);
+            
+            // Should have standard telemetry variables
+            Assert.Contains(variables, v => v.Name.Contains("Speed"));
+            Assert.Contains(variables, v => v.Name.Contains("RPM") || v.Name.Contains("Rpm"));
+            Assert.Contains(variables, v => v.Name.Contains("Fuel"));
+        }
+
         // TODO: Add test for 60Hz sample extraction once we have mock IBT file
         // [Fact]
         // public async Task ImportIBTFile_WhenValid_Returns60HzSamples()
