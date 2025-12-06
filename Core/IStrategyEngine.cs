@@ -10,11 +10,11 @@ namespace PitWall.Core
         /// <summary>
         /// Gets a recommendation based on current telemetry
         /// </summary>
-        Recommendation GetRecommendation(Telemetry telemetry);
+        Recommendation GetRecommendation(SimHubTelemetry telemetry);
 
         /// <summary>
         /// Records a completed lap for strategy analysis
         /// </summary>
-        void RecordLap(Telemetry telemetry);
+        void RecordLap(SimHubTelemetry telemetry);
     }
 }

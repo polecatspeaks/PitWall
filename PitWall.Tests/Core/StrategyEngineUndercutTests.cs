@@ -25,7 +25,7 @@ namespace PitWall.Tests.Core
                 fuelStrategy.RecordLap(i, startFuel, endFuel);
             }
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 CurrentLap = 10,
                 FuelRemaining = 20.0, // 20L / 3L per lap = 6.67 laps (>= 5, good for undercut)
@@ -66,7 +66,7 @@ namespace PitWall.Tests.Core
                 fuelStrategy.RecordLap(i, startFuel, endFuel);
             }
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 CurrentLap = 10,
                 FuelRemaining = 20.0, // 20/3 = 6.67 laps (>= 5 for undercut check)
@@ -104,7 +104,7 @@ namespace PitWall.Tests.Core
                 fuelStrategy.RecordLap(i, 50.0, 50.0 - (i * 2.5));
             }
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 CurrentLap = 20,
                 FuelRemaining = 4.0, // Critical fuel - only 1.6 laps left
@@ -140,7 +140,7 @@ namespace PitWall.Tests.Core
                 fuelStrategy.RecordLap(i, 50.0, 50.0 - (i * 2.5));
             }
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 CurrentLap = 10,
                 FuelRemaining = 30.0,

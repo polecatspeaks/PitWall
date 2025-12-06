@@ -34,7 +34,7 @@ namespace PitWall.Tests.Core
 
             await engine.LoadProfile("TestDriver", "TestTrack", "TestCar");
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 FuelRemaining = 4.0, // Should be ~1.6 laps with profile (4.0 / 2.5), trigger warning
                 FuelCapacity = 50.0,
@@ -65,7 +65,7 @@ namespace PitWall.Tests.Core
             fuelStrategy.RecordLap(1, 50.0, 47.0); // 3.0 per lap
             fuelStrategy.RecordLap(2, 47.0, 44.0); // 3.0 per lap
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 FuelRemaining = 5.0, // Should be ~1.6 laps (5.0 / 3.0), trigger warning
                 FuelCapacity = 50.0,
@@ -109,7 +109,7 @@ namespace PitWall.Tests.Core
             // Current session has anomalous high usage (3.0/lap), but profile says 2.0/lap
             fuelStrategy.RecordLap(1, 50.0, 47.0); // 3.0 this lap (traffic)
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 FuelRemaining = 10.0, // Profile: 5 laps OK, Current: 3.3 laps (would warn incorrectly)
                 FuelCapacity = 50.0,

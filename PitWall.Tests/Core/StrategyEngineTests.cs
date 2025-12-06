@@ -14,7 +14,7 @@ namespace PitWall.Tests.Core
             fuelStrategy.RecordLap(1, 50.0, 45.0); // 5.0 per lap
             fuelStrategy.RecordLap(2, 45.0, 40.0); // 5.0 per lap
             var engine = new StrategyEngine(fuelStrategy);
-            var telemetry = new Telemetry { FuelRemaining = 9.0 };
+            var telemetry = new SimHubTelemetry { FuelRemaining = 9.0 };
 
             // Act
             Recommendation rec = engine.GetRecommendation(telemetry);
@@ -33,7 +33,7 @@ namespace PitWall.Tests.Core
             var fuelStrategy = new FuelStrategy();
             fuelStrategy.RecordLap(1, 50.0, 45.0); // 5.0 per lap
             var engine = new StrategyEngine(fuelStrategy);
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 FuelRemaining = 20.0,
                 TyreWearFrontLeft = 90,
@@ -57,7 +57,7 @@ namespace PitWall.Tests.Core
             // Arrange
             var fuelStrategy = new FuelStrategy();
             var engine = new StrategyEngine(fuelStrategy);
-            var telemetry = new Telemetry { CurrentLap = 3, FuelRemaining = 40.0 };
+            var telemetry = new SimHubTelemetry { CurrentLap = 3, FuelRemaining = 40.0 };
 
             // Act
             engine.RecordLap(telemetry);

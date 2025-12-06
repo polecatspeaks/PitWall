@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using PitWall.Core;
 using PitWall.Models;
 
 namespace PitWall.Storage
@@ -27,6 +28,7 @@ namespace PitWall.Storage
 
             string dbPath = Path.Combine(baseDir, DB_FILE);
             _connectionString = $"Data Source={dbPath};Version=3;";
+            try { Logger.Info($"SQLite DB path: {dbPath}"); } catch {}
             InitializeDatabase();
         }
 

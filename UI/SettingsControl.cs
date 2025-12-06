@@ -4,20 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using PitWall.Core;
-using PitWall.Replay;
 using PitWall.Storage;
 
 namespace PitWall.UI
 {
     /// <summary>
     /// Settings control for PitWall plugin
-    /// Allows users to import historical replay data
+    /// Allows users to import historical IBT telemetry data
     /// </summary>
     public partial class SettingsControl : UserControl
     {
         private readonly PitWallSettings _settings;
         private readonly SQLiteProfileDatabase _database;
-        private ReplayProcessor? _replayProcessor;
+        // TODO: IBT importer will be injected here when implemented
         private bool _isProcessing;
 
         private TextBox _replayFolderTextBox;
@@ -196,8 +195,8 @@ namespace PitWall.UI
             // Info label
             var infoLabel = new Label
             {
-                Text = "Tip: Import historical replays to get personalized predictions from day 1.\n" +
-                       "Recent sessions are automatically weighted higher than old sessions.",
+                Text = "Tip: IBT telemetry files provide fine-grained 60Hz data for accurate profile generation.\n" +
+                       "Recent sessions are weighted higher for more timely predictions.",
                 Font = new Font("Segoe UI", 8, FontStyle.Italic),
                 Location = new Point(10, yPos),
                 Size = new Size(600, 40),
@@ -245,7 +244,7 @@ namespace PitWall.UI
 
             if (string.IsNullOrWhiteSpace(_replayFolderTextBox.Text))
             {
-                MessageBox.Show("Please select a replay folder first.", "No Folder Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select an IBT telemetry folder first.", "No Folder Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -260,59 +259,40 @@ namespace PitWall.UI
             _browseFolderButton.Enabled = false;
             _progressBar.Visible = true;
             _progressBar.Value = 0;
-            _statusLabel.Text = "Scanning replay folder...";
-            _statusLabel.ForeColor = Color.Blue;
-            Logger.Info($"Import started. Folder={_replayFolderTextBox.Text}");
+            _statusLabel.Text = "IBT import implementation pending...";
+            _statusLabel.ForeColor = Color.Orange;
+            Logger.Info($"IBT import requested. Folder={_replayFolderTextBox.Text}");
 
             try
             {
-                _replayProcessor = new ReplayProcessor(_database);
+                // TODO: Implement IBT importer with iRSDKSharp
+                // - Scan Documents/iRacing/telemetry for .ibt files
+                // - Parse header and 60Hz samples
+                // - Build hierarchical profiles (Driver -> Car -> Track)
+                // - Apply recency weighting and confidence scoring
                 
-                _replayProcessor.ProgressChanged += (s, args) =>
-                {
-                    this.Invoke((MethodInvoker)delegate
-                    {
-                        var percent = (args.CurrentIndex * 100) / args.TotalFiles;
-                        _progressBar.Value = Math.Min(percent, 100);
-                        _statusLabel.Text = $"Processing [{args.CurrentIndex}/{args.TotalFiles}]: {args.CurrentFile}";
-                    });
-                };
+                await Task.Delay(1000); // Placeholder delay
 
-                _replayProcessor.ProcessingComplete += (s, args) =>
-                {
-                    this.Invoke((MethodInvoker)delegate
-                    {
-                        _progressBar.Visible = false;
-                        _statusLabel.Text = args.Message;
-                        _statusLabel.ForeColor = args.Success ? Color.Green : Color.Red;
+                _progressBar.Visible = false;
+                _statusLabel.Text = "IBT import not yet implemented";
+                _statusLabel.ForeColor = Color.Orange;
 
-                        _settings.LastImportDate = DateTime.Now;
-                        _settings.ProfilesImported = args.ProfilesCreated;
-                        _settings.ReplaysProcessed = args.ReplaysProcessed;
+                _settings.LastImportDate = DateTime.Now;
+                LoadSettings();
+                RefreshProfileList();
 
-                        Logger.Info($"Import complete. Profiles={args.ProfilesCreated}, ReplaysProcessed={args.ReplaysProcessed}, ReplaysSkipped={args.ReplaysSkipped}");
+                _importButton.Enabled = true;
+                _browseFolderButton.Enabled = true;
+                _isProcessing = false;
 
-                        LoadSettings();
-                        RefreshProfileList();
-
-                        _importButton.Enabled = true;
-                        _browseFolderButton.Enabled = true;
-                        _isProcessing = false;
-
-                        MessageBox.Show(
-                            $"Import complete!\n\n" +
-                            $"Profiles created: {args.ProfilesCreated}\n" +
-                            $"Replays processed: {args.ReplaysProcessed}\n" +
-                            $"Replays skipped: {args.ReplaysSkipped}",
-                            "Import Complete",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information
-                        );
-                    });
-                };
-
-                var driverName = Environment.UserName;
-                await Task.Run(() => _replayProcessor.ProcessReplayLibraryAsync(_replayFolderTextBox.Text, driverName));
+                MessageBox.Show(
+                    "IBT import functionality is being implemented.\n\n" +
+                    "This will support automatic scanning of iRacing telemetry files\n" +
+                    "and hierarchical profile building.",
+                    "Feature In Development",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
             }
             catch (Exception ex)
             {

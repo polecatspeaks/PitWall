@@ -7,7 +7,7 @@ namespace PitWall.Tests.Mocks
     /// </summary>
     public class MockTelemetryBuilder
     {
-        private Telemetry _telemetry = new();
+        private SimHubTelemetry _telemetry = new();
 
         /// <summary>
         /// Creates a builder with GT3 car defaults
@@ -15,7 +15,7 @@ namespace PitWall.Tests.Mocks
         public static MockTelemetryBuilder GT3()
         {
             var builder = new MockTelemetryBuilder();
-            builder._telemetry = new Telemetry
+            builder._telemetry = new SimHubTelemetry
             {
                 FuelCapacity = 120.0,
                 FuelRemaining = 100.0,
@@ -37,7 +37,7 @@ namespace PitWall.Tests.Mocks
         public static MockTelemetryBuilder LMP2()
         {
             var builder = new MockTelemetryBuilder();
-            builder._telemetry = new Telemetry
+            builder._telemetry = new SimHubTelemetry
             {
                 FuelCapacity = 75.0,
                 FuelRemaining = 60.0,
@@ -89,7 +89,7 @@ namespace PitWall.Tests.Mocks
             return this;
         }
 
-        public Telemetry Build()
+        public SimHubTelemetry Build()
         {
             return _telemetry;
         }

@@ -19,9 +19,9 @@ namespace PitWall.Core
 
         public bool IsGameRunning => !string.IsNullOrEmpty(_propertyProvider.GameName);
 
-        public Telemetry GetCurrentTelemetry()
+        public SimHubTelemetry GetCurrentTelemetry()
         {
-            return new Telemetry
+            return new SimHubTelemetry
             {
                 FuelRemaining = ReadDouble("DataCorePlugin.GameData.NewData.Fuel"),
                 FuelCapacity = ReadDouble("DataCorePlugin.GameData.NewData.FuelMaxCapacity"),

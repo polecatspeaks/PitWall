@@ -3,9 +3,10 @@ using System.Collections.Generic;
 namespace PitWall.Models
 {
     /// <summary>
-    /// Telemetry data snapshot from the simulator
+    /// Live telemetry data snapshot from SimHub/iRacing
+    /// This is the real-time telemetry that SimHub receives from the simulator
     /// </summary>
-    public class Telemetry
+    public class SimHubTelemetry
     {
         public double FuelRemaining { get; set; }
         public double FuelCapacity { get; set; }

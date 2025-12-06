@@ -50,7 +50,7 @@ namespace PitWall.Core
             }
         }
 
-        public Recommendation GetRecommendation(Telemetry telemetry)
+        public Recommendation GetRecommendation(SimHubTelemetry telemetry)
         {
             // Update fuel model with latest lap if lap incremented
             if (telemetry.IsLapValid && telemetry.CurrentLap > 0)
@@ -134,7 +134,7 @@ namespace PitWall.Core
             };
         }
 
-        public void RecordLap(Telemetry telemetry)
+        public void RecordLap(SimHubTelemetry telemetry)
         {
             // Assume last lap used (FuelCapacity - FuelRemaining) for simplicity in Phase 1
             double startFuel = telemetry.FuelCapacity;
@@ -184,7 +184,7 @@ namespace PitWall.Core
             return false;
         }
 
-        private Recommendation? CheckUndercutOpportunity(Telemetry telemetry, int lapsRemaining)
+        private Recommendation? CheckUndercutOpportunity(SimHubTelemetry telemetry, int lapsRemaining)
         {
             // Need opponent data and at least 5 laps of fuel remaining to consider undercut
             if (telemetry.Opponents == null || telemetry.Opponents.Count == 0 || lapsRemaining < 5)
@@ -270,7 +270,7 @@ namespace PitWall.Core
             return null;
         }
 
-        private OpponentData? FindCarAhead(Telemetry telemetry)
+        private OpponentData? FindCarAhead(SimHubTelemetry telemetry)
         {
             if (telemetry.Opponents == null || telemetry.PlayerPosition <= 1)
             {
@@ -289,7 +289,7 @@ namespace PitWall.Core
             return null;
         }
 
-        private OpponentData? FindCarBehind(Telemetry telemetry)
+        private OpponentData? FindCarBehind(SimHubTelemetry telemetry)
         {
             if (telemetry.Opponents == null)
             {

@@ -15,7 +15,7 @@ namespace PitWall.Tests.Core
             var provider = new SimHubTelemetryProvider(mockPluginManager);
 
             // Act
-            Telemetry telemetry = provider.GetCurrentTelemetry();
+            SimHubTelemetry telemetry = provider.GetCurrentTelemetry();
 
             // Assert
             Assert.Equal(0.0, telemetry.FuelRemaining);
@@ -48,7 +48,7 @@ namespace PitWall.Tests.Core
             var provider = new SimHubTelemetryProvider(mockPluginManager);
 
             // Act
-            Telemetry telemetry = provider.GetCurrentTelemetry();
+            SimHubTelemetry telemetry = provider.GetCurrentTelemetry();
 
             // Assert
             Assert.Equal(42.5, telemetry.FuelRemaining);

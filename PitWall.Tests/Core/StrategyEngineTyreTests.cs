@@ -13,7 +13,7 @@ namespace PitWall.Tests.Core
             var tyreDeg = new TyreDegradation();
             var engine = new StrategyEngine(fuelStrategy, tyreDeg);
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 CurrentLap = 2,
                 FuelCapacity = 100,
@@ -41,7 +41,7 @@ namespace PitWall.Tests.Core
             tyreDeg.RecordLap(2, 80, 80, 80, 80); // 10 per lap
             var engine = new StrategyEngine(fuelStrategy, tyreDeg);
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 CurrentLap = 3,
                 FuelCapacity = 100,
@@ -70,7 +70,7 @@ namespace PitWall.Tests.Core
             tyreDeg.RecordLap(2, 85, 85, 85, 85);
             var engine = new StrategyEngine(fuelStrategy, tyreDeg);
 
-            var telemetry = new Telemetry
+            var telemetry = new SimHubTelemetry
             {
                 CurrentLap = 2,
                 FuelCapacity = 100,
