@@ -60,7 +60,7 @@ namespace PitWall.Storage.Telemetry
             using (var conn = new SQLiteConnection($"Data Source={_dbPath};Version=3;"))
             {
                 await conn.OpenAsync();
-                
+
                 // Save session metadata
                 using (var cmd = conn.CreateCommand())
                 {

@@ -60,9 +60,9 @@ namespace PitWall.Tests
                     _output.WriteLine($"  {key} - NOT FOUND");
                 }
             }
-            
+
             _output.WriteLine("");
-            
+
             // Look for lap-related variables
             _output.WriteLine("Lap-related Variables:");
             var lapVars = variables.Where(v => v.Name.Trim('\0').IndexOf("lap", StringComparison.OrdinalIgnoreCase) >= 0).Take(15);
@@ -70,7 +70,7 @@ namespace PitWall.Tests
             {
                 _output.WriteLine($"  {v.Name.Trim('\0')} (Type: {v.Type}, Offset: {v.Offset}, Unit: {v.Unit.Trim('\0')})");
             }
-            
+
             _output.WriteLine("");
             _output.WriteLine("Testing sample reads:");
             var samples = reader.ReadTelemetrySamples();
@@ -78,8 +78,8 @@ namespace PitWall.Tests
             if (samples.Count > 0)
             {
                 _output.WriteLine($"Sample 0: Lap={samples[0].LapNumber}, Speed={samples[0].Speed}");
-                _output.WriteLine($"Sample 1000: Lap={samples[Math.Min(1000, samples.Count-1)].LapNumber}, Speed={samples[Math.Min(1000, samples.Count-1)].Speed}");
-                
+                _output.WriteLine($"Sample 1000: Lap={samples[Math.Min(1000, samples.Count - 1)].LapNumber}, Speed={samples[Math.Min(1000, samples.Count - 1)].Speed}");
+
                 var distinctLaps = samples.Select(s => s.LapNumber).Distinct().OrderBy(n => n).Take(10).ToList();
                 _output.WriteLine($"Distinct laps: {string.Join(", ", distinctLaps)}");
             }

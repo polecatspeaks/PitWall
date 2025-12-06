@@ -217,13 +217,13 @@ namespace PitWall.Telemetry
             // Read session info offset and length
             _reader.BaseStream.Seek(HEADER_SESSION_INFO_OFFSET, SeekOrigin.Begin);
             int sessionInfoOffset = _reader.ReadInt32();
-            
+
             _reader.BaseStream.Seek(HEADER_SESSION_INFO_LENGTH_OFFSET, SeekOrigin.Begin);
             int sessionInfoLength = _reader.ReadInt32();
-            
+
             _reader.BaseStream.Seek(HEADER_VAR_HEADER_OFFSET, SeekOrigin.Begin);
             int varHeaderOffset = _reader.ReadInt32();
-            
+
             _reader.BaseStream.Seek(HEADER_NUM_VARS_OFFSET, SeekOrigin.Begin);
             int numVars = _reader.ReadInt32();
 
@@ -261,13 +261,13 @@ namespace PitWall.Telemetry
                 sample.Gear = ReadInt(buffer, varMap, "Gear"); // Type 2 = int
                 sample.FuelLevel = ReadFloat(buffer, varMap, "FuelLevelPct") / 100f; // FuelLevelPct, convert to 0-1
                 sample.LapNumber = ReadInt(buffer, varMap, "Lap"); // Type 2 = int, Offset 209
-                
+
                 // Engine temps
                 sample.EngineTemp = ReadFloat(buffer, varMap, "WaterTemp");
                 sample.OilTemp = ReadFloat(buffer, varMap, "OilTemp");
                 sample.OilPressure = ReadFloat(buffer, varMap, "OilPress");
                 sample.WaterTemp = ReadFloat(buffer, varMap, "WaterTemp");
-                sample.WaterPressure = ReadFloat(buffer, varMap, "WaterPress");                samples.Add(sample);
+                sample.WaterPressure = ReadFloat(buffer, varMap, "WaterPress"); samples.Add(sample);
 
                 currentOffset += bufferLength;
             }
