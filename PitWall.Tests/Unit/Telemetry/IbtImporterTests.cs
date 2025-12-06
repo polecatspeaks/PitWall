@@ -140,11 +140,39 @@ namespace PitWall.Tests.Unit.Telemetry
             Assert.NotEqual("Unknown", session.SessionMetadata.SessionType);
         }
 
-        // TODO: Add test for 60Hz sample extraction once we have mock IBT file
-        // [Fact]
-        // public async Task ImportIBTFile_WhenValid_Returns60HzSamples()
+        [Fact]
+        public async Task ImportIBTFile_WhenValidFile_Extracts60HzSamples()
+        {
+            // Arrange
+            var importer = new IbtImporter();
+            string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
+            
+            // Skip test if file doesn't exist
+            if (!File.Exists(ibtPath))
+            {
+                return;
+            }
 
-        // TODO: Add test for lap aggregation once we have mock IBT file  
+            // Act
+            var session = await importer.ImportIBTFileAsync(ibtPath);
+
+            // Assert
+            Assert.NotNull(session);
+            Assert.NotNull(session.RawSamples);
+            Assert.NotEmpty(session.RawSamples);
+            
+            // Should have samples at 60Hz (at least a few seconds worth)
+            Assert.True(session.RawSamples.Count >= 60, $"Expected at least 60 samples, got {session.RawSamples.Count}");
+            
+            // Samples should have valid data
+            var firstSample = session.RawSamples[0];
+            Assert.True(firstSample.LapNumber >= 0);
+            
+            // Should have at least some samples with non-zero speed
+            Assert.Contains(session.RawSamples, s => s.Speed > 0);
+        }
+
+        // TODO: Add test for lap aggregation once we have sample extraction working
         // [Fact]
         // public async Task ImportIBTFile_WhenValid_CalculatesLapMetadata()
     }

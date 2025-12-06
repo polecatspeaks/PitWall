@@ -110,8 +110,8 @@ namespace PitWall.Telemetry
                 // Extract metadata from session info
                 session.SessionMetadata = ExtractSessionMetadata(sessionInfo, filePath);
 
-                // TODO: Extract 60Hz telemetry samples
-                // session.RawSamples = ExtractTelemetrySamples(reader);
+                // Extract 60Hz telemetry samples
+                session.RawSamples = reader.ReadTelemetrySamples();
 
                 // TODO: Calculate lap-level aggregates
                 // session.Laps = CalculateLapAggregates(session.RawSamples);

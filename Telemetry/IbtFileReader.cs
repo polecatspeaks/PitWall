@@ -182,6 +182,114 @@ namespace PitWall.Telemetry
             return _reader.ReadInt32();
         }
 
+        /// <summary>
+        /// Reads all telemetry samples from IBT file
+        /// Returns list of samples with data mapped from variable offsets
+        /// </summary>
+        public List<Models.Telemetry.TelemetrySample> ReadTelemetrySamples()
+        {
+            EnsureStreamOpen();
+
+            var samples = new List<Models.Telemetry.TelemetrySample>();
+            
+            // Get variable headers to map offsets to property names
+            var variables = ReadVariableHeaders();
+            var varMap = new Dictionary<string, TelemetryVariable>();
+            foreach (var v in variables)
+            {
+                // Trim null bytes from variable names
+                string cleanName = v.Name.Trim('\0');
+                if (!string.IsNullOrEmpty(cleanName))
+                {
+                    varMap[cleanName] = v;
+                }
+            }
+
+            // Read header info
+            _reader!.BaseStream.Seek(HEADER_BUF_LEN_OFFSET, SeekOrigin.Begin);
+            int bufferLength = _reader.ReadInt32();
+
+            if (bufferLength <= 0)
+            {
+                return samples;
+            }
+
+            // Read variable header offset - this is where variable headers start
+            _reader.BaseStream.Seek(HEADER_VAR_HEADER_OFFSET, SeekOrigin.Begin);
+            int varHeaderOffset = _reader.ReadInt32();
+            
+            _reader.BaseStream.Seek(HEADER_NUM_VARS_OFFSET, SeekOrigin.Begin);
+            int numVars = _reader.ReadInt32();
+
+            // Calculate where data section starts
+            // Variable headers are 144 bytes each
+            long dataStartOffset = varHeaderOffset + (numVars * 144);
+
+            // For archived IBT files, numBuffers is not reliable
+            // Calculate actual sample count from file size
+            long fileSize = _reader.BaseStream.Length;
+            long availableDataBytes = fileSize - dataStartOffset;
+            int actualSampleCount = (int)(availableDataBytes / bufferLength);
+
+            // Read each sample buffer sequentially
+            long currentOffset = dataStartOffset;
+            
+            for (int i = 0; i < actualSampleCount; i++)
+            {
+                if (currentOffset + bufferLength > fileSize)
+                {
+                    break;
+                }
+
+                _reader.BaseStream.Seek(currentOffset, SeekOrigin.Begin);
+                byte[] buffer = _reader.ReadBytes(bufferLength);
+
+                var sample = new Models.Telemetry.TelemetrySample();
+
+                // Map common variables to TelemetrySample properties
+                // Note: iRacing variable names may differ from expected
+                sample.Speed = ReadFloat(buffer, varMap, "Speed");
+                sample.Throttle = ReadFloat(buffer, varMap, "Throttle") / 100f; // Convert from % to 0-1
+                sample.Brake = ReadFloat(buffer, varMap, "Brake") / 100f; // Convert from % to 0-1
+                sample.SteeringAngle = ReadFloat(buffer, varMap, "SteeringWheelAngle");
+                sample.EngineRpm = (int)ReadFloat(buffer, varMap, "RPM");
+                sample.Gear = (int)ReadFloat(buffer, varMap, "Gear");
+                sample.FuelLevel = ReadFloat(buffer, varMap, "FuelLevelPct") / 100f; // FuelLevelPct, convert to 0-1
+                sample.LapNumber = (int)ReadFloat(buffer, varMap, "Lap");
+                
+                // Engine temps
+                sample.EngineTemp = ReadFloat(buffer, varMap, "WaterTemp");
+                sample.OilTemp = ReadFloat(buffer, varMap, "OilTemp");
+                sample.OilPressure = ReadFloat(buffer, varMap, "OilPress");
+                sample.WaterTemp = ReadFloat(buffer, varMap, "WaterTemp");
+                sample.WaterPressure = ReadFloat(buffer, varMap, "WaterPress");
+
+                samples.Add(sample);
+                
+                currentOffset += bufferLength;
+            }
+
+            return samples;
+        }
+
+        /// <summary>
+        /// Reads a float value from buffer at the offset specified by variable
+        /// </summary>
+        private float ReadFloat(byte[] buffer, Dictionary<string, TelemetryVariable> varMap, string varName)
+        {
+            if (!varMap.TryGetValue(varName, out var variable))
+            {
+                return 0f;
+            }
+
+            if (variable.Offset < 0 || variable.Offset + 4 > buffer.Length)
+            {
+                return 0f;
+            }
+
+            return BitConverter.ToSingle(buffer, variable.Offset);
+        }
+
         private void EnsureStreamOpen()
         {
             if (_stream == null)
