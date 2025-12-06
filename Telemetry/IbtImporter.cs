@@ -82,15 +82,9 @@ namespace PitWall.Telemetry
 
         /// <summary>
         /// Imports single IBT file
-        /// 
-        /// IMPORTANT: IRSDKSharper is for LIVE telemetry, not archived IBT files.
-        /// IBT file parsing requires either:
-        /// 1. Custom binary parser following iRacing IBT format specification
-        /// 2. Different library specifically for IBT file reading
-        /// 3. iRacing SDK with file mode (if available)
-        /// 
-        /// For now, this returns a stub ImportedSession.
-        /// TODO: Implement actual IBT binary format parsing
+        /// <summary>
+        /// Imports single IBT file
+        /// Extracts session metadata using IbtFileReader
         /// </summary>
         public Task<ImportedSession> ImportIBTFileAsync(string filePath)
         {
@@ -102,35 +96,106 @@ namespace PitWall.Telemetry
             var session = new ImportedSession
             {
                 SourceFilePath = filePath,
-                ImportedAt = DateTime.UtcNow,
-                SessionMetadata = new SessionMetadata
-                {
-                    SessionId = Path.GetFileNameWithoutExtension(filePath),
-                    SessionDate = File.GetLastWriteTimeUtc(filePath),
-                    SourceFilePath = filePath,
-                    ProcessedDate = DateTime.UtcNow,
-
-                    // TODO: Parse from IBT binary format
-                    // The IBT file contains:
-                    // - YAML session header with driver/car/track info
-                    // - Binary telemetry data buffer with variable definitions
-                    // - Sample data at 60Hz
-                    DriverName = "TODO: Parse from IBT",
-                    CarName = "TODO: Parse from IBT",
-                    TrackName = "TODO: Parse from IBT",
-                    SessionType = "Unknown"
-                }
+                ImportedAt = DateTime.UtcNow
             };
 
-            // TODO: Implement IBT binary format parsing
-            // Step 1: Read file header (first 144 bytes contain offsets)
-            // Step 2: Parse YAML session info from header
-            // Step 3: Parse variable definitions (names, types, offsets)
-            // Step 4: Read all telemetry samples at 60Hz
-            // Step 5: Group samples by lap number
-            // Step 6: Calculate lap-level aggregates
+            try
+            {
+                // Use IbtFileReader to parse binary IBT file
+                using var reader = new IbtFileReader(filePath);
+                
+                // Parse session info YAML
+                var sessionInfo = reader.ParseSessionInfo();
+                
+                // Extract metadata from session info
+                session.SessionMetadata = ExtractSessionMetadata(sessionInfo, filePath);
+
+                // TODO: Extract 60Hz telemetry samples
+                // session.RawSamples = ExtractTelemetrySamples(reader);
+
+                // TODO: Calculate lap-level aggregates
+                // session.Laps = CalculateLapAggregates(session.RawSamples);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error importing IBT file: {ex.Message}");
+                throw;
+            }
 
             return Task.FromResult(session);
+        }
+
+        /// <summary>
+        /// Extracts session metadata from parsed IBT session info
+        /// Navigates nested YAML structure to find driver, car, track, session type
+        /// </summary>
+        private SessionMetadata ExtractSessionMetadata(Dictionary<string, object> sessionInfo, string filePath)
+        {
+            var metadata = new SessionMetadata
+            {
+                SessionId = Path.GetFileNameWithoutExtension(filePath),
+                SessionDate = File.GetLastWriteTimeUtc(filePath),
+                SourceFilePath = filePath,
+                ProcessedDate = DateTime.UtcNow
+            };
+
+            try
+            {
+                // Extract WeekendInfo
+                if (sessionInfo.TryGetValue("WeekendInfo", out var weekendInfoObj) && 
+                    weekendInfoObj is Dictionary<object, object> weekendInfo)
+                {
+                    if (weekendInfo.TryGetValue("TrackDisplayName", out var trackName))
+                        metadata.TrackName = trackName?.ToString() ?? "";
+                }
+
+                // Extract DriverInfo
+                if (sessionInfo.TryGetValue("DriverInfo", out var driverInfoObj) &&
+                    driverInfoObj is Dictionary<object, object> driverInfo)
+                {
+                    // Get driver car index (usually 0 for single player)
+                    int driverCarIdx = 0;
+                    if (driverInfo.TryGetValue("DriverCarIdx", out var carIdx))
+                    {
+                        driverCarIdx = Convert.ToInt32(carIdx);
+                    }
+
+                    // Get drivers list
+                    if (driverInfo.TryGetValue("Drivers", out var driversObj) &&
+                        driversObj is List<object> drivers && drivers.Count > driverCarIdx)
+                    {
+                        if (drivers[driverCarIdx] is Dictionary<object, object> driver)
+                        {
+                            if (driver.TryGetValue("UserName", out var userName))
+                                metadata.DriverName = userName?.ToString() ?? "";
+                            if (driver.TryGetValue("CarScreenName", out var carName))
+                                metadata.CarName = carName?.ToString() ?? "";
+                        }
+                    }
+                }
+
+                // Extract SessionInfo
+                if (sessionInfo.TryGetValue("SessionInfo", out var sessionInfoObj) &&
+                    sessionInfoObj is Dictionary<object, object> sessionInfoDict)
+                {
+                    if (sessionInfoDict.TryGetValue("Sessions", out var sessionsObj) &&
+                        sessionsObj is List<object> sessions && sessions.Count > 0)
+                    {
+                        // Get first session (typically the race session)
+                        if (sessions[0] is Dictionary<object, object> firstSession)
+                        {
+                            if (firstSession.TryGetValue("SessionType", out var sessionType))
+                                metadata.SessionType = sessionType?.ToString() ?? "Unknown";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error extracting metadata: {ex.Message}");
+            }
+
+            return metadata;
         }
     }
 }

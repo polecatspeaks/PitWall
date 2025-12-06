@@ -113,6 +113,33 @@ namespace PitWall.Tests.Unit.Telemetry
             Assert.Contains(variables, v => v.Name.Contains("Fuel"));
         }
 
+        [Fact]
+        public async Task ImportIBTFile_WhenValidFile_ExtractsMetadata()
+        {
+            // Arrange
+            var importer = new IbtImporter();
+            string ibtPath = @"C:\Users\ohzee\Documents\iRacing\telemetry\mclaren720sgt3_charlotte 2025 roval2025 2025-11-16 13-15-19.ibt";
+            
+            // Skip test if file doesn't exist
+            if (!File.Exists(ibtPath))
+            {
+                return;
+            }
+
+            // Act
+            var session = await importer.ImportIBTFileAsync(ibtPath);
+
+            // Assert
+            Assert.NotNull(session);
+            Assert.NotNull(session.SessionMetadata);
+            
+            // Should extract metadata from IBT file
+            Assert.NotEqual("TODO: Parse from IBT", session.SessionMetadata.DriverName);
+            Assert.NotEqual("TODO: Parse from IBT", session.SessionMetadata.CarName);
+            Assert.NotEqual("TODO: Parse from IBT", session.SessionMetadata.TrackName);
+            Assert.NotEqual("Unknown", session.SessionMetadata.SessionType);
+        }
+
         // TODO: Add test for 60Hz sample extraction once we have mock IBT file
         // [Fact]
         // public async Task ImportIBTFile_WhenValid_Returns60HzSamples()
