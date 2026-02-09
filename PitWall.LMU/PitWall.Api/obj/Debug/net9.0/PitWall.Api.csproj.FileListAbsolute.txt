@@ -28,3 +28,5 @@ C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Ap
 C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\obj\Debug\net9.0\PitWall.Api.pdb
 C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\obj\Debug\net9.0\PitWall.Api.genruntimeconfig.cache
 C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\obj\Debug\net9.0\ref\PitWall.Api.dll
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\bin\Debug\net9.0\DuckDB.NET.Bindings.dll
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\bin\Debug\net9.0\DuckDB.NET.Data.dll

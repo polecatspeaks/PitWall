@@ -124,6 +124,12 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "DuckDB.NET.Data": {
+              "target": "Package",
+              "version": "[1.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -171,7 +177,11 @@
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\Users\\ohzee\\.claude-worktrees\\PitWall\\vibrant-meninsky\\PitWall.LMU\\PitWall.Core\\PitWall.Core.csproj": {
+                "projectPath": "C:\\Users\\ohzee\\.claude-worktrees\\PitWall\\vibrant-meninsky\\PitWall.LMU\\PitWall.Core\\PitWall.Core.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
