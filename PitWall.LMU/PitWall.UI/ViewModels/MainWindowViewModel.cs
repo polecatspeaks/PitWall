@@ -45,7 +45,7 @@ public partial class MainWindowViewModel : ViewModelBase
 	[ObservableProperty]
 	private string strategyConfidence = "CONF --";
 
-	public async Task StartAsync(string sessionId, CancellationToken cancellationToken)
+	public Task StartAsync(string sessionId, CancellationToken cancellationToken)
 	{
 		_cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
@@ -57,6 +57,8 @@ public partial class MainWindowViewModel : ViewModelBase
 			_cts.Token);
 
 		_ = Task.Run(() => PollRecommendationsAsync(sessionId, _cts.Token), _cts.Token);
+
+		return Task.CompletedTask;
 	}
 
 	public void Stop()

@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace PitWall.UI.Models
 {
@@ -9,6 +10,7 @@ namespace PitWall.UI.Models
         public double Throttle { get; set; }
         public double Brake { get; set; }
         public double Steering { get; set; }
+        [JsonPropertyName("tyreTemps")]
         public double[] TyreTempsC { get; set; } = Array.Empty<double>();
         public double FuelLiters { get; set; }
     }
