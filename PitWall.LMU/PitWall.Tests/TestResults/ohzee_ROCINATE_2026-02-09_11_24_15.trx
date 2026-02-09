@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="66823990-008f-479f-8e6d-fd247be290bc" name="ohzee@ROCINATE 2026-02-09 11:24:15" runUser="ROCINATE\ohzee" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-02-09T11:24:15.9900312-05:00" queuing="2026-02-09T11:24:15.9900314-05:00" start="2026-02-09T11:24:15.5047544-05:00" finish="2026-02-09T11:24:15.9932700-05:00" />
+  <TestSettings name="default" id="350e1d4b-fe2f-4fa2-8b40-7c1ff0f296da">
+    <Deployment runDeploymentRoot="ohzee_ROCINATE_2026-02-09_11_24_15" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="ccc8234c-eafc-4768-9eaa-ec2b137a0553" testId="4226a219-379e-a0e3-6d83-358222aeb520" testName="PitWall.Tests.StrategyTests.TyreTemp_Overheat_ReturnsWarning" computerName="ROCINATE" duration="00:00:00.0576963" startTime="2026-02-09T11:24:15.9235019-05:00" endTime="2026-02-09T11:24:15.9235019-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ccc8234c-eafc-4768-9eaa-ec2b137a0553" />
+    <UnitTestResult executionId="9feba5c2-bbde-43f6-bd58-4768c7ddbc5d" testId="00cb5b90-e7b9-2ee4-f973-9f2cb661b0cc" testName="PitWall.Tests.TelemetryWriterTests.WriteSamples_ReturnsZeroForEmptySession" computerName="ROCINATE" duration="00:00:00.0583276" startTime="2026-02-09T11:24:15.9221047-05:00" endTime="2026-02-09T11:24:15.9221148-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9feba5c2-bbde-43f6-bd58-4768c7ddbc5d" />
+    <UnitTestResult executionId="76045074-8046-4055-aa46-c943f4ccf97e" testId="268c5397-9734-1c8c-d8f2-a69154086bcd" testName="PitWall.Tests.TelemetryWriterTests.WriteSamples_StoresSamplesSuccessfully" computerName="ROCINATE" duration="00:00:00.0018549" startTime="2026-02-09T11:24:15.9241468-05:00" endTime="2026-02-09T11:24:15.9241469-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="76045074-8046-4055-aa46-c943f4ccf97e" />
+    <UnitTestResult executionId="c5b9b577-6737-4951-bd7b-cd3baefa165e" testId="3b114e58-c83b-c054-292a-ef4975205740" testName="PitWall.Tests.StrategyTests.FuelProjection_CalculatesLaps" computerName="ROCINATE" duration="00:00:00.0019645" startTime="2026-02-09T11:24:15.9242971-05:00" endTime="2026-02-09T11:24:15.9242972-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c5b9b577-6737-4951-bd7b-cd3baefa165e" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PitWall.Tests.StrategyTests.FuelProjection_CalculatesLaps" storage="c:\users\ohzee\.claude-worktrees\pitwall\vibrant-meninsky\pitwall.lmu\pitwall.tests\bin\debug\net9.0\pitwall.tests.dll" id="3b114e58-c83b-c054-292a-ef4975205740">
+      <Execution id="c5b9b577-6737-4951-bd7b-cd3baefa165e" />
+      <TestMethod codeBase="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Tests\bin\Debug\net9.0\PitWall.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="PitWall.Tests.StrategyTests" name="FuelProjection_CalculatesLaps" />
+    </UnitTest>
+    <UnitTest name="PitWall.Tests.TelemetryWriterTests.WriteSamples_ReturnsZeroForEmptySession" storage="c:\users\ohzee\.claude-worktrees\pitwall\vibrant-meninsky\pitwall.lmu\pitwall.tests\bin\debug\net9.0\pitwall.tests.dll" id="00cb5b90-e7b9-2ee4-f973-9f2cb661b0cc">
+      <Execution id="9feba5c2-bbde-43f6-bd58-4768c7ddbc5d" />
+      <TestMethod codeBase="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Tests\bin\Debug\net9.0\PitWall.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="PitWall.Tests.TelemetryWriterTests" name="WriteSamples_ReturnsZeroForEmptySession" />
+    </UnitTest>
+    <UnitTest name="PitWall.Tests.StrategyTests.TyreTemp_Overheat_ReturnsWarning" storage="c:\users\ohzee\.claude-worktrees\pitwall\vibrant-meninsky\pitwall.lmu\pitwall.tests\bin\debug\net9.0\pitwall.tests.dll" id="4226a219-379e-a0e3-6d83-358222aeb520">
+      <Execution id="ccc8234c-eafc-4768-9eaa-ec2b137a0553" />
+      <TestMethod codeBase="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Tests\bin\Debug\net9.0\PitWall.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="PitWall.Tests.StrategyTests" name="TyreTemp_Overheat_ReturnsWarning" />
+    </UnitTest>
+    <UnitTest name="PitWall.Tests.TelemetryWriterTests.WriteSamples_StoresSamplesSuccessfully" storage="c:\users\ohzee\.claude-worktrees\pitwall\vibrant-meninsky\pitwall.lmu\pitwall.tests\bin\debug\net9.0\pitwall.tests.dll" id="268c5397-9734-1c8c-d8f2-a69154086bcd">
+      <Execution id="76045074-8046-4055-aa46-c943f4ccf97e" />
+      <TestMethod codeBase="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Tests\bin\Debug\net9.0\PitWall.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="PitWall.Tests.TelemetryWriterTests" name="WriteSamples_StoresSamplesSuccessfully" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="4226a219-379e-a0e3-6d83-358222aeb520" executionId="ccc8234c-eafc-4768-9eaa-ec2b137a0553" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="00cb5b90-e7b9-2ee4-f973-9f2cb661b0cc" executionId="9feba5c2-bbde-43f6-bd58-4768c7ddbc5d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="268c5397-9734-1c8c-d8f2-a69154086bcd" executionId="76045074-8046-4055-aa46-c943f4ccf97e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3b114e58-c83b-c054-292a-ef4975205740" executionId="c5b9b577-6737-4951-bd7b-cd3baefa165e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="4" executed="4" passed="4" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.5)&#xD;
+[xUnit.net 00:00:00.04]   Discovering: PitWall.Tests&#xD;
+[xUnit.net 00:00:00.06]   Discovered:  PitWall.Tests&#xD;
+[xUnit.net 00:00:00.07]   Starting:    PitWall.Tests&#xD;
+[xUnit.net 00:00:00.15]   Finished:    PitWall.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
