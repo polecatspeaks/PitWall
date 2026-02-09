@@ -179,6 +179,7 @@ When implementing strategy logic:
 ### Testing Standards
 
 Every new feature needs:
+1. **TDD first** - Write failing tests before implementation
 1. **Unit tests** - Test logic in isolation
 2. **Integration tests** - Test with real components
 3. **Edge cases** - Low fuel, worn tires, weather changes
