@@ -29,7 +29,7 @@ namespace PitWall.Tests
             Assert.NotNull(response);
             Assert.Equal(sessionId, response.SessionId);
             Assert.Contains("overheat", response.Recommendation, StringComparison.OrdinalIgnoreCase);
-            Assert.True(response.Confidence > 0);
+            Assert.True(response.Confidence >= 0.8);
         }
 
         [Fact]
@@ -52,6 +52,7 @@ namespace PitWall.Tests
             Assert.NotNull(response);
             Assert.Equal(sessionId, response.SessionId);
             Assert.Contains("lap", response.Recommendation, StringComparison.OrdinalIgnoreCase);
+            Assert.True(response.Confidence >= 0.7);
         }
 
         [Fact]

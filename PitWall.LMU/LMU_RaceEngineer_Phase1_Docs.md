@@ -50,9 +50,9 @@ Phase 1 creates the **data acquisition foundation**:
 - [x] DuckDB backend with schema and batch ingestion
 - [x] GET /api/recommend endpoint with RecommendationService
 - [x] 18+ unit tests (all passing)
-- [ ] WebSocket /ws/state for real-time streaming (Phase 3)
-- [ ] Extended strategy rules (Phase 3)
-- [ ] Confidence scoring (Phase 3)
+- [x] WebSocket /ws/state for real-time streaming (Phase 3)
+- [x] Extended strategy rules (Phase 3)
+- [x] Confidence scoring (Phase 3)
 - [ ] Local LLM integration (Phase 4)
 
 ---
@@ -95,19 +95,22 @@ Phase 1 creates the **data acquisition foundation**:
 
 **Completed:**
 - **GET /api/recommend** - REST endpoint for strategy recommendations
-  - sessionId query parameter validation
-  - Returns RecommendationResponse with: recommendation text, confidence (0.85 placeholder), timestamp
-  - Service injection and error handling
-  - 5 unit tests passing
-  - 2 integration tests scaffolded (skipped pending WebApplicationFactory)
+    - sessionId query parameter validation
+    - Returns RecommendationResponse with: recommendation text, confidence score, timestamp
+    - Service injection and error handling
+    - 5 unit tests passing
+    - 2 integration tests wired with WebApplicationFactory
+
+- **WebSocket `/ws/state`** - real-time recommendation push
+    - sessionId/startRow/endRow/intervalMs query parameters
+    - Streams telemetry samples as JSON
 
 - **Enhanced StrategyEngine**
-  - Constants: TyreOverheatThreshold (110°C), CriticalFuelLevel (2.0L), AvgLapFuelConsumption (1.8L/lap)
-  - Logic: tyre temp check → fuel level check → readable recommendations
-  - Examples: "Pit now - overheated tyres", "Plan pit in 3 laps", "No action needed"
-
-**In Progress:**
-- WebSocket `/ws/state` endpoint for real-time recommendation push
+    - Constants: TyreOverheatThreshold (110°C), CriticalFuelLevel (2.0L), AvgLapFuelConsumption (1.8L/lap)
+    - Added wheel lock risk, brake/throttle overlap coaching, heavy brake + steering coaching
+    - Pit window messaging within 5 laps
+    - Confidence scoring per recommendation
+    - Examples: "Tyre overheat: reduce pace / pit soon", "Wheel lock risk: ease brake pressure", "Pit window open: plan stop within ~4 laps"
 
 ### 📋 Phase 4: AI & Intelligence (PLANNED - Q2 2026)
 **Objective:** Local LLM integration for complex reasoning.
@@ -117,13 +120,13 @@ Phase 1 creates the **data acquisition foundation**:
 - See LLM Strategy section below for details
 
 ### 🧪 Test Coverage
-**Current:** 23 tests (18 passing, 5 skipped)
+**Current:** 29 tests (29 passing, 0 skipped)
 - RecommendationService: 5 passing
 - SharedMemoryReader: 6 passing  
-- StrategyEngine: 2 passing
+- StrategyEngine: 5 passing
 - TelemetryWriter/DuckDB: 5 passing
-- DuckDB Integration: 3 skipped (needs native binaries)
-- API Integration: 2 skipped (needs WebApplicationFactory)
+- DuckDB Integration: 3 passing
+- API Integration: 2 passing
 
 ---
 
