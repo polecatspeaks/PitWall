@@ -12,13 +12,15 @@ namespace PitWall.UI.Services
 
         public static RecommendationDto Parse(string json)
         {
-            var dto = JsonSerializer.Deserialize<RecommendationDto>(json, Options);
+            var dto = JsonSerializer.Deserialize<RecommendationDto>(json, Options)
+                      ?? new RecommendationDto();
 
-            return dto ?? new RecommendationDto
+            if (string.IsNullOrWhiteSpace(dto.Recommendation))
             {
-                Recommendation = string.Empty,
-                Confidence = 0.0
-            };
+                dto.Recommendation = string.Empty;
+            }
+
+            return dto;
         }
     }
 }

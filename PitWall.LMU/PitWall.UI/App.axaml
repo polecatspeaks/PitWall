@@ -32,7 +32,7 @@
     </Application.Resources>
 
     <Application.Styles>
-        <FluentTheme Mode="Dark" />
+        <FluentTheme />
 
         <Style Selector="Window">
             <Setter Property="Background" Value="{DynamicResource BrushBackground}" />

@@ -17,7 +17,7 @@ public partial class MainWindow : Window
         Closed += OnClosed;
     }
 
-    private async void OnOpened(object? sender, RoutedEventArgs e)
+    private async void OnOpened(object? sender, EventArgs e)
     {
         if (DataContext is MainWindowViewModel vm)
         {
