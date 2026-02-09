@@ -13,17 +13,20 @@ namespace PitWall.Agent.Services
         private readonly IRulesEngine _rulesEngine;
         private readonly ILLMService? _llmService;
         private readonly IRaceContextProvider _contextProvider;
+        private readonly AgentOptions _options;
         private readonly ILogger<AgentService> _logger;
 
         public AgentService(
             IRulesEngine rulesEngine,
             StrategyEngine strategyEngine,
             IRaceContextProvider contextProvider,
+            AgentOptions options,
             ILogger<AgentService> logger,
             ILLMService? llmService = null)
         {
             _rulesEngine = rulesEngine;
             _contextProvider = contextProvider;
+            _options = options;
             _logger = logger;
             _llmService = llmService;
         }
@@ -49,6 +52,22 @@ namespace PitWall.Agent.Services
 
                 if (_llmService?.IsEnabled == true)
                 {
+                    if (_options.RequirePitForLlm && context.IsActivelyRacing)
+                    {
+                        _logger.LogInformation(
+                            "LLM suppressed while racing: {Query}",
+                            request.Query);
+
+                        return new AgentResponse
+                        {
+                            Answer = "LLM disabled while racing. Ask again in pit lane.",
+                            Source = "Safety",
+                            Confidence = 0.0,
+                            ResponseTimeMs = (int)(DateTime.UtcNow - startTime).TotalMilliseconds,
+                            Success = false
+                        };
+                    }
+
                     _logger.LogInformation(
                         "Rules engine unable to answer, querying LLM: {Query}",
                         request.Query);

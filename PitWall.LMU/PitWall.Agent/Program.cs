@@ -23,10 +23,23 @@ namespace PitWall.Agent
 			builder.Services.AddSingleton<StrategyEngine>();
 			builder.Services.AddSingleton<ITelemetryWriter, InMemoryTelemetryWriter>();
 			builder.Services.AddSingleton<IRaceContextProvider, RaceContextProvider>();
+			builder.Services.AddSingleton<ILlmEndpointEnumerator, LocalSubnetEndpointEnumerator>();
+			builder.Services.AddHttpClient<ILLMDiscoveryService, OllamaDiscoveryService>();
 
 			if (agentOptions.EnableLLM)
 			{
-				builder.Services.AddHttpClient<ILLMService, OllamaLLMService>();
+				switch (agentOptions.LLMProvider.ToLowerInvariant())
+				{
+					case "openai":
+						builder.Services.AddHttpClient<ILLMService, OpenAiLlmService>();
+						break;
+					case "anthropic":
+						builder.Services.AddHttpClient<ILLMService, AnthropicLlmService>();
+						break;
+					default:
+						builder.Services.AddHttpClient<ILLMService, OllamaLLMService>();
+						break;
+				}
 			}
 
 			builder.Services.AddScoped<IAgentService, AgentService>();
@@ -59,6 +72,25 @@ namespace PitWall.Agent
 
 				var response = await agentService.ProcessQueryAsync(request);
 				return Results.Ok(response);
+			});
+
+			app.MapGet("/agent/llm/test", async ([FromServices] AgentOptions options, [FromServices] ILLMService? llmService = null) =>
+			{
+				var enabled = llmService?.IsEnabled ?? options.EnableLLM;
+
+				if (!enabled || llmService == null)
+				{
+					return Results.Ok(new { llmEnabled = enabled, available = false });
+				}
+
+				var available = await llmService.TestConnectionAsync();
+				return Results.Ok(new { llmEnabled = enabled, available });
+			});
+
+			app.MapGet("/agent/llm/discover", async (ILLMDiscoveryService discoveryService) =>
+			{
+				var endpoints = await discoveryService.DiscoverAsync();
+				return Results.Ok(new { endpoints });
 			});
 
 			app.Run();

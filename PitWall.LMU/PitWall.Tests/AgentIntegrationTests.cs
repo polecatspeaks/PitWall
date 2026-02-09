@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PitWall.Agent.Models;
+using PitWall.Agent.Services.LLM;
 using PitWall.Core.Models;
 using PitWall.Core.Storage;
 using Xunit;
@@ -63,7 +64,50 @@ namespace PitWall.Tests
             Assert.Contains("FUEL CRITICAL", payload.Answer);
         }
 
-        private static WebApplicationFactory<PitWall.Agent.Program> CreateFactory(bool enableLlm, InMemoryTelemetryWriter writer)
+        [Fact]
+        public async Task AgentLlmTest_ReturnsAvailability()
+        {
+            var llmService = new StubLlmService(isEnabled: true, isAvailable: true);
+            using var factory = CreateFactory(enableLlm: true, writer: new InMemoryTelemetryWriter(), llmService: llmService);
+            using var client = factory.CreateClient();
+
+            var response = await client.GetAsync("/agent/llm/test");
+            response.EnsureSuccessStatusCode();
+
+            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var root = doc.RootElement;
+
+            Assert.True(root.TryGetProperty("available", out var available));
+            Assert.True(available.GetBoolean());
+        }
+
+        [Fact]
+        public async Task AgentLlmDiscover_ReturnsResults()
+        {
+            var discovery = new StubDiscoveryService(new[]
+            {
+                "http://192.168.1.100:11434",
+                "http://192.168.1.101:11434"
+            });
+
+            using var factory = CreateFactory(enableLlm: false, writer: new InMemoryTelemetryWriter(), discoveryService: discovery);
+            using var client = factory.CreateClient();
+
+            var response = await client.GetAsync("/agent/llm/discover");
+            response.EnsureSuccessStatusCode();
+
+            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var root = doc.RootElement;
+
+            Assert.True(root.TryGetProperty("endpoints", out var endpoints));
+            Assert.Equal(2, endpoints.GetArrayLength());
+        }
+
+        private static WebApplicationFactory<PitWall.Agent.Program> CreateFactory(
+            bool enableLlm,
+            InMemoryTelemetryWriter writer,
+            ILLMService? llmService = null,
+            ILLMDiscoveryService? discoveryService = null)
         {
             return new WebApplicationFactory<PitWall.Agent.Program>()
                 .WithWebHostBuilder(builder =>
@@ -84,8 +128,62 @@ namespace PitWall.Tests
                     {
                         services.RemoveAll(typeof(ITelemetryWriter));
                         services.AddSingleton<ITelemetryWriter>(writer);
+
+                        if (llmService != null)
+                        {
+                            services.RemoveAll(typeof(ILLMService));
+                            services.AddSingleton(llmService);
+                        }
+
+                        if (discoveryService != null)
+                        {
+                            services.RemoveAll(typeof(ILLMDiscoveryService));
+                            services.AddSingleton(discoveryService);
+                        }
                     });
                 });
+        }
+
+        private sealed class StubDiscoveryService : ILLMDiscoveryService
+        {
+            private readonly IReadOnlyList<string> _endpoints;
+
+            public StubDiscoveryService(IReadOnlyList<string> endpoints)
+            {
+                _endpoints = endpoints;
+            }
+
+            public Task<IReadOnlyList<string>> DiscoverAsync(System.Threading.CancellationToken cancellationToken = default)
+            {
+                return Task.FromResult(_endpoints);
+            }
+        }
+
+        private sealed class StubLlmService : ILLMService
+        {
+            public StubLlmService(bool isEnabled, bool isAvailable)
+            {
+                IsEnabled = isEnabled;
+                IsAvailable = isAvailable;
+            }
+
+            public bool IsEnabled { get; }
+            public bool IsAvailable { get; }
+
+            public Task<bool> TestConnectionAsync()
+            {
+                return Task.FromResult(IsAvailable);
+            }
+
+            public Task<AgentResponse> QueryAsync(string query, RaceContext context)
+            {
+                return Task.FromResult(new AgentResponse
+                {
+                    Answer = "stub",
+                    Source = "LLM",
+                    Success = true
+                });
+            }
         }
     }
 }

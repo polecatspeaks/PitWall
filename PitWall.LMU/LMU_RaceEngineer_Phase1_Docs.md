@@ -3,7 +3,7 @@
 
 **Version:** 1.1 | **Date:** February 9, 2026  
 **Platform:** Windows | **Framework:** .NET 9.0 | **IDE:** VS Code + Copilot  
-**Status:** Phase 1 & 2 COMPLETE ✅ | Phase 3 IN PROGRESS | Phase 4 PLANNED
+**Status:** Phase 1 & 2 COMPLETE ✅ | Phase 3 COMPLETE ✅ | Phase 4 IN PROGRESS
 
 ---
 
@@ -53,7 +53,7 @@ Phase 1 creates the **data acquisition foundation**:
 - [x] WebSocket /ws/state for real-time streaming (Phase 3)
 - [x] Extended strategy rules (Phase 3)
 - [x] Confidence scoring (Phase 3)
-- [ ] Local LLM integration (Phase 4)
+- [x] Local LLM integration (Phase 4)
 
 ---
 
@@ -90,7 +90,7 @@ Phase 1 creates the **data acquisition foundation**:
   - Fetches latest samples, evaluates strategy, returns RecommendationResponse
   - 5 unit tests covering overheated tyres, low fuel, no data scenarios
 
-### 🔄 Phase 3: Real-Time API & WebSockets (IN PROGRESS)
+### ✅ Phase 3: Real-Time API & WebSockets (COMPLETE)
 **Objective:** Expose recommendations and real-time updates to clients.
 
 **Completed:**
@@ -112,21 +112,23 @@ Phase 1 creates the **data acquisition foundation**:
     - Confidence scoring per recommendation
     - Examples: "Tyre overheat: reduce pace / pit soon", "Wheel lock risk: ease brake pressure", "Pit window open: plan stop within ~4 laps"
 
-### 📋 Phase 4: AI & Intelligence (PLANNED - Q2 2026)
+### 🔄 Phase 4: AI & Intelligence (IN PROGRESS)
 **Objective:** Local LLM integration for complex reasoning.
-- Rules engine for 90% of queries (instant, free)
-- Local LLM server support (Ollama/LM Studio on secondary PC)
+**Completed:**
+- Rules engine for common queries (instant, free)
+- Local LLM support via Ollama HTTP (same-machine)
+- Local LLM server discovery (LAN)
 - Optional cloud LLM integration (OpenAI/Anthropic)
+- Safety restrictions for in-session use (pit-only LLM)
+- Agent service endpoints (/agent/query, /agent/health, /agent/llm/test, /agent/llm/discover)
+- Agent integration tests
+**Planned:**
+- Voice synthesis for responses
+- UI/config for selecting providers and safety toggles
 - See LLM Strategy section below for details
 
 ### 🧪 Test Coverage
-**Current:** 29 tests (29 passing, 0 skipped)
-- RecommendationService: 5 passing
-- SharedMemoryReader: 6 passing  
-- StrategyEngine: 5 passing
-- TelemetryWriter/DuckDB: 5 passing
-- DuckDB Integration: 3 passing
-- API Integration: 2 passing
+**Current:** All tests passing (0 skipped)
 
 ---
 
@@ -1224,7 +1226,7 @@ dotnet restore
 - RecommendationService orchestration layer
 - 5 unit tests passing (3 integration tests skipped - needs native binaries)
 
-### 🔄 Phase 3 (IN PROGRESS - Current Focus)
+### ✅ Phase 3 (COMPLETE)
 **Real-Time API & Extended Strategy**
 
 **Completed:**
@@ -1233,18 +1235,20 @@ dotnet restore
 - Enhanced StrategyEngine with fuel thresholds ✅
 - 5 API tests passing ✅
 
-**Next (This Session):**
-- [ ] WebSocket `/ws/state` endpoint for real-time state push
-- [ ] Extend strategy rules: wheel lock detection, pit window optimization, brake coaching
-- [ ] Confidence scoring system (replace 0.85 placeholder)
-- [ ] Integration tests with WebApplicationFactory
+**Completed:**
+- WebSocket `/ws/state` endpoint for real-time state push ✅
+- Extend strategy rules: wheel lock detection, pit window optimization, brake coaching ✅
+- Confidence scoring system (replace 0.85 placeholder) ✅
+- Integration tests with WebApplicationFactory ✅
 
-### 📅 Phase 4 (PLANNED - Q2 2026)
+### 📅 Phase 4 (IN PROGRESS)
 **Advanced Intelligence & LLM Integration**
-- Rules engine for common queries (90% coverage, instant, free)
-- Local LLM server support (Ollama/LM Studio)
-- Optional cloud LLM integration
-- Natural language race engineering
+- Rules engine for common queries (90% coverage, instant, free) ✅
+- Local LLM support (Ollama HTTP) ✅
+- Optional cloud LLM integration ✅
+- Local server discovery ✅
+- Safety restrictions for in-session use ✅
+- Natural language race engineering (in progress)
 - See [LLM Strategy](#appendix-aiagent-strategy-phase-4-planning) section for detailed architecture
 
 ### 🛠️ Phase 5 (FUTURE - Q3 2026)
@@ -1316,11 +1320,11 @@ As you reverse-engineer LMU's memory structure, document findings in:
 
 ---
 
-## 🤖 APPENDIX: AI/LLM Strategy (Phase 4 PLANNED - Q2 2026)
+## 🤖 APPENDIX: AI/LLM Strategy (Phase 4 IN PROGRESS)
 
-> **Status:** Detailed architectural planning for future implementation. Not yet built into the codebase.
-> **Timeline:** Phase 4 development to begin after Phase 3 completion (WebSocket, extended rules).
-> **Purpose:** Document strategy and design for seamless integration when Phase 4 work begins.
+> **Status:** Architecture documented; core rules + local Ollama HTTP path implemented.
+> **Timeline:** Phase 4 started after Phase 3 completion.
+> **Purpose:** Document strategy and guide remaining implementation.
 
 ### Overview
 
@@ -1756,27 +1760,27 @@ Found servers:
 ### Development Roadmap
 
 **Phase 4a: Rules Engine (Essential)**
-- Pattern matching for common queries
-- Integration with ML predictions
-- Voice synthesis for responses
+- Pattern matching for common queries ✅
+- Integration with ML predictions (partial)
+- Voice synthesis for responses (planned)
 - **Deliverable:** 90% query coverage, zero cost
 
 **Phase 4b: Cloud LLM Integration (Optional)**
-- OpenAI/Anthropic API integration
-- Cost tracking and limits
-- Fallback to rules on failure
+- OpenAI/Anthropic API integration ✅
+- Cost tracking and limits (planned)
+- Fallback to rules on failure ✅
 - **Deliverable:** Complex query handling, $1-3/month cost
 
 **Phase 4c: Local Server LLM (Recommended)**
-- HTTP client for Ollama/LM Studio
-- Network discovery
-- Connection testing and monitoring
+- HTTP client for Ollama/LM Studio ✅ (Ollama HTTP)
+- Network discovery ✅
+- Connection testing and monitoring ✅
 - **Deliverable:** Free AI, zero racing PC impact
 
 **Phase 4d: Same-Machine LLM (Advanced)**
-- Direct Ollama integration
-- Safety restrictions (pit-only)
-- Performance monitoring
+- Direct Ollama integration ✅
+- Safety restrictions (pit-only) ✅
+- Performance monitoring (planned)
 - **Deliverable:** No 2nd PC needed, performance trade-off
 
 ---
@@ -1827,5 +1831,5 @@ Pit:    "Analyze my stint pace compared to optimal"
 
 **END OF AI/LLM APPENDIX**
 
-*This appendix covers Phase 4 planning. Implementation details will be expanded when Phase 4 development begins.*
+*This appendix covers Phase 4 planning and in-progress implementation.*
 
