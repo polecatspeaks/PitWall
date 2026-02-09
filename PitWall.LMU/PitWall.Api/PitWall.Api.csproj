@@ -5,6 +5,10 @@
     <ProjectReference Include="..\PitWall.Strategy\PitWall.Strategy.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\native\duckdb\duckdb.dll" Link="duckdb.dll" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>

@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using PitWall.Core.Models;
 
 namespace PitWall.Core.Services
 {
+    [SupportedOSPlatform("windows")]
     public class SharedMemoryReader : ISharedMemoryReader
     {
         private readonly string _memoryMapName;
@@ -31,6 +33,9 @@ namespace PitWall.Core.Services
 
         public async IAsyncEnumerable<TelemetrySample> StreamSamples()
         {
+            if (!OperatingSystem.IsWindows())
+                throw new PlatformNotSupportedException("Shared memory telemetry is only supported on Windows.");
+
             MemoryMappedFile? mmf = null;
             bool shouldContinue = false;
             TelemetrySample? initialSample = null;
