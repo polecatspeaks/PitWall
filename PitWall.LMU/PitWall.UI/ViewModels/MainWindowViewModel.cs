@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PitWall.UI.Models;
 using PitWall.UI.Services;
 
@@ -11,17 +13,23 @@ public partial class MainWindowViewModel : ViewModelBase
 {
 	private readonly IRecommendationClient _recommendationClient;
 	private readonly ITelemetryStreamClient _telemetryStreamClient;
+	private readonly IAgentQueryClient _agentQueryClient;
 	private CancellationTokenSource? _cts;
 
 	public MainWindowViewModel()
-		: this(new NullRecommendationClient(), new NullTelemetryStreamClient())
+		: this(new NullRecommendationClient(), new NullTelemetryStreamClient(), new NullAgentQueryClient())
 	{
 	}
 
-	public MainWindowViewModel(IRecommendationClient recommendationClient, ITelemetryStreamClient telemetryStreamClient)
+	public MainWindowViewModel(
+		IRecommendationClient recommendationClient,
+		ITelemetryStreamClient telemetryStreamClient,
+		IAgentQueryClient agentQueryClient)
 	{
 		_recommendationClient = recommendationClient;
 		_telemetryStreamClient = telemetryStreamClient;
+		_agentQueryClient = agentQueryClient;
+		SendAiQueryCommand = new AsyncRelayCommand(() => SendAiQueryAsync(CancellationToken.None));
 	}
 
 	[ObservableProperty]
@@ -44,6 +52,38 @@ public partial class MainWindowViewModel : ViewModelBase
 
 	[ObservableProperty]
 	private string strategyConfidence = "CONF --";
+
+	[ObservableProperty]
+	private string aiInput = string.Empty;
+
+	public ObservableCollection<AiMessage> AiMessages { get; } = new();
+
+	public IAsyncRelayCommand SendAiQueryCommand { get; }
+
+	public async Task SendAiQueryAsync(CancellationToken cancellationToken)
+	{
+		if (string.IsNullOrWhiteSpace(AiInput))
+		{
+			return;
+		}
+
+		var userMessage = new AiMessage
+		{
+			Role = "User",
+			Text = AiInput.Trim()
+		};
+
+		AiMessages.Add(userMessage);
+		AiInput = string.Empty;
+
+		var response = await _agentQueryClient.SendQueryAsync(userMessage.Text, cancellationToken);
+		AiMessages.Add(new AiMessage
+		{
+			Role = "Assistant",
+			Text = response.Answer,
+			Source = response.Source
+		});
+	}
 
 	public Task StartAsync(string sessionId, CancellationToken cancellationToken)
 	{
@@ -117,6 +157,19 @@ public partial class MainWindowViewModel : ViewModelBase
 		public Task ConnectAsync(int sessionId, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
 		{
 			return Task.CompletedTask;
+		}
+	}
+
+	private sealed class NullAgentQueryClient : IAgentQueryClient
+	{
+		public Task<AgentResponseDto> SendQueryAsync(string query, CancellationToken cancellationToken)
+		{
+			return Task.FromResult(new AgentResponseDto
+			{
+				Answer = "",
+				Source = "",
+				Success = false
+			});
 		}
 	}
 }

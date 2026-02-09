@@ -15,7 +15,7 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*" Margin="16" RowSpacing="16">
+    <Grid RowDefinitions="Auto,*,Auto,Auto" ColumnDefinitions="*" Margin="16" RowSpacing="16">
         <Border Classes="panel" Grid.Row="0">
             <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnSpacing="24">
                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -104,6 +104,26 @@
                 <Button Content="AI Assistant" />
                 <Button Content="Settings" />
             </StackPanel>
+        </Border>
+
+        <Border Classes="panel" Grid.Row="3">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*" RowSpacing="8">
+                <TextBlock Classes="label" Text="AI ASSISTANT" />
+                <ItemsControl Grid.Row="0" ItemsSource="{Binding AiMessages}" Margin="0,20,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{Binding Role}" Classes="label" />
+                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                    <TextBox Width="600" Text="{Binding AiInput, Mode=TwoWay}" Watermark="Ask the race engineer..." />
+                    <Button Content="Send" Command="{Binding SendAiQueryCommand}" />
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 

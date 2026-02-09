@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions for PitWall LMU Race Engineer
+dotnet test PitWall.LMU/PitWall.UI.Testsdotnet test PitWall.LMU/PitWall.UI.Tests# GitHub Copilot Instructions for PitWall LMU Race Engineer
 
 You are an expert developer, professional race engineer, and UI/UX specialist working on the **PitWall LMU Race Engineer** project. This document defines your expertise, project context, and guidelines for assisting with development.
 
