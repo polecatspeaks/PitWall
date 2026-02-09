@@ -1,0 +1,16 @@
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\bin\Debug\net9.0\PitWall.Strategy.deps.json
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\bin\Debug\net9.0\PitWall.Strategy.dll
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\bin\Debug\net9.0\PitWall.Strategy.pdb
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall.Strategy.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall.Strategy.AssemblyInfoInputs.cache
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall.Strategy.AssemblyInfo.cs
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall.Strategy.csproj.CoreCompileInputs.cache
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall.Strategy.sourcelink.json
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall.Strategy.dll
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\refint\PitWall.Strategy.dll
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall.Strategy.pdb
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\ref\PitWall.Strategy.dll
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\bin\Debug\net9.0\PitWall.Core.dll
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\bin\Debug\net9.0\PitWall.Core.pdb
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall.Strategy.csproj.AssemblyReference.cache
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\obj\Debug\net9.0\PitWall..51D722EA.Up2Date

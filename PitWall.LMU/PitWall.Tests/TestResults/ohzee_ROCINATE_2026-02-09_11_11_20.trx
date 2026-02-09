@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="1f3305db-822a-4daf-9a85-ed2d07df0332" name="ohzee@ROCINATE 2026-02-09 11:11:20" runUser="ROCINATE\ohzee" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-02-09T11:11:20.7998526-05:00" queuing="2026-02-09T11:11:20.7998530-05:00" start="2026-02-09T11:11:20.4462393-05:00" finish="2026-02-09T11:11:20.8030627-05:00" />
+  <TestSettings name="default" id="3d0dc0a1-a223-4911-8456-acad322ca905">
+    <Deployment runDeploymentRoot="ohzee_ROCINATE_2026-02-09_11_11_20" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="0755d2cb-b477-4165-9314-c02245e6ec00" testId="5edac5ec-144a-4b3e-d22d-8afa4f19410d" testName="PitWall.Tests.UnitTest1.Test1" computerName="ROCINATE" duration="00:00:00.0012248" startTime="2026-02-09T11:11:20.7343272-05:00" endTime="2026-02-09T11:11:20.7343362-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0755d2cb-b477-4165-9314-c02245e6ec00" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PitWall.Tests.UnitTest1.Test1" storage="c:\users\ohzee\.claude-worktrees\pitwall\vibrant-meninsky\pitwall.lmu\pitwall.tests\bin\debug\net9.0\pitwall.tests.dll" id="5edac5ec-144a-4b3e-d22d-8afa4f19410d">
+      <Execution id="0755d2cb-b477-4165-9314-c02245e6ec00" />
+      <TestMethod codeBase="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Tests\bin\Debug\net9.0\PitWall.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="PitWall.Tests.UnitTest1" name="Test1" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="5edac5ec-144a-4b3e-d22d-8afa4f19410d" executionId="0755d2cb-b477-4165-9314-c02245e6ec00" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.5)&#xD;
+[xUnit.net 00:00:00.03]   Discovering: PitWall.Tests&#xD;
+[xUnit.net 00:00:00.05]   Discovered:  PitWall.Tests&#xD;
+[xUnit.net 00:00:00.05]   Starting:    PitWall.Tests&#xD;
+[xUnit.net 00:00:00.07]   Finished:    PitWall.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
