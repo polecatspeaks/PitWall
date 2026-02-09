@@ -1,0 +1,110 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PitWall.UI.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
+        x:Class="PitWall.UI.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="PitWall LMU">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*" Margin="16" RowSpacing="16">
+        <Border Classes="panel" Grid.Row="0">
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnSpacing="24">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Classes="label" Text="LAP" />
+                    <TextBlock Classes="value" Text="15/30" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1">
+                    <TextBlock Classes="label" Text="POS" />
+                    <TextBlock Classes="value" Text="P3" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="2">
+                    <TextBlock Classes="label" Text="GAP" />
+                    <TextBlock Classes="value" Text="+2.3s" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="3">
+                    <TextBlock Classes="label" Text="PIT WINDOW" />
+                    <TextBlock Classes="value" Text="L18" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="4">
+                    <TextBlock Classes="label" Text="FUEL" />
+                    <TextBlock Classes="value" Text="{Binding FuelLaps}" />
+                </StackPanel>
+                <Border Grid.Column="5" Background="{DynamicResource BrushCritical}" CornerRadius="4" Padding="8" HorizontalAlignment="Right">
+                    <TextBlock Text="ALERTS" FontWeight="Bold" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto" ColumnDefinitions="2*,2*,2*,2*" RowSpacing="16" ColumnSpacing="16">
+            <Border Classes="panel" Grid.Row="0" Grid.Column="0">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="FUEL" />
+                    <TextBlock Classes="value" Text="{Binding FuelLiters}" />
+                    <TextBlock Classes="label" Text="{Binding FuelLaps}" />
+                    <Border Background="{DynamicResource BrushWarning}" Height="8" CornerRadius="4" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="panel" Grid.Row="0" Grid.Column="1">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="TIRES" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="12">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding TiresLine1}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding TiresLine2}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="panel" Grid.Row="0" Grid.Column="2">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="STRATEGY" />
+                    <TextBlock Classes="value" Text="{Binding StrategyMessage}" />
+                    <TextBlock Classes="label" Text="{Binding StrategyConfidence}" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="panel" Grid.Row="0" Grid.Column="3">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="TIMING" />
+                    <TextBlock Classes="value" Text="LAST 3:42.123" />
+                    <TextBlock Classes="label" Text="BEST 3:40.891" />
+                    <TextBlock Text="DELTA +1.232" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="panel" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="WEATHER" />
+                    <TextBlock Classes="value" Text="CLEAR 32C TRACK" />
+                    <TextBlock Classes="label" Text="WIND 5 KPH" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="panel" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="ALERTS" />
+                    <TextBlock Text="None" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Classes="panel" Grid.Row="2">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button Content="Telemetry" />
+                <Button Content="Competitors" />
+                <Button Content="AI Assistant" />
+                <Button Content="Settings" />
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</Window>
