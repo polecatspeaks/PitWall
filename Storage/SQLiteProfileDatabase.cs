@@ -28,7 +28,7 @@ namespace PitWall.Storage
 
             string dbPath = Path.Combine(baseDir, DB_FILE);
             _connectionString = $"Data Source={dbPath};Version=3;";
-            try { Logger.Info($"SQLite DB path: {dbPath}"); } catch {}
+            try { Logger.Info($"SQLite DB path: {dbPath}"); } catch { }
             InitializeDatabase();
         }
 
@@ -201,6 +201,46 @@ namespace PitWall.Storage
             await command.ExecuteNonQueryAsync();
         }
 
+        public async Task<List<DriverProfile>> GetProfiles(int count)
+        {
+            var profiles = new List<DriverProfile>();
+
+            using var connection = new SQLiteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            string query = @"
+                SELECT DriverName, TrackName, CarName, AverageFuelPerLap,
+                       TypicalTyreDegradation, Style, SessionsCompleted, LastUpdated,
+                       Confidence, IsStale, LastSessionDate
+                FROM Profiles
+                ORDER BY LastUpdated DESC
+                LIMIT @count";
+
+            using var command = new SQLiteCommand(query, connection);
+            command.Parameters.AddWithValue("@count", count);
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                profiles.Add(new DriverProfile
+                {
+                    DriverName = reader.GetString(0),
+                    TrackName = reader.GetString(1),
+                    CarName = reader.GetString(2),
+                    AverageFuelPerLap = reader.GetDouble(3),
+                    TypicalTyreDegradation = reader.GetDouble(4),
+                    Style = (DrivingStyle)reader.GetInt32(5),
+                    SessionsCompleted = reader.GetInt32(6),
+                    LastUpdated = DateTime.Parse(reader.GetString(7)),
+                    Confidence = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
+                    IsStale = reader.IsDBNull(9) ? false : reader.GetInt32(9) == 1,
+                    LastSessionDate = reader.IsDBNull(10) ? null : DateTime.Parse(reader.GetString(10))
+                });
+            }
+
+            return profiles;
+        }
+
         public async Task<List<SessionData>> GetRecentSessions(int count)
         {
             using var connection = new SQLiteConnection(_connectionString);
@@ -218,7 +258,7 @@ namespace PitWall.Storage
 
             var sessions = new List<SessionData>();
             using var reader = await command.ExecuteReaderAsync();
-            
+
             while (await reader.ReadAsync())
             {
                 int sessionId = reader.GetInt32(0);
@@ -333,8 +373,8 @@ namespace PitWall.Storage
         /// Store time-series session data for replay processing
         /// </summary>
         public async Task StoreTimeSeriesSession(
-            string driver, 
-            string track, 
+            string driver,
+            string track,
             string car,
             DateTime sessionDate,
             string sessionId,
@@ -377,8 +417,8 @@ namespace PitWall.Storage
         /// Ordered chronologically (oldest to newest)
         /// </summary>
         public async Task<List<(DateTime Date, int LapCount, double FuelPerLap, double TyreDeg)>> GetTimeSeries(
-            string driver, 
-            string track, 
+            string driver,
+            string track,
             string car)
         {
             using var connection = new SQLiteConnection(_connectionString);

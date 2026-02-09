@@ -1,10 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using PitWall.Core;
+using PitWall.Models;
 using PitWall.Storage;
+using PitWall.Storage.Telemetry;
+using PitWall.Telemetry;
 
 namespace PitWall.UI
 {
@@ -16,23 +21,35 @@ namespace PitWall.UI
     {
         private readonly PitWallSettings _settings;
         private readonly SQLiteProfileDatabase _database;
-        // TODO: IBT importer will be injected here when implemented
+        private readonly IbtImporter _ibtImporter;
+        private readonly ISessionRepository _sessionRepository;
+        private readonly ProfileGenerator _profileGenerator;
         private bool _isProcessing;
 
-        private TextBox _replayFolderTextBox;
-        private Button _browseFolderButton;
-        private Button _importButton;
-        private Label _statusLabel;
-        private Label _profileCountLabel;
-        private Label _lastImportLabel;
-        private ProgressBar _progressBar;
-        private ListBox _profileListBox;
-        private Button _refreshProfilesButton;
+        private TextBox _replayFolderTextBox = null!;
+        private Button _browseFolderButton = null!;
+        private Button _importButton = null!;
+        private Label _statusLabel = null!;
+        private Label _profileCountLabel = null!;
+        private Label _lastImportLabel = null!;
+        private ProgressBar _progressBar = null!;
+        private ListBox _profileListBox = null!;
+        private Button _refreshProfilesButton = null!;
+        private Button _viewDetailsButton = null!;
+        private LinkLabel _viewDetailsLink = null!;
+        private Label _profileDetailsBodyLabel = null!;
+
+        private List<DriverProfile> _profiles = new List<DriverProfile>();
 
         public SettingsControl(PitWallSettings settings, SQLiteProfileDatabase database)
         {
             _settings = settings;
             _database = database;
+            _ibtImporter = new IbtImporter();
+            // Unified database path for telemetry and profiles
+            var dbPath = DatabasePaths.GetDatabasePath();
+            _sessionRepository = new SQLiteSessionRepository(dbPath);
+            _profileGenerator = new ProfileGenerator(_sessionRepository, database);
 
             InitializeComponent();
             LoadSettings();
@@ -172,10 +189,20 @@ namespace PitWall.UI
             };
             this.Controls.Add(profileLabel);
 
+            _viewDetailsLink = new LinkLabel
+            {
+                Text = "View details",
+                Location = new Point(400, yPos),
+                Size = new Size(90, 22),
+                Font = new Font("Segoe UI", 9)
+            };
+            _viewDetailsLink.LinkClicked += (s, e) => ShowSelectedProfileDetails();
+            this.Controls.Add(_viewDetailsLink);
+
             _refreshProfilesButton = new Button
             {
                 Text = "Refresh",
-                Location = new Point(520, yPos - 2),
+                Location = new Point(500, yPos - 2),
                 Size = new Size(90, 28),
                 Font = new Font("Segoe UI", 9)
             };
@@ -189,20 +216,51 @@ namespace PitWall.UI
                 Size = new Size(600, 200),
                 Font = new Font("Consolas", 8)
             };
+            _profileListBox.SelectedIndexChanged += ProfileListBox_SelectedIndexChanged;
+            _profileListBox.DoubleClick += ProfileListBox_DoubleClick;
             this.Controls.Add(_profileListBox);
-            yPos += 210;
+            yPos += 205;
 
-            // Info label
-            var infoLabel = new Label
+            // Profile details panel directly under list to stay in viewport
+            var detailsPanel = new Panel
             {
-                Text = "Tip: IBT telemetry files provide fine-grained 60Hz data for accurate profile generation.\n" +
-                       "Recent sessions are weighted higher for more timely predictions.",
-                Font = new Font("Segoe UI", 8, FontStyle.Italic),
                 Location = new Point(10, yPos),
-                Size = new Size(600, 40),
-                ForeColor = Color.Gray
+                Size = new Size(600, 90),
+                BackColor = Color.FromArgb(245, 245, 245),
+                BorderStyle = BorderStyle.FixedSingle
             };
-            this.Controls.Add(infoLabel);
+
+            var detailsHeader = new Label
+            {
+                Text = "Profile Details",
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Location = new Point(10, 8),
+                Size = new Size(200, 20)
+            };
+            detailsPanel.Controls.Add(detailsHeader);
+
+            _viewDetailsButton = new Button
+            {
+                Text = "View Details",
+                Location = new Point(detailsPanel.Width - 110, 8),
+                Size = new Size(100, 28),
+                Font = new Font("Segoe UI", 9)
+            };
+            _viewDetailsButton.Click += (s, e) => ShowSelectedProfileDetails();
+            detailsPanel.Controls.Add(_viewDetailsButton);
+
+            _profileDetailsBodyLabel = new Label
+            {
+                Text = "Select a profile to view details",
+                Font = new Font("Consolas", 9),
+                Location = new Point(10, 38),
+                Size = new Size(detailsPanel.Width - 20, 45),
+                BackColor = Color.FromArgb(255, 255, 224)
+            };
+            detailsPanel.Controls.Add(_profileDetailsBodyLabel);
+
+            this.Controls.Add(detailsPanel);
+            yPos += detailsPanel.Height + 10;
 
             this.ResumeLayout();
         }
@@ -259,23 +317,83 @@ namespace PitWall.UI
             _browseFolderButton.Enabled = false;
             _progressBar.Visible = true;
             _progressBar.Value = 0;
-            _statusLabel.Text = "IBT import implementation pending...";
-            _statusLabel.ForeColor = Color.Orange;
-            Logger.Info($"IBT import requested. Folder={_replayFolderTextBox.Text}");
+            _statusLabel.Text = "Scanning for IBT files...";
+            _statusLabel.ForeColor = Color.Blue;
+            Logger.Info($"IBT import started. Folder={_replayFolderTextBox.Text}");
 
             try
             {
-                // TODO: Implement IBT importer with iRSDKSharp
-                // - Scan Documents/iRacing/telemetry for .ibt files
-                // - Parse header and 60Hz samples
-                // - Build hierarchical profiles (Driver -> Car -> Track)
-                // - Apply recency weighting and confidence scoring
+                // Phase 5A: Use real IbtImporter
+                var ibtFiles = Directory.GetFiles(_replayFolderTextBox.Text, "*.ibt", SearchOption.TopDirectoryOnly);
 
-                await Task.Delay(1000); // Placeholder delay
+                if (ibtFiles.Length == 0)
+                {
+                    MessageBox.Show(
+                        $"No .ibt files found in:\n{_replayFolderTextBox.Text}\n\n" +
+                        "Make sure you've selected the correct iRacing telemetry folder.\n" +
+                        "Default location: Documents\\iRacing\\telemetry",
+                        "No IBT Files Found",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                    _progressBar.Visible = false;
+                    _statusLabel.Text = "No IBT files found";
+                    _statusLabel.ForeColor = Color.Orange;
+                    _importButton.Enabled = true;
+                    _browseFolderButton.Enabled = true;
+                    _isProcessing = false;
+                    return;
+                }
+
+                _statusLabel.Text = $"Found {ibtFiles.Length} IBT files. Importing...";
+                Logger.Info($"Found {ibtFiles.Length} IBT files to import");
+
+                int imported = 0;
+                int failed = 0;
+
+                for (int i = 0; i < ibtFiles.Length; i++)
+                {
+                    var file = ibtFiles[i];
+                    try
+                    {
+                        _statusLabel.Text = $"Importing {i + 1}/{ibtFiles.Length}: {Path.GetFileName(file)}";
+                        _progressBar.Value = (int)((i + 1) * 100.0 / ibtFiles.Length);
+
+                        // Import IBT file
+                        var session = await _ibtImporter.ImportIBTFileAsync(file);
+
+                        // Save to database
+                        await _sessionRepository.SaveSessionAsync(session);
+
+                        imported++;
+                        Logger.Info($"Imported: {Path.GetFileName(file)} - {session.Laps.Count} laps, {session.RawSamples.Count} samples");
+                    }
+                    catch (Exception ex)
+                    {
+                        failed++;
+                        Logger.Error($"Failed to import {file}: {ex.Message}");
+                    }
+                }
+
+                // Generate profiles from imported telemetry
+                _statusLabel.Text = $"Generating profiles from {imported} sessions...";
+                _statusLabel.ForeColor = Color.Blue;
+                Logger.Info("Starting profile generation");
+
+                int profilesGenerated = 0;
+                try
+                {
+                    profilesGenerated = await _profileGenerator.GenerateProfilesFromImportedSessionsAsync();
+                    Logger.Info($"Generated {profilesGenerated} profiles");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Profile generation failed: {ex.Message}");
+                }
 
                 _progressBar.Visible = false;
-                _statusLabel.Text = "IBT import not yet implemented";
-                _statusLabel.ForeColor = Color.Orange;
+                _statusLabel.Text = $"Import complete: {imported} sessions, {profilesGenerated} profiles";
+                _statusLabel.ForeColor = imported > 0 ? Color.Green : Color.Red;
 
                 _settings.LastImportDate = DateTime.Now;
                 LoadSettings();
@@ -286,12 +404,19 @@ namespace PitWall.UI
                 _isProcessing = false;
 
                 MessageBox.Show(
-                    "IBT import functionality is being implemented.\n\n" +
-                    "This will support automatic scanning of iRacing telemetry files\n" +
-                    "and hierarchical profile building.",
-                    "Feature In Development",
+                    $"Import Complete!\n\n" +
+                    $"Successfully imported: {imported} sessions\n" +
+                                        $"Profiles generated: {profilesGenerated}\n" +
+                    $"Failed: {failed}\n\n" +
+                    $"Each session includes:\n" +
+                    $"• Session metadata (driver, car, track)\n" +
+                    $"• Lap-by-lap statistics\n" +
+                    $"• 60Hz telemetry samples\n\n" +
+                                        $"Profiles aggregated by driver/car/track combination.\n\n" +
+                    $"Data saved to: pitwall_telemetry.db",
+                    "Import Complete",
                     MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
+                    imported > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning
                 );
             }
             catch (Exception ex)
@@ -312,47 +437,83 @@ namespace PitWall.UI
         private void RefreshProfileList()
         {
             _profileListBox.Items.Clear();
+            _profiles.Clear();
 
             try
             {
-                // Get all profiles from database
-                var profiles = _database.GetRecentSessions(100).Result;
+                // Get all driver profiles from database
+                var profiles = _database.GetProfiles(100).Result;
+                _profiles = profiles.OrderByDescending(p => p.LastUpdated).ToList();
 
-                if (profiles.Count == 0)
+                if (_profiles.Count == 0)
                 {
                     _profileListBox.Items.Add("No profiles found. Import replays or race to build profiles.");
+                    UpdateProfileDetails(null);
                     return;
                 }
 
-                // Group by track/car and show summary
-                var grouped = profiles
-                    .GroupBy(p => $"{p.TrackName} + {p.CarName}")
-                    .OrderByDescending(g => g.Max(p => p.SessionDate))
-                    .ToList();
-
-                _profileListBox.Items.Add($"Found {grouped.Count} track/car combinations:");
-                _profileListBox.Items.Add("");
-
-                foreach (var group in grouped)
+                foreach (var profile in _profiles)
                 {
-                    var latest = group.OrderByDescending(p => p.SessionDate).First();
-                    var sessionCount = group.Count();
-                    var daysAgo = (DateTime.Now - latest.SessionDate).TotalDays;
-
-                    var line = $"{latest.TrackName.PadRight(25)} + {latest.CarName.PadRight(25)} | " +
-                               $"{sessionCount,2} sessions | Last: {daysAgo,3:F0} days ago";
-
-                    if (daysAgo > 180)
-                    {
-                        line += " ⚠️ STALE";
-                    }
-
-                    _profileListBox.Items.Add(line);
+                    _profileListBox.Items.Add(new ProfileListItem(profile));
                 }
+
+                // Default to first profile selection to show details
+                _profileListBox.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
                 _profileListBox.Items.Add($"Error loading profiles: {ex.Message}");
+                UpdateProfileDetails(null);
+            }
+        }
+
+        private void ProfileListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var selected = _profileListBox.SelectedItem as ProfileListItem;
+            UpdateProfileDetails(selected?.Profile);
+        }
+
+        private void ProfileListBox_DoubleClick(object sender, EventArgs e)
+        {
+            ShowSelectedProfileDetails();
+        }
+
+        private void ShowSelectedProfileDetails()
+        {
+            var selected = _profileListBox.SelectedItem as ProfileListItem;
+            if (selected?.Profile == null)
+            {
+                return;
+            }
+
+            MessageBox.Show(
+                ProfileDisplayFormatter.FormatDetails(selected.Profile),
+                "Profile Details",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        private void UpdateProfileDetails(DriverProfile? profile)
+        {
+            _profileDetailsBodyLabel.Text = profile == null
+                ? "Select a profile to view details"
+                : ProfileDisplayFormatter.FormatDetails(profile);
+        }
+
+        private sealed class ProfileListItem
+        {
+            public DriverProfile Profile { get; }
+
+            public ProfileListItem(DriverProfile profile)
+            {
+                Profile = profile;
+            }
+
+            public override string ToString()
+            {
+                var daysAgo = (DateTime.Now - Profile.LastUpdated).TotalDays;
+                string stale = Profile.IsStale ? " STALE" : string.Empty;
+                return $"{Profile.DriverName.PadRight(20)} | {Profile.TrackName.PadRight(20)} | {Profile.CarName.PadRight(20)} | Fuel/lap: {Profile.AverageFuelPerLap:F2} | Laps: {Profile.SessionsCompleted,3} | Updated: {daysAgo,3:F0} days ago{stale}";
             }
         }
     }

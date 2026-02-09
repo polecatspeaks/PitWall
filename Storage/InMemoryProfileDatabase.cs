@@ -43,6 +43,15 @@ namespace PitWall.Storage
             return Task.CompletedTask;
         }
 
+        public Task<List<DriverProfile>> GetProfiles(int count)
+        {
+            var profiles = _profiles.Values
+                .OrderByDescending(p => p.LastUpdated)
+                .Take(count)
+                .ToList();
+            return Task.FromResult(profiles);
+        }
+
         private string MakeKey(string driver, string track, string car)
         {
             return $"{driver}|{track}|{car}";

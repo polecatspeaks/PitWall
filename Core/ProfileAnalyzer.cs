@@ -12,6 +12,7 @@ namespace PitWall.Core
     {
         private const double SMOOTH_THRESHOLD = 1.0; // Lap time variance < 1 second
         private const double AGGRESSIVE_THRESHOLD = 3.0; // Lap time variance > 3 seconds
+        private const int STALE_DAYS = 90;
 
         public DriverProfile AnalyzeSession(SessionData session)
         {
@@ -31,7 +32,10 @@ namespace PitWall.Core
                 TypicalTyreDegradation = CalculateAverageTyreDegradation(validLaps),
                 Style = IdentifyDrivingStyle(validLaps),
                 SessionsCompleted = 1,
-                LastUpdated = DateTime.Now
+                LastUpdated = DateTime.Now,
+                Confidence = CalculateConfidence(validLaps.Count),
+                IsStale = false,
+                LastSessionDate = session.SessionDate
             };
 
             return profile;
@@ -40,6 +44,13 @@ namespace PitWall.Core
         public DriverProfile MergeProfiles(DriverProfile existing, DriverProfile newProfile)
         {
             int totalSessions = existing.SessionsCompleted + newProfile.SessionsCompleted;
+
+            // Use the most recent session date for freshness
+            var lastSessionDate = MaxDate(existing.LastSessionDate, newProfile.LastSessionDate);
+            bool isStale = lastSessionDate.HasValue && (DateTime.UtcNow - lastSessionDate.Value).TotalDays > STALE_DAYS;
+
+            // Confidence grows with session count (cap at 1.0)
+            double confidence = Math.Min(1.0, totalSessions / 10.0);
 
             // Weighted average based on session count
             double mergedFuel = (existing.AverageFuelPerLap * existing.SessionsCompleted +
@@ -57,8 +68,24 @@ namespace PitWall.Core
                 TypicalTyreDegradation = mergedTyre,
                 Style = DetermineMergedStyle(existing.Style, newProfile.Style),
                 SessionsCompleted = totalSessions,
-                LastUpdated = DateTime.Now
+                LastUpdated = DateTime.Now,
+                Confidence = confidence,
+                IsStale = isStale,
+                LastSessionDate = lastSessionDate
             };
+        }
+
+        private static DateTime? MaxDate(DateTime? a, DateTime? b)
+        {
+            if (!a.HasValue) return b;
+            if (!b.HasValue) return a;
+            return a.Value >= b.Value ? a : b;
+        }
+
+        private double CalculateConfidence(int validLapCount)
+        {
+            // Simple heuristic: full confidence at 50 valid laps
+            return Math.Min(1.0, validLapCount / 50.0);
         }
 
         private double CalculateAverageFuel(List<LapData> validLaps)

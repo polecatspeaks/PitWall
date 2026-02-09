@@ -50,7 +50,7 @@ namespace PitWall
         /// <summary>
         /// IWPFSettingsV2: Icon for settings panel menu (null = default)
         /// </summary>
-        public ImageSource PictureIcon => null;
+        public ImageSource PictureIcon => null!;
 
         /// <summary>
         /// IWPFSettingsV2: Settings panel control (hosts WinForms UI inside WPF container)
@@ -79,7 +79,7 @@ namespace PitWall
         /// <summary>
         /// IWPFSettingsV2: Help/description text
         /// </summary>
-        public string GetInfoText() => 
+        public string GetInfoText() =>
             "Pit Wall Race Engineer - AI-powered race strategy assistant\n" +
             "\n" +
             "Features:\n" +
@@ -123,7 +123,7 @@ namespace PitWall
             _tyreDegradation = new TyreDegradation();
             _profileAnalyzer = new ProfileAnalyzer();
             _profileDatabase = new SQLiteProfileDatabase();
-            
+
             IPluginPropertyProvider propertyProvider = pluginManager as IPluginPropertyProvider
                 ?? new PluginManagerPropertyProvider(pluginManager);
             _telemetryProvider = new SimHubTelemetryProvider(propertyProvider);
@@ -133,7 +133,7 @@ namespace PitWall
 
             // Load profile asynchronously (non-blocking)
             // Driver/track/car info will be available after first DataUpdate
-            
+
             // Initialize settings UI
             if (_profileDatabase != null && _settings != null)
             {
@@ -217,7 +217,7 @@ namespace PitWall
                         SessionDate = DateTime.Now,
                         Laps = _sessionLaps,
                         TotalFuelUsed = _sessionLaps.Sum(l => l.FuelUsed),
-                        SessionDuration = _sessionLaps.Count > 0 
+                        SessionDuration = _sessionLaps.Count > 0
                             ? TimeSpan.FromTicks(_sessionLaps.Sum(l => l.LapTime.Ticks))
                             : TimeSpan.Zero
                     };

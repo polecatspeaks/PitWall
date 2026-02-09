@@ -17,7 +17,7 @@ namespace PitWall.Tests.Unit.Storage
     public class DriverProfileRepositoryTests
     {
         [Fact]
-        public async Task CreateDriver_StoresDriverProfile()
+        public Task CreateDriver_StoresDriverProfile()
         {
             // Arrange
             var driver = new DriverProfile
@@ -36,10 +36,12 @@ namespace PitWall.Tests.Unit.Storage
             // Assert - Would verify driver exists in DB
             Assert.NotNull(driver.DriverId);
             Assert.Equal("Chris Mann", driver.DriverName);
+
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task GetDriver_ReturnsHierarchy()
+        public Task GetDriver_ReturnsHierarchy()
         {
             // Arrange - Hierarchical structure
             var driver = new DriverProfile
@@ -76,6 +78,8 @@ namespace PitWall.Tests.Unit.Storage
             Assert.Single(driver.CarProfiles);
             Assert.Single(driver.CarProfiles[0].TrackProfiles);
             Assert.Equal(1.87f, driver.CarProfiles[0].TrackProfiles[0].AvgFuelPerLap);
+
+            return Task.CompletedTask;
         }
     }
 
@@ -86,7 +90,7 @@ namespace PitWall.Tests.Unit.Storage
     public class SessionRepositoryTests
     {
         [Fact]
-        public async Task CreateSession_StoresMetadata()
+        public Task CreateSession_StoresMetadata()
         {
             // Arrange
             var session = new SessionMetadata
@@ -113,10 +117,12 @@ namespace PitWall.Tests.Unit.Storage
             // Assert
             Assert.NotEmpty(session.SessionId);
             Assert.Equal(42, session.LapCount);
+
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task StoreTelemetrySamples_Preserves60HzData()
+        public Task StoreTelemetrySamples_Preserves60HzData()
         {
             // Arrange - 1 second (60 samples at 60Hz)
             var samples = new List<TelemetrySample>();
@@ -146,6 +152,8 @@ namespace PitWall.Tests.Unit.Storage
             Assert.Equal(60, samples.Count);
             Assert.True(samples[0].Speed < samples[59].Speed);
             Assert.True(samples[0].EngineRpm < samples[59].EngineRpm);
+
+            return Task.CompletedTask;
         }
     }
 

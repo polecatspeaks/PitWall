@@ -26,6 +26,8 @@ namespace PitWall.Tests.Core
             Assert.Equal("TestCar", profile.CarName);
             Assert.InRange(profile.AverageFuelPerLap, 2.4, 2.6); // 2.5 average
             Assert.Equal(1, profile.SessionsCompleted);
+            Assert.True(profile.Confidence > 0);
+            Assert.False(profile.IsStale);
         }
 
         [Fact]
@@ -40,6 +42,7 @@ namespace PitWall.Tests.Core
 
             // Assert
             Assert.Equal(DrivingStyle.Smooth, profile.Style);
+            Assert.False(profile.IsStale);
         }
 
         [Fact]
@@ -114,6 +117,7 @@ namespace PitWall.Tests.Core
             Assert.Equal(8, merged.SessionsCompleted);
             // Weighted average: (2.5*5 + 2.7*3) / 8 = 2.575
             Assert.InRange(merged.AverageFuelPerLap, 2.55, 2.6);
+            Assert.True(merged.Confidence > 0.5);
         }
 
         // Helper methods
