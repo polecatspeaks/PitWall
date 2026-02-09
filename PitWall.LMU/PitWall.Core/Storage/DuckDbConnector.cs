@@ -14,7 +14,13 @@ namespace PitWall.Core.Storage
     public class DuckDbConnector : IDuckDbConnector
     {
         private readonly string _databasePath;
-        private const string TelemetryTableName = "telemetry_samples";
+        private const string TableGpsSpeed = "GPS Speed";
+        private const string TableGpsTime = "GPS Time";
+        private const string TableThrottle = "Throttle Pos";
+        private const string TableBrake = "Brake Pos";
+        private const string TableSteering = "Steering Pos";
+        private const string TableFuel = "Fuel Level";
+        private const string TableTyreTemps = "TyresTempCentre";
 
         public DuckDbConnector(string databasePath)
         {
@@ -28,17 +34,14 @@ namespace PitWall.Core.Storage
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = $@"
-CREATE TABLE IF NOT EXISTS {TelemetryTableName} (
-    timestamp TIMESTAMP,
-    speed_kph DOUBLE,
-    tyre_temps_c VARCHAR,
-    fuel_liters DOUBLE,
-    brake_input DOUBLE,
-    throttle_input DOUBLE,
-    steering_input DOUBLE,
-    session_id VARCHAR
-);
+                    command.CommandText = @"
+CREATE TABLE IF NOT EXISTS ""GPS Speed"" (value FLOAT);
+CREATE TABLE IF NOT EXISTS ""GPS Time"" (value DOUBLE);
+CREATE TABLE IF NOT EXISTS ""Throttle Pos"" (value FLOAT);
+CREATE TABLE IF NOT EXISTS ""Brake Pos"" (value FLOAT);
+CREATE TABLE IF NOT EXISTS ""Steering Pos"" (value FLOAT);
+CREATE TABLE IF NOT EXISTS ""Fuel Level"" (value FLOAT);
+CREATE TABLE IF NOT EXISTS ""TyresTempCentre"" (value1 FLOAT, value2 FLOAT, value3 FLOAT, value4 FLOAT);
 ";
                     command.ExecuteNonQuery();
                 }
@@ -59,65 +62,67 @@ CREATE TABLE IF NOT EXISTS {TelemetryTableName} (
                 connection.Open();
                 using (var transaction = connection.BeginTransaction())
                 {
-                    using (var command = connection.CreateCommand())
+                    using var speedCommand = CreateInsertCommand(connection, transaction, TableGpsSpeed, "value");
+                    using var timeCommand = CreateInsertCommand(connection, transaction, TableGpsTime, "value");
+                    using var throttleCommand = CreateInsertCommand(connection, transaction, TableThrottle, "value");
+                    using var brakeCommand = CreateInsertCommand(connection, transaction, TableBrake, "value");
+                    using var steeringCommand = CreateInsertCommand(connection, transaction, TableSteering, "value");
+                    using var fuelCommand = CreateInsertCommand(connection, transaction, TableFuel, "value");
+                    using var tempsCommand = CreateInsertCommand(connection, transaction, TableTyreTemps, "value1", "value2", "value3", "value4");
+
+                    foreach (var sample in sampleList)
                     {
-                        command.Transaction = transaction;
-                        command.CommandText = $@"
-INSERT INTO {TelemetryTableName} 
-(timestamp, speed_kph, tyre_temps_c, fuel_liters, brake_input, throttle_input, steering_input, session_id)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                        var speedMps = sample.SpeedKph / 3.6;
+                        var gpsTime = (sample.Timestamp - DateTime.UnixEpoch).TotalSeconds;
+                        var tyreTemps = sample.TyreTempsC ?? Array.Empty<double>();
 
-                        var timestampParam = command.CreateParameter();
-                        timestampParam.ParameterName = "@timestamp";
-                        command.Parameters.Add(timestampParam);
+                        speedCommand.Parameters[0].Value = speedMps;
+                        timeCommand.Parameters[0].Value = gpsTime;
+                        throttleCommand.Parameters[0].Value = sample.Throttle;
+                        brakeCommand.Parameters[0].Value = sample.Brake;
+                        steeringCommand.Parameters[0].Value = sample.Steering;
+                        fuelCommand.Parameters[0].Value = sample.FuelLiters;
 
-                        var speedParam = command.CreateParameter();
-                        speedParam.ParameterName = "@speed_kph";
-                        command.Parameters.Add(speedParam);
+                        tempsCommand.Parameters[0].Value = tyreTemps.Length > 0 ? tyreTemps[0] : 0.0;
+                        tempsCommand.Parameters[1].Value = tyreTemps.Length > 1 ? tyreTemps[1] : 0.0;
+                        tempsCommand.Parameters[2].Value = tyreTemps.Length > 2 ? tyreTemps[2] : 0.0;
+                        tempsCommand.Parameters[3].Value = tyreTemps.Length > 3 ? tyreTemps[3] : 0.0;
 
-                        var tyreTempsParam = command.CreateParameter();
-                        tyreTempsParam.ParameterName = "@tyre_temps_c";
-                        command.Parameters.Add(tyreTempsParam);
-
-                        var fuelParam = command.CreateParameter();
-                        fuelParam.ParameterName = "@fuel_liters";
-                        command.Parameters.Add(fuelParam);
-
-                        var brakeParam = command.CreateParameter();
-                        brakeParam.ParameterName = "@brake_input";
-                        command.Parameters.Add(brakeParam);
-
-                        var throttleParam = command.CreateParameter();
-                        throttleParam.ParameterName = "@throttle_input";
-                        command.Parameters.Add(throttleParam);
-
-                        var steeringParam = command.CreateParameter();
-                        steeringParam.ParameterName = "@steering_input";
-                        command.Parameters.Add(steeringParam);
-
-                        var sessionParam = command.CreateParameter();
-                        sessionParam.ParameterName = "@session_id";
-                        command.Parameters.Add(sessionParam);
-
-                        command.Prepare();
-
-                        foreach (var sample in sampleList)
-                        {
-                            timestampParam.Value = sample.Timestamp;
-                            speedParam.Value = sample.SpeedKph;
-                            tyreTempsParam.Value = string.Join(",", sample.TyreTempsC);
-                            fuelParam.Value = sample.FuelLiters;
-                            brakeParam.Value = sample.Brake;
-                            throttleParam.Value = sample.Throttle;
-                            steeringParam.Value = sample.Steering;
-                            sessionParam.Value = sessionId;
-
-                            command.ExecuteNonQuery();
-                        }
+                        speedCommand.ExecuteNonQuery();
+                        timeCommand.ExecuteNonQuery();
+                        throttleCommand.ExecuteNonQuery();
+                        brakeCommand.ExecuteNonQuery();
+                        steeringCommand.ExecuteNonQuery();
+                        fuelCommand.ExecuteNonQuery();
+                        tempsCommand.ExecuteNonQuery();
                     }
+
                     transaction.Commit();
                 }
             }
+        }
+
+        private static DuckDBCommand CreateInsertCommand(
+            DuckDBConnection connection,
+            DuckDBTransaction transaction,
+            string tableName,
+            params string[] columns)
+        {
+            var command = connection.CreateCommand();
+            command.Transaction = transaction;
+
+            var quotedColumns = string.Join(", ", columns.Select(col => $"\"{col}\""));
+            var placeholders = string.Join(", ", Enumerable.Repeat("?", columns.Length));
+            command.CommandText = $"INSERT INTO \"{tableName}\" ({quotedColumns}) VALUES ({placeholders})";
+
+            foreach (var column in columns)
+            {
+                var parameter = command.CreateParameter();
+                command.Parameters.Add(parameter);
+            }
+
+            command.Prepare();
+            return command;
         }
     }
 }

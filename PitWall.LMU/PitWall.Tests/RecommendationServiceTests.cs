@@ -78,9 +78,10 @@ namespace PitWall.Tests
             // Arrange
             var service = new RecommendationService();
             var writer = new InMemoryTelemetryWriter();
+            string? sessionId = null;
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => service.GetRecommendation(null, writer));
+            Assert.Throws<ArgumentException>(() => service.GetRecommendation(sessionId!, writer));
         }
 
         [Fact]
@@ -88,9 +89,10 @@ namespace PitWall.Tests
         {
             // Arrange
             var service = new RecommendationService();
+            ITelemetryWriter? writer = null;
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => service.GetRecommendation("session-1", null));
+            Assert.Throws<ArgumentNullException>(() => service.GetRecommendation("session-1", writer!));
         }
     }
 }

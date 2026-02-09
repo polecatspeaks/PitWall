@@ -26,7 +26,7 @@ namespace PitWall.Tests
             }
         }
 
-        [Fact(Skip = "Requires native DuckDB libraries. Install DuckDB binaries or use vcpkg to enable.")]
+        [Fact]
         public void DuckDbConnector_CreatesSchemaOnEnsureSchema()
         {
             _connector.EnsureSchema();
@@ -34,7 +34,7 @@ namespace PitWall.Tests
             Assert.True(File.Exists(_testDbPath));
         }
 
-        [Fact(Skip = "Requires native DuckDB libraries. Install DuckDB binaries or use vcpkg to enable.")]
+        [Fact]
         public void DuckDbConnector_InsertsSamplesSuccessfully()
         {
             _connector.EnsureSchema();
@@ -51,7 +51,7 @@ namespace PitWall.Tests
             Assert.True(File.Exists(_testDbPath));
         }
 
-        [Fact(Skip = "Requires native DuckDB libraries. Install DuckDB binaries or use vcpkg to enable.")]
+        [Fact]
         public void DuckDbConnector_HandlesEmptySampleList()
         {
             _connector.EnsureSchema();
