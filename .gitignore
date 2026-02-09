@@ -53,3 +53,8 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Ignore LMU Telemetry Database
+PitWall.LMU/lmu_telemetry.db
+PitWall.LMU/lmu_telemetry.db-shm
+PitWall.LMU/lmu_telemetry.db-wal
