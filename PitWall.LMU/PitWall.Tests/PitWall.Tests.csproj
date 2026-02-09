@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PitWall.Core\PitWall.Core.csproj" />
     <ProjectReference Include="..\PitWall.Strategy\PitWall.Strategy.csproj" />
+    <ProjectReference Include="..\PitWall.Api\PitWall.Api.csproj" />
   </ItemGroup>
 
 </Project>

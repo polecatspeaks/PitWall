@@ -1,0 +1,61 @@
+using System;
+using System.Collections.Generic;
+using PitWall.Core.Models;
+using PitWall.Core.Storage;
+using PitWall.Strategy;
+
+namespace PitWall.Api.Services
+{
+    /// <summary>
+    /// Service that wires telemetry data with StrategyEngine to generate recommendations.
+    /// </summary>
+    public interface IRecommendationService
+    {
+        RecommendationResponse GetRecommendation(string sessionId, ITelemetryWriter writer);
+    }
+
+    public class RecommendationService : IRecommendationService
+    {
+        private readonly StrategyEngine _engine;
+
+        public RecommendationService()
+        {
+            _engine = new StrategyEngine();
+        }
+
+        public RecommendationResponse GetRecommendation(string sessionId, ITelemetryWriter writer)
+        {
+            if (string.IsNullOrWhiteSpace(sessionId))
+                throw new ArgumentException("Session ID is required.", nameof(sessionId));
+
+            if (writer == null)
+                throw new ArgumentNullException(nameof(writer));
+
+            // Retrieve the latest sample(s) for this session
+            var samples = writer.GetSamples(sessionId);
+
+            if (samples == null || samples.Count == 0)
+                return new RecommendationResponse
+                {
+                    Recommendation = "No telemetry data available",
+                    Confidence = 0.0,
+                    SessionId = sessionId
+                };
+
+            // Use the most recent sample
+            var latestSample = samples[samples.Count - 1];
+
+            // Evaluate using StrategyEngine
+            var evaluation = _engine.Evaluate(latestSample);
+
+            return new RecommendationResponse
+            {
+                Recommendation = evaluation,
+                Confidence = 0.85, // TODO: Add confidence scoring from engine
+                SessionId = sessionId,
+                Timestamp = latestSample.Timestamp,
+                SpeedKph = latestSample.SpeedKph
+            };
+        }
+    }
+}
