@@ -26,7 +26,10 @@ PitWall.Strategy
 PitWall.Core
   ├─ Models (TelemetrySample, RaceState, etc.)
   ├─ LMU.LMUAdapter (LMU telemetry ingestion)
-  └─ Storage.ITelemetryWriter (batch persistence)
+  └─ Storage
+      ├─ ITelemetryWriter (persistence abstraction)
+      ├─ InMemoryTelemetryWriter (testing)
+      └─ DuckDbTelemetryWriter (production, requires native DuckDB)
 
 PitWall.Tests (xUnit + TDD)
   ├─ StrategyTests (tyre/fuel rules)
@@ -45,20 +48,28 @@ PitWall.Tests (xUnit + TDD)
   - [x] Tyre overheat detection (>110°C threshold)
   - [x] Fuel projection (laps remaining calculation)
 - [x] InMemoryTelemetryWriter (batch storage interface)
-- [x] Unit tests: **4/4 passing** (no regressions)
+- [x] DuckDbTelemetryWriter + DuckDbConnector (full implementation with schema & batching)
+  - ✓ Schema creation (CREATE TABLE telemetry_samples)
+  - ✓ Batch insert with transactions
+  - ✓ Parameterized queries & type safety
+  - ⚠️ Integration tests skipped (requires native DuckDB binaries)
+- [x] Unit tests: **6/6 passing** (DuckDB mock tests passing)
+  - [x] TelemetrySample, LMUAdapter, StrategyEngine, DuckDbTelemetryWriter unit tests
+  - [x] Integration tests scaffolded (skipped: native dependency pending)
 
 ### 🚧 In Progress
-- [ ] API + WebSocket integration tests
+- [ ] Enable DuckDB integration tests (requires native binaries)
+- [ ] API + WebSocket integration tests and real implementation
 - [ ] CI pipeline (GitHub Actions)
 - [ ] Performance tests (throughput, latency)
 - [ ] Developer docs & runbook
 
 ### 📋 Planned
-- [ ] DuckDB writer (optional; currently in-memory)
 - [ ] ML inference layer (confidence scores)
 - [ ] UI stub (Electron or web PWA)
 - [ ] Session replay & replay analysis
 - [ ] Historical profile seeding
+- [ ] Load testing (concurrent sessions)
 
 ## Quick Start
 
@@ -76,8 +87,10 @@ dotnet test --no-build
 
 Expected output:
 ```
-Test summary: total: 4, failed: 0, succeeded: 4, skipped: 0, duration: 0.6s
+Test summary: total: 9, failed: 0, succeeded: 6, skipped: 3, duration: 0.6s
 ```
+
+Note: The 3 skipped tests are DuckDB integration tests that require native DuckDB binaries. Unit tests (which mock the DuckDB connector) run and pass without native dependencies.
 
 ### Project Structure
 
@@ -91,12 +104,16 @@ PitWall.LMU/
 │   │   └── LMUAdapter.cs
 │   └── Storage/
 │       ├── ITelemetryWriter.cs
-│       └── InMemoryTelemetryWriter.cs
+│       ├── InMemoryTelemetryWriter.cs
+│       ├── DuckDbTelemetryWriter.cs
+│       ├── DuckDbConnector.cs
+│       └── IDuckDbConnector.cs
 ├── PitWall.Strategy/         # Rule engine & strategy logic
 │   └── StrategyEngine.cs
 ├── PitWall.Tests/            # Unit + integration tests
-│   ├── UnitTest1.cs (StrategyTests)
-│   └── TelemetryWriterTests.cs
+│   ├── TelemetryWriterTests.cs
+│   ├── DuckDbTelemetryWriterTests.cs
+│   └── DuckDbConnectorIntegrationTests.cs
 └── PitWall.LMU.sln
 ```
 
@@ -212,6 +229,31 @@ Follow TDD strictly:
 3. Refactor for clarity
 4. Commit with descriptive message
 5. Ensure all tests pass before pushing
+
+## DuckDB Integration (Optional)
+
+The `DuckDbTelemetryWriter` provides high-performance analytics and session storage using DuckDB. Integration tests are skipped by default because they require native DuckDB binaries.
+
+To enable DuckDB integration tests:
+
+1. **Install DuckDB binaries** (Option A: vcpkg)
+   ```bash
+   vcpkg install duckdb:x64-windows
+   # Then set DUCKDB_PATH environment variable or add to PATH
+   ```
+
+2. **Or use pre-built binaries** (Option B: download)
+   - Download from [duckdb.org/releases](https://duckdb.org/releases)
+   - Extract and add to system PATH
+
+3. **Enable integration tests**
+   - Remove the `[Fact(Skip = ...)]` attribute from integration test methods
+   - Run tests: `dotnet test --filter "Integration"`
+
+Once enabled, the integration tests verify:
+- Schema creation (CREATE TABLE telemetry_samples)
+- Batch inserts with parameterized queries
+- Transaction handling and rollback safety
 
 ## License
 

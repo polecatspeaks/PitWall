@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DuckDB.NET.Data" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>

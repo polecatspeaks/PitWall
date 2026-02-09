@@ -10,3 +10,4 @@ C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Co
 C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\obj\Debug\net9.0\refint\PitWall.Core.dll
 C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\obj\Debug\net9.0\PitWall.Core.pdb
 C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\obj\Debug\net9.0\ref\PitWall.Core.dll
+C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\obj\Debug\net9.0\PitWall.Core.csproj.AssemblyReference.cache

@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "eENBJ80iG4A=",
+  "dgSpecHash": "nzlOqZzqqBQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\ohzee\\.claude-worktrees\\PitWall\\vibrant-meninsky\\PitWall.LMU\\PitWall.Tests\\PitWall.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ohzee\\.nuget\\packages\\coverlet.collector\\6.0.2\\coverlet.collector.6.0.2.nupkg.sha512",
+    "C:\\Users\\ohzee\\.nuget\\packages\\duckdb.net.bindings\\1.0.0\\duckdb.net.bindings.1.0.0.nupkg.sha512",
+    "C:\\Users\\ohzee\\.nuget\\packages\\duckdb.net.data\\1.0.0\\duckdb.net.data.1.0.0.nupkg.sha512",
     "C:\\Users\\ohzee\\.nuget\\packages\\microsoft.codecoverage\\17.12.0\\microsoft.codecoverage.17.12.0.nupkg.sha512",
     "C:\\Users\\ohzee\\.nuget\\packages\\microsoft.net.test.sdk\\17.12.0\\microsoft.net.test.sdk.17.12.0.nupkg.sha512",
     "C:\\Users\\ohzee\\.nuget\\packages\\microsoft.testplatform.objectmodel\\17.12.0\\microsoft.testplatform.objectmodel.17.12.0.nupkg.sha512",

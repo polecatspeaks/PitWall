@@ -8,6 +8,35 @@
           "build/netstandard2.0/coverlet.collector.targets": {}
         }
       },
+      "DuckDB.NET.Bindings/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/DuckDB.NET.Bindings.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/DuckDB.NET.Bindings.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "DuckDB.NET.Data/1.0.0": {
+        "type": "package",
+        "dependencies": {
+          "DuckDB.NET.Bindings": "1.0.0"
+        },
+        "compile": {
+          "lib/net6.0/DuckDB.NET.Data.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/DuckDB.NET.Data.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
       "Microsoft.CodeCoverage/17.12.0": {
         "type": "package",
         "compile": {
@@ -415,6 +444,9 @@
       "PitWall.Core/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "DuckDB.NET.Data": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/PitWall.Core.dll": {}
         },
@@ -506,6 +538,42 @@
         "coverlet-icon.png",
         "coverlet.collector.6.0.2.nupkg.sha512",
         "coverlet.collector.nuspec"
+      ]
+    },
+    "DuckDB.NET.Bindings/1.0.0": {
+      "sha512": "J7vNAOc2Pec9CF83Sko7O2hZO3LW8Diqqqg0Hf1hz09XNUIXPgCcOA45r+DAQG+/9GJr6Hx4paBbTRsoDSerLQ==",
+      "type": "package",
+      "path": "duckdb.net.bindings/1.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "Logo.jpg",
+        "README.md",
+        "duckdb.net.bindings.1.0.0.nupkg.sha512",
+        "duckdb.net.bindings.nuspec",
+        "lib/net6.0/DuckDB.NET.Bindings.dll",
+        "lib/net6.0/DuckDB.NET.Bindings.pdb",
+        "lib/netstandard2.0/DuckDB.NET.Bindings.dll",
+        "lib/netstandard2.0/DuckDB.NET.Bindings.pdb"
+      ]
+    },
+    "DuckDB.NET.Data/1.0.0": {
+      "sha512": "cSCPkt36SBmxY01hihW981uVQGQVn0IrXqvNEF6C6NEy0sYrZP2OL8MHcAVI3IisOQsM8ZDEaa0RQLq3Aq9Uxw==",
+      "type": "package",
+      "path": "duckdb.net.data/1.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "Logo.jpg",
+        "README.md",
+        "duckdb.net.data.1.0.0.nupkg.sha512",
+        "duckdb.net.data.nuspec",
+        "lib/net6.0/DuckDB.NET.Data.dll",
+        "lib/net6.0/DuckDB.NET.Data.pdb",
+        "lib/netstandard2.0/DuckDB.NET.Data.dll",
+        "lib/netstandard2.0/DuckDB.NET.Data.pdb"
       ]
     },
     "Microsoft.CodeCoverage/17.12.0": {
