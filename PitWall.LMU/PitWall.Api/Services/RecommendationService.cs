@@ -46,12 +46,12 @@ namespace PitWall.Api.Services
             var latestSample = samples[samples.Count - 1];
 
             // Evaluate using StrategyEngine
-            var evaluation = _engine.Evaluate(latestSample);
+            var evaluation = _engine.EvaluateWithConfidence(latestSample);
 
             return new RecommendationResponse
             {
-                Recommendation = evaluation,
-                Confidence = 0.85, // TODO: Add confidence scoring from engine
+                Recommendation = evaluation.Recommendation,
+                Confidence = evaluation.Confidence,
                 SessionId = sessionId,
                 Timestamp = latestSample.Timestamp,
                 SpeedKph = latestSample.SpeedKph
