@@ -1,0 +1,91 @@
+using System.Collections.Generic;
+using System.Net.Http.Json;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using PitWall.Agent.Models;
+using PitWall.Core.Models;
+using PitWall.Core.Storage;
+using Xunit;
+
+namespace PitWall.Tests
+{
+    public class AgentIntegrationTests
+    {
+        [Fact]
+        public async Task AgentHealth_ReturnsLlmStatus()
+        {
+            using var factory = CreateFactory(enableLlm: false, writer: new InMemoryTelemetryWriter());
+            using var client = factory.CreateClient();
+
+            var response = await client.GetAsync("/agent/health");
+            response.EnsureSuccessStatusCode();
+
+            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var root = doc.RootElement;
+
+            Assert.True(root.TryGetProperty("llmEnabled", out var enabled));
+            Assert.False(enabled.GetBoolean());
+        }
+
+        [Fact]
+        public async Task AgentQuery_UsesTelemetryContextFuel()
+        {
+            var writer = new InMemoryTelemetryWriter();
+            var sessionId = "session-1";
+            writer.WriteSamples(sessionId, new List<TelemetrySample>
+            {
+                new TelemetrySample(System.DateTime.UtcNow, 100, new double[] { 90, 90, 90, 90 }, 2.0, 0.1, 0.2, 0.0)
+            });
+
+            using var factory = CreateFactory(enableLlm: false, writer: writer);
+            using var client = factory.CreateClient();
+
+            var request = new AgentRequest
+            {
+                Query = "How much fuel do I have?",
+                Context = new Dictionary<string, object>
+                {
+                    ["sessionId"] = sessionId
+                }
+            };
+
+            var response = await client.PostAsJsonAsync("/agent/query", request);
+            response.EnsureSuccessStatusCode();
+
+            var payload = await response.Content.ReadFromJsonAsync<AgentResponse>();
+
+            Assert.NotNull(payload);
+            Assert.True(payload!.Success);
+            Assert.Equal("RulesEngine", payload.Source);
+            Assert.Contains("FUEL CRITICAL", payload.Answer);
+        }
+
+        private static WebApplicationFactory<PitWall.Agent.Program> CreateFactory(bool enableLlm, InMemoryTelemetryWriter writer)
+        {
+            return new WebApplicationFactory<PitWall.Agent.Program>()
+                .WithWebHostBuilder(builder =>
+                {
+                    builder.ConfigureAppConfiguration((_, config) =>
+                    {
+                        config.AddInMemoryCollection(new Dictionary<string, string?>
+                        {
+                            ["Agent:EnableLLM"] = enableLlm.ToString().ToLowerInvariant(),
+                            ["Agent:LLMProvider"] = "Ollama",
+                            ["Agent:LLMEndpoint"] = "http://localhost:11434",
+                            ["Agent:LLMModel"] = "llama3.2",
+                            ["Agent:LLMTimeoutMs"] = "5000"
+                        });
+                    });
+
+                    builder.ConfigureServices(services =>
+                    {
+                        services.RemoveAll(typeof(ITelemetryWriter));
+                        services.AddSingleton<ITelemetryWriter>(writer);
+                    });
+                });
+        }
+    }
+}

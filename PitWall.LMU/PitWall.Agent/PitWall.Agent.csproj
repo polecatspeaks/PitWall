@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PitWall.Strategy\PitWall.Strategy.csproj" />
+    <ProjectReference Include="..\PitWall.Core\PitWall.Core.csproj" />
   </ItemGroup>
 
 </Project>

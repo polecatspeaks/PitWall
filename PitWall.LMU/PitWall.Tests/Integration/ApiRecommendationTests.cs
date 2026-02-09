@@ -20,13 +20,13 @@ namespace PitWall.Tests.Integration
     /// </summary>
     public class ApiRecommendationTests : IDisposable
     {
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly WebApplicationFactory<global::Program> _factory;
         private readonly InMemoryTelemetryWriter _writer;
 
         public ApiRecommendationTests()
         {
             _writer = new InMemoryTelemetryWriter();
-            _factory = new WebApplicationFactory<Program>()
+            _factory = new WebApplicationFactory<global::Program>()
                 .WithWebHostBuilder(builder =>
                 {
                     builder.ConfigureServices(services =>
