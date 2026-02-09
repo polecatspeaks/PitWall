@@ -33,10 +33,11 @@ public partial class App : Application
             var wsBase = BuildWebSocketBase(apiBase);
             var telemetryClient = new TelemetryStreamClient(wsBase);
             var recommendationClient = new RecommendationClient(httpClient);
+            var agentClient = new AgentQueryClient(httpClient);
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(recommendationClient, telemetryClient),
+                DataContext = new MainWindowViewModel(recommendationClient, telemetryClient, agentClient),
             };
         }
 
