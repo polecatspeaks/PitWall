@@ -103,25 +103,86 @@ namespace PitWall.Tests
             Assert.Equal(2, endpoints.GetArrayLength());
         }
 
+        [Fact]
+        public async Task AgentConfig_Get_MasksApiKeys()
+        {
+            using var factory = CreateFactory(enableLlm: true, writer: new InMemoryTelemetryWriter());
+            using var client = factory.CreateClient();
+
+            var update = new AgentConfigUpdate
+            {
+                OpenAiApiKey = "secret-key"
+            };
+
+            var updateResponse = await client.PutAsJsonAsync("/agent/config", update);
+            updateResponse.EnsureSuccessStatusCode();
+
+            var response = await client.GetAsync("/agent/config");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var payload = await response.Content.ReadFromJsonAsync<AgentConfigResponse>();
+            using var doc = JsonDocument.Parse(json);
+
+            Assert.NotNull(payload);
+            Assert.True(payload!.OpenAiApiKeyConfigured);
+            Assert.False(payload.AnthropicApiKeyConfigured);
+            Assert.False(doc.RootElement.TryGetProperty("openAiApiKey", out _));
+            Assert.False(doc.RootElement.TryGetProperty("openAIApiKey", out _));
+        }
+
+        [Fact]
+        public async Task AgentConfig_Put_UpdatesProvider()
+        {
+            using var factory = CreateFactory(enableLlm: true, writer: new InMemoryTelemetryWriter());
+            using var client = factory.CreateClient();
+
+            var update = new AgentConfigUpdate
+            {
+                LLMProvider = "OpenAI",
+                OpenAiApiKey = "new-key"
+            };
+
+            var response = await client.PutAsJsonAsync("/agent/config", update);
+            response.EnsureSuccessStatusCode();
+
+            var payload = await response.Content.ReadFromJsonAsync<AgentConfigResponse>();
+
+            Assert.NotNull(payload);
+            Assert.Equal("OpenAI", payload!.LLMProvider);
+            Assert.True(payload.OpenAiApiKeyConfigured);
+        }
+
         private static WebApplicationFactory<PitWall.Agent.Program> CreateFactory(
             bool enableLlm,
             InMemoryTelemetryWriter writer,
             ILLMService? llmService = null,
-            ILLMDiscoveryService? discoveryService = null)
+            ILLMDiscoveryService? discoveryService = null,
+            Dictionary<string, string?>? extraConfig = null)
         {
             return new WebApplicationFactory<PitWall.Agent.Program>()
                 .WithWebHostBuilder(builder =>
                 {
                     builder.ConfigureAppConfiguration((_, config) =>
                     {
-                        config.AddInMemoryCollection(new Dictionary<string, string?>
+                        var settings = new Dictionary<string, string?>
                         {
                             ["Agent:EnableLLM"] = enableLlm.ToString().ToLowerInvariant(),
                             ["Agent:LLMProvider"] = "Ollama",
                             ["Agent:LLMEndpoint"] = "http://localhost:11434",
                             ["Agent:LLMModel"] = "llama3.2",
                             ["Agent:LLMTimeoutMs"] = "5000"
-                        });
+                        };
+
+                        if (extraConfig != null)
+                        {
+                            foreach (var entry in extraConfig)
+                            {
+                                settings[entry.Key] = entry.Value;
+                            }
+                        }
+
+                        config.AddInMemoryCollection(settings);
                     });
 
                     builder.ConfigureServices(services =>
