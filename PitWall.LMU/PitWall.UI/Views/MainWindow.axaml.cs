@@ -23,6 +23,7 @@ public partial class MainWindow : Window
         {
             _cts = new CancellationTokenSource();
             var sessionId = Environment.GetEnvironmentVariable("PITWALL_SESSION_ID") ?? "1";
+            await vm.LoadSettingsAsync(_cts.Token);
             await vm.StartAsync(sessionId, _cts.Token);
         }
     }

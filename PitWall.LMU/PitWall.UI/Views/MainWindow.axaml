@@ -15,7 +15,7 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto" ColumnDefinitions="*" Margin="16" RowSpacing="16">
+    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto" ColumnDefinitions="*" Margin="16" RowSpacing="16">
         <Border Classes="panel" Grid.Row="0">
             <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnSpacing="24">
                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -122,6 +122,49 @@
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
                     <TextBox Width="600" Text="{Binding AiInput, Mode=TwoWay}" Watermark="Ask the race engineer..." />
                     <Button Content="Send" Command="{Binding SendAiQueryCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Classes="panel" Grid.Row="4">
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="24" RowSpacing="12">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="label" Text="AGENT SETTINGS" />
+                    <CheckBox Content="Enable LLM" IsChecked="{Binding EnableLlm}" />
+                    <CheckBox Content="Require pit for LLM" IsChecked="{Binding RequirePitForLlm}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Provider" VerticalAlignment="Center" />
+                        <ComboBox Width="180" ItemsSource="{Binding LlmProviders}" SelectedItem="{Binding LlmProvider}" />
+                    </StackPanel>
+                    <TextBox Width="320" Watermark="LLM Endpoint" Text="{Binding LlmEndpoint, Mode=TwoWay}" />
+                    <TextBox Width="320" Watermark="LLM Model" Text="{Binding LlmModel, Mode=TwoWay}" />
+                    <TextBox Width="160" Watermark="Timeout (ms)" Text="{Binding LlmTimeoutMs, Mode=TwoWay}" />
+                    <CheckBox Content="Enable discovery" IsChecked="{Binding EnableLlmDiscovery}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox Width="160" Watermark="Discovery Port" Text="{Binding LlmDiscoveryPort, Mode=TwoWay}" />
+                        <TextBox Width="160" Watermark="Concurrency" Text="{Binding LlmDiscoveryMaxConcurrency, Mode=TwoWay}" />
+                    </StackPanel>
+                    <TextBox Width="320" Watermark="Subnet Prefix" Text="{Binding LlmDiscoverySubnetPrefix, Mode=TwoWay}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="10">
+                    <TextBlock Classes="label" Text="CLOUD PROVIDERS" />
+                    <TextBlock Text="OpenAI" Classes="value" />
+                    <TextBox Width="320" Watermark="OpenAI Endpoint" Text="{Binding OpenAiEndpoint, Mode=TwoWay}" />
+                    <TextBox Width="320" Watermark="OpenAI Model" Text="{Binding OpenAiModel, Mode=TwoWay}" />
+                    <TextBox Width="320" Watermark="OpenAI API Key" Text="{Binding OpenAiApiKey, Mode=TwoWay}" PasswordChar="*" />
+                    <TextBlock Text="Configured" IsVisible="{Binding OpenAiApiKeyConfigured}" />
+
+                    <TextBlock Text="Anthropic" Classes="value" Margin="0,12,0,0" />
+                    <TextBox Width="320" Watermark="Anthropic Endpoint" Text="{Binding AnthropicEndpoint, Mode=TwoWay}" />
+                    <TextBox Width="320" Watermark="Anthropic Model" Text="{Binding AnthropicModel, Mode=TwoWay}" />
+                    <TextBox Width="320" Watermark="Anthropic API Key" Text="{Binding AnthropicApiKey, Mode=TwoWay}" PasswordChar="*" />
+                    <TextBlock Text="Configured" IsVisible="{Binding AnthropicApiKeyConfigured}" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                        <Button Content="Reload" Command="{Binding LoadSettingsCommand}" />
+                        <Button Content="Save" Command="{Binding SaveSettingsCommand}" />
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Border>

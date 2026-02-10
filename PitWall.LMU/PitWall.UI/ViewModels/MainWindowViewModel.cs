@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,22 +15,27 @@ public partial class MainWindowViewModel : ViewModelBase
 	private readonly IRecommendationClient _recommendationClient;
 	private readonly ITelemetryStreamClient _telemetryStreamClient;
 	private readonly IAgentQueryClient _agentQueryClient;
+	private readonly IAgentConfigClient _agentConfigClient;
 	private CancellationTokenSource? _cts;
 
 	public MainWindowViewModel()
-		: this(new NullRecommendationClient(), new NullTelemetryStreamClient(), new NullAgentQueryClient())
+		: this(new NullRecommendationClient(), new NullTelemetryStreamClient(), new NullAgentQueryClient(), new NullAgentConfigClient())
 	{
 	}
 
 	public MainWindowViewModel(
 		IRecommendationClient recommendationClient,
 		ITelemetryStreamClient telemetryStreamClient,
-		IAgentQueryClient agentQueryClient)
+		IAgentQueryClient agentQueryClient,
+		IAgentConfigClient agentConfigClient)
 	{
 		_recommendationClient = recommendationClient;
 		_telemetryStreamClient = telemetryStreamClient;
 		_agentQueryClient = agentQueryClient;
+		_agentConfigClient = agentConfigClient;
 		SendAiQueryCommand = new AsyncRelayCommand(() => SendAiQueryAsync(CancellationToken.None));
+		LoadSettingsCommand = new AsyncRelayCommand(() => LoadSettingsAsync(CancellationToken.None));
+		SaveSettingsCommand = new AsyncRelayCommand(() => SaveSettingsAsync(CancellationToken.None));
 	}
 
 	[ObservableProperty]
@@ -56,9 +62,70 @@ public partial class MainWindowViewModel : ViewModelBase
 	[ObservableProperty]
 	private string aiInput = string.Empty;
 
+	[ObservableProperty]
+	private bool enableLlm;
+
+	[ObservableProperty]
+	private string llmProvider = "Ollama";
+
+	[ObservableProperty]
+	private string llmEndpoint = string.Empty;
+
+	[ObservableProperty]
+	private string llmModel = string.Empty;
+
+	[ObservableProperty]
+	private int llmTimeoutMs;
+
+	[ObservableProperty]
+	private bool requirePitForLlm;
+
+	[ObservableProperty]
+	private bool enableLlmDiscovery;
+
+	[ObservableProperty]
+	private int llmDiscoveryTimeoutMs;
+
+	[ObservableProperty]
+	private int llmDiscoveryPort;
+
+	[ObservableProperty]
+	private int llmDiscoveryMaxConcurrency;
+
+	[ObservableProperty]
+	private string? llmDiscoverySubnetPrefix;
+
+	[ObservableProperty]
+	private string openAiEndpoint = string.Empty;
+
+	[ObservableProperty]
+	private string openAiModel = string.Empty;
+
+	[ObservableProperty]
+	private string openAiApiKey = string.Empty;
+
+	[ObservableProperty]
+	private bool openAiApiKeyConfigured;
+
+	[ObservableProperty]
+	private string anthropicEndpoint = string.Empty;
+
+	[ObservableProperty]
+	private string anthropicModel = string.Empty;
+
+	[ObservableProperty]
+	private string anthropicApiKey = string.Empty;
+
+	[ObservableProperty]
+	private bool anthropicApiKeyConfigured;
+
 	public ObservableCollection<AiMessage> AiMessages { get; } = new();
 
 	public IAsyncRelayCommand SendAiQueryCommand { get; }
+	public IAsyncRelayCommand LoadSettingsCommand { get; }
+	public IAsyncRelayCommand SaveSettingsCommand { get; }
+
+	public IReadOnlyList<string> LlmProviders { get; } = new[] { "Ollama", "OpenAI", "Anthropic" };
 
 	public async Task SendAiQueryAsync(CancellationToken cancellationToken)
 	{
@@ -99,6 +166,58 @@ public partial class MainWindowViewModel : ViewModelBase
 		_ = Task.Run(() => PollRecommendationsAsync(sessionId, _cts.Token), _cts.Token);
 
 		return Task.CompletedTask;
+	}
+
+	public async Task LoadSettingsAsync(CancellationToken cancellationToken)
+	{
+		var config = await _agentConfigClient.GetConfigAsync(cancellationToken);
+		EnableLlm = config.EnableLLM;
+		LlmProvider = string.IsNullOrWhiteSpace(config.LLMProvider) ? "Ollama" : config.LLMProvider;
+		LlmEndpoint = config.LLMEndpoint ?? string.Empty;
+		LlmModel = config.LLMModel ?? string.Empty;
+		LlmTimeoutMs = config.LLMTimeoutMs;
+		RequirePitForLlm = config.RequirePitForLlm;
+		EnableLlmDiscovery = config.EnableLLMDiscovery;
+		LlmDiscoveryTimeoutMs = config.LLMDiscoveryTimeoutMs;
+		LlmDiscoveryPort = config.LLMDiscoveryPort;
+		LlmDiscoveryMaxConcurrency = config.LLMDiscoveryMaxConcurrency;
+		LlmDiscoverySubnetPrefix = config.LLMDiscoverySubnetPrefix;
+		OpenAiEndpoint = config.OpenAIEndpoint ?? string.Empty;
+		OpenAiModel = config.OpenAIModel ?? string.Empty;
+		OpenAiApiKeyConfigured = config.OpenAiApiKeyConfigured;
+		AnthropicEndpoint = config.AnthropicEndpoint ?? string.Empty;
+		AnthropicModel = config.AnthropicModel ?? string.Empty;
+		AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
+	}
+
+	public async Task SaveSettingsAsync(CancellationToken cancellationToken)
+	{
+		var update = new AgentConfigUpdateDto
+		{
+			EnableLLM = EnableLlm,
+			LLMProvider = LlmProvider,
+			LLMEndpoint = LlmEndpoint,
+			LLMModel = LlmModel,
+			LLMTimeoutMs = LlmTimeoutMs,
+			RequirePitForLlm = RequirePitForLlm,
+			EnableLLMDiscovery = EnableLlmDiscovery,
+			LLMDiscoveryTimeoutMs = LlmDiscoveryTimeoutMs,
+			LLMDiscoveryPort = LlmDiscoveryPort,
+			LLMDiscoveryMaxConcurrency = LlmDiscoveryMaxConcurrency,
+			LLMDiscoverySubnetPrefix = LlmDiscoverySubnetPrefix,
+			OpenAiEndpoint = OpenAiEndpoint,
+			OpenAiModel = OpenAiModel,
+			OpenAiApiKey = string.IsNullOrWhiteSpace(OpenAiApiKey) ? null : OpenAiApiKey,
+			AnthropicEndpoint = AnthropicEndpoint,
+			AnthropicModel = AnthropicModel,
+			AnthropicApiKey = string.IsNullOrWhiteSpace(AnthropicApiKey) ? null : AnthropicApiKey
+		};
+
+		var config = await _agentConfigClient.UpdateConfigAsync(update, cancellationToken);
+		OpenAiApiKey = string.Empty;
+		AnthropicApiKey = string.Empty;
+		OpenAiApiKeyConfigured = config.OpenAiApiKeyConfigured;
+		AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
 	}
 
 	public void Stop()
@@ -170,6 +289,19 @@ public partial class MainWindowViewModel : ViewModelBase
 				Source = "",
 				Success = false
 			});
+		}
+	}
+
+	private sealed class NullAgentConfigClient : IAgentConfigClient
+	{
+		public Task<AgentConfigDto> GetConfigAsync(CancellationToken cancellationToken)
+		{
+			return Task.FromResult(new AgentConfigDto());
+		}
+
+		public Task<AgentConfigDto> UpdateConfigAsync(AgentConfigUpdateDto update, CancellationToken cancellationToken)
+		{
+			return Task.FromResult(new AgentConfigDto());
 		}
 	}
 }
