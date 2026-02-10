@@ -34,10 +34,11 @@ public partial class App : Application
             var telemetryClient = new TelemetryStreamClient(wsBase);
             var recommendationClient = new RecommendationClient(httpClient);
             var agentClient = new AgentQueryClient(httpClient);
+            var agentConfigClient = new AgentConfigClient(httpClient);
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(recommendationClient, telemetryClient, agentClient),
+                DataContext = new MainWindowViewModel(recommendationClient, telemetryClient, agentClient, agentConfigClient),
             };
         }
 
