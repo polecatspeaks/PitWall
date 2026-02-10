@@ -23,8 +23,27 @@ public partial class MainWindow : Window
         {
             _cts = new CancellationTokenSource();
             var sessionId = Environment.GetEnvironmentVariable("PITWALL_SESSION_ID") ?? "1";
-            await vm.LoadSettingsAsync(_cts.Token);
-            await vm.StartAsync(sessionId, _cts.Token);
+            
+            try
+            {
+                await vm.LoadSettingsAsync(_cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Failed to load settings: {ex.Message}");
+                // Continue with defaults
+            }
+
+            try
+            {
+                await vm.StartAsync(sessionId, _cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Failed to start telemetry stream: {ex.Message}");
+                Console.WriteLine("UI will continue with mock data. Ensure PitWall API is running at PITWALL_API_BASE.");
+                // Continue without telemetry
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,14 @@ namespace PitWall.UI.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+	private const double TyreOverheatThreshold = 110.0;
+	private const double CriticalFuelLevel = 2.0;
+	private const double WheelLockBrakeThreshold = 0.9;
+	private const double WheelLockSpeedKph = 120.0;
+	private const double WheelLockThrottleMax = 0.05;
+	private const double BrakeOverlapThreshold = 0.6;
+	private const double ThrottleOverlapThreshold = 0.2;
+	private const double HeavyBrakeSteerThreshold = 0.6;
 	private readonly IRecommendationClient _recommendationClient;
 	private readonly ITelemetryStreamClient _telemetryStreamClient;
 	private readonly IAgentQueryClient _agentQueryClient;
@@ -36,6 +45,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		SendAiQueryCommand = new AsyncRelayCommand(() => SendAiQueryAsync(CancellationToken.None));
 		LoadSettingsCommand = new AsyncRelayCommand(() => LoadSettingsAsync(CancellationToken.None));
 		SaveSettingsCommand = new AsyncRelayCommand(() => SaveSettingsAsync(CancellationToken.None));
+		RunDiscoveryCommand = new AsyncRelayCommand(() => RunDiscoveryAsync(CancellationToken.None));
 	}
 
 	[ObservableProperty]
@@ -48,6 +58,18 @@ public partial class MainWindowViewModel : ViewModelBase
 	private string speedDisplay = "-- KPH";
 
 	[ObservableProperty]
+	private string lapDisplay = "--/--";
+
+	[ObservableProperty]
+	private string timingLastLap = "LAST --";
+
+	[ObservableProperty]
+	private string timingBestLap = "BEST --";
+
+	[ObservableProperty]
+	private string timingDelta = "DELTA --";
+
+	[ObservableProperty]
 	private string tiresLine1 = "FL --  --  |  FR --  --";
 
 	[ObservableProperty]
@@ -58,6 +80,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
 	[ObservableProperty]
 	private string strategyConfidence = "CONF --";
+
+	[ObservableProperty]
+	private string alertsDisplay = "None";
 
 	[ObservableProperty]
 	private string aiInput = string.Empty;
@@ -75,7 +100,7 @@ public partial class MainWindowViewModel : ViewModelBase
 	private string llmModel = string.Empty;
 
 	[ObservableProperty]
-	private int llmTimeoutMs;
+	private string llmTimeoutMs = string.Empty;
 
 	[ObservableProperty]
 	private bool requirePitForLlm;
@@ -84,13 +109,13 @@ public partial class MainWindowViewModel : ViewModelBase
 	private bool enableLlmDiscovery;
 
 	[ObservableProperty]
-	private int llmDiscoveryTimeoutMs;
+	private string llmDiscoveryTimeoutMs = string.Empty;
 
 	[ObservableProperty]
-	private int llmDiscoveryPort;
+	private string llmDiscoveryPort = string.Empty;
 
 	[ObservableProperty]
-	private int llmDiscoveryMaxConcurrency;
+	private string llmDiscoveryMaxConcurrency = string.Empty;
 
 	[ObservableProperty]
 	private string? llmDiscoverySubnetPrefix;
@@ -119,11 +144,15 @@ public partial class MainWindowViewModel : ViewModelBase
 	[ObservableProperty]
 	private bool anthropicApiKeyConfigured;
 
+	[ObservableProperty]
+	private string discoveryResultsMessage = string.Empty;
+
 	public ObservableCollection<AiMessage> AiMessages { get; } = new();
 
 	public IAsyncRelayCommand SendAiQueryCommand { get; }
 	public IAsyncRelayCommand LoadSettingsCommand { get; }
 	public IAsyncRelayCommand SaveSettingsCommand { get; }
+	public IAsyncRelayCommand RunDiscoveryCommand { get; }
 
 	public IReadOnlyList<string> LlmProviders { get; } = new[] { "Ollama", "OpenAI", "Anthropic" };
 
@@ -143,13 +172,25 @@ public partial class MainWindowViewModel : ViewModelBase
 		AiMessages.Add(userMessage);
 		AiInput = string.Empty;
 
-		var response = await _agentQueryClient.SendQueryAsync(userMessage.Text, cancellationToken);
-		AiMessages.Add(new AiMessage
+		try
 		{
-			Role = "Assistant",
-			Text = response.Answer,
-			Source = response.Source
-		});
+			var response = await _agentQueryClient.SendQueryAsync(userMessage.Text, cancellationToken);
+			AiMessages.Add(new AiMessage
+			{
+				Role = "Assistant",
+				Text = response.Answer,
+				Source = response.Source
+			});
+		}
+		catch (Exception ex)
+		{
+			AiMessages.Add(new AiMessage
+			{
+				Role = "Assistant",
+				Text = $"Error: {ex.Message}",
+				Source = "System"
+			});
+		}
 	}
 
 	public Task StartAsync(string sessionId, CancellationToken cancellationToken)
@@ -170,54 +211,98 @@ public partial class MainWindowViewModel : ViewModelBase
 
 	public async Task LoadSettingsAsync(CancellationToken cancellationToken)
 	{
-		var config = await _agentConfigClient.GetConfigAsync(cancellationToken);
-		EnableLlm = config.EnableLLM;
-		LlmProvider = string.IsNullOrWhiteSpace(config.LLMProvider) ? "Ollama" : config.LLMProvider;
-		LlmEndpoint = config.LLMEndpoint ?? string.Empty;
-		LlmModel = config.LLMModel ?? string.Empty;
-		LlmTimeoutMs = config.LLMTimeoutMs;
-		RequirePitForLlm = config.RequirePitForLlm;
-		EnableLlmDiscovery = config.EnableLLMDiscovery;
-		LlmDiscoveryTimeoutMs = config.LLMDiscoveryTimeoutMs;
-		LlmDiscoveryPort = config.LLMDiscoveryPort;
-		LlmDiscoveryMaxConcurrency = config.LLMDiscoveryMaxConcurrency;
-		LlmDiscoverySubnetPrefix = config.LLMDiscoverySubnetPrefix;
-		OpenAiEndpoint = config.OpenAIEndpoint ?? string.Empty;
-		OpenAiModel = config.OpenAIModel ?? string.Empty;
-		OpenAiApiKeyConfigured = config.OpenAiApiKeyConfigured;
-		AnthropicEndpoint = config.AnthropicEndpoint ?? string.Empty;
-		AnthropicModel = config.AnthropicModel ?? string.Empty;
-		AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
+		try
+		{
+			var config = await _agentConfigClient.GetConfigAsync(cancellationToken);
+			if (config == null)
+			{
+				return; // Keep defaults
+			}
+
+			EnableLlm = config.EnableLLM;
+			LlmProvider = string.IsNullOrWhiteSpace(config.LLMProvider) ? "Ollama" : config.LLMProvider;
+			LlmEndpoint = config.LLMEndpoint ?? string.Empty;
+			LlmModel = config.LLMModel ?? string.Empty;
+			LlmTimeoutMs = config.LLMTimeoutMs > 0 ? config.LLMTimeoutMs.ToString() : string.Empty;
+			RequirePitForLlm = config.RequirePitForLlm;
+			EnableLlmDiscovery = config.EnableLLMDiscovery;
+			LlmDiscoveryTimeoutMs = config.LLMDiscoveryTimeoutMs > 0 ? config.LLMDiscoveryTimeoutMs.ToString() : string.Empty;
+			LlmDiscoveryPort = config.LLMDiscoveryPort > 0 ? config.LLMDiscoveryPort.ToString() : string.Empty;
+			LlmDiscoveryMaxConcurrency = config.LLMDiscoveryMaxConcurrency > 0 ? config.LLMDiscoveryMaxConcurrency.ToString() : string.Empty;
+			LlmDiscoverySubnetPrefix = config.LLMDiscoverySubnetPrefix;
+			OpenAiEndpoint = config.OpenAIEndpoint ?? string.Empty;
+			OpenAiModel = config.OpenAIModel ?? string.Empty;
+			OpenAiApiKeyConfigured = config.OpenAiApiKeyConfigured;
+			AnthropicEndpoint = config.AnthropicEndpoint ?? string.Empty;
+			AnthropicModel = config.AnthropicModel ?? string.Empty;
+			AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Failed to load settings: {ex.Message}");
+			// Keep defaults
+		}
 	}
 
 	public async Task SaveSettingsAsync(CancellationToken cancellationToken)
 	{
-		var update = new AgentConfigUpdateDto
+		try
 		{
-			EnableLLM = EnableLlm,
-			LLMProvider = LlmProvider,
-			LLMEndpoint = LlmEndpoint,
-			LLMModel = LlmModel,
-			LLMTimeoutMs = LlmTimeoutMs,
-			RequirePitForLlm = RequirePitForLlm,
-			EnableLLMDiscovery = EnableLlmDiscovery,
-			LLMDiscoveryTimeoutMs = LlmDiscoveryTimeoutMs,
-			LLMDiscoveryPort = LlmDiscoveryPort,
-			LLMDiscoveryMaxConcurrency = LlmDiscoveryMaxConcurrency,
-			LLMDiscoverySubnetPrefix = LlmDiscoverySubnetPrefix,
-			OpenAiEndpoint = OpenAiEndpoint,
-			OpenAiModel = OpenAiModel,
-			OpenAiApiKey = string.IsNullOrWhiteSpace(OpenAiApiKey) ? null : OpenAiApiKey,
-			AnthropicEndpoint = AnthropicEndpoint,
-			AnthropicModel = AnthropicModel,
-			AnthropicApiKey = string.IsNullOrWhiteSpace(AnthropicApiKey) ? null : AnthropicApiKey
-		};
+			var update = new AgentConfigUpdateDto
+			{
+				EnableLLM = EnableLlm,
+				LLMProvider = LlmProvider,
+				LLMEndpoint = LlmEndpoint,
+				LLMModel = LlmModel,
+				LLMTimeoutMs = int.TryParse(LlmTimeoutMs, out var timeout) ? timeout : 30000,
+				RequirePitForLlm = RequirePitForLlm,
+				EnableLLMDiscovery = EnableLlmDiscovery,
+				LLMDiscoveryTimeoutMs = int.TryParse(LlmDiscoveryTimeoutMs, out var discoveryTimeout) ? discoveryTimeout : 5000,
+				LLMDiscoveryPort = int.TryParse(LlmDiscoveryPort, out var port) ? port : 11434,
+				LLMDiscoveryMaxConcurrency = int.TryParse(LlmDiscoveryMaxConcurrency, out var concurrency) ? concurrency : 10,
+				LLMDiscoverySubnetPrefix = LlmDiscoverySubnetPrefix,
+				OpenAiEndpoint = OpenAiEndpoint,
+				OpenAiModel = OpenAiModel,
+				OpenAiApiKey = string.IsNullOrWhiteSpace(OpenAiApiKey) ? null : OpenAiApiKey,
+				AnthropicEndpoint = AnthropicEndpoint,
+				AnthropicModel = AnthropicModel,
+				AnthropicApiKey = string.IsNullOrWhiteSpace(AnthropicApiKey) ? null : AnthropicApiKey
+			};
 
-		var config = await _agentConfigClient.UpdateConfigAsync(update, cancellationToken);
-		OpenAiApiKey = string.Empty;
-		AnthropicApiKey = string.Empty;
-		OpenAiApiKeyConfigured = config.OpenAiApiKeyConfigured;
-		AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
+			var config = await _agentConfigClient.UpdateConfigAsync(update, cancellationToken);
+			OpenAiApiKey = string.Empty;
+			AnthropicApiKey = string.Empty;
+			OpenAiApiKeyConfigured = config.OpenAiApiKeyConfigured;
+			AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Failed to save settings: {ex.Message}");
+			// Could show error to user in future
+		}
+	}
+
+	public async Task RunDiscoveryAsync(CancellationToken cancellationToken)
+	{
+		try
+		{
+			DiscoveryResultsMessage = "Scanning network...";
+			var result = await _agentConfigClient.RunDiscoveryAsync(cancellationToken);
+
+			if (result.Endpoints == null || result.Endpoints.Count == 0)
+			{
+				DiscoveryResultsMessage = "No LLM endpoints found on network";
+			}
+			else
+			{
+				DiscoveryResultsMessage = $"Found {result.Endpoints.Count} endpoint(s): {string.Join(", ", result.Endpoints)}";
+			}
+		}
+		catch (Exception ex)
+		{
+			DiscoveryResultsMessage = $"Discovery failed: {ex.Message}";
+			Console.WriteLine($"Discovery error: {ex.Message}");
+		}
 	}
 
 	public void Stop()
@@ -231,6 +316,11 @@ public partial class MainWindowViewModel : ViewModelBase
 	{
 		FuelLiters = $"{telemetry.FuelLiters:0.0} L";
 		SpeedDisplay = $"{telemetry.SpeedKph:0.0} KPH";
+		LapDisplay = FormatLapDisplay(telemetry.CurrentLap, telemetry.TotalLaps);
+		TimingLastLap = $"LAST {FormatLapTime(telemetry.LastLapTime)}";
+		TimingBestLap = $"BEST {FormatLapTime(telemetry.BestLapTime)}";
+		TimingDelta = $"DELTA {FormatLapDelta(telemetry.LastLapTime, telemetry.BestLapTime)}";
+		AlertsDisplay = BuildAlertsDisplay(telemetry);
 
 		if (telemetry.TyreTempsC.Length >= 4)
 		{
@@ -242,6 +332,72 @@ public partial class MainWindowViewModel : ViewModelBase
 			TiresLine1 = "FL --  --  |  FR --  --";
 			TiresLine2 = "RL --  --  |  RR --  --";
 		}
+	}
+
+	private static string BuildAlertsDisplay(TelemetrySampleDto telemetry)
+	{
+		var alerts = new List<string>();
+		if (telemetry.FuelLiters <= CriticalFuelLevel)
+		{
+			alerts.Add("FUEL CRITICAL");
+		}
+
+		if (telemetry.TyreTempsC.Any(t => t >= TyreOverheatThreshold))
+		{
+			alerts.Add("TIRE OVERHEAT");
+		}
+
+		if (telemetry.Brake >= WheelLockBrakeThreshold
+			&& telemetry.SpeedKph >= WheelLockSpeedKph
+			&& telemetry.Throttle <= WheelLockThrottleMax)
+		{
+			alerts.Add("WHEEL LOCK RISK");
+		}
+
+		if (telemetry.Brake >= BrakeOverlapThreshold && telemetry.Throttle >= ThrottleOverlapThreshold)
+		{
+			alerts.Add("BRAKE/THROTTLE OVERLAP");
+		}
+
+		if (telemetry.Brake >= BrakeOverlapThreshold && Math.Abs(telemetry.Steering) >= HeavyBrakeSteerThreshold)
+		{
+			alerts.Add("HEAVY BRAKE + STEER");
+		}
+
+		return alerts.Count == 0 ? "None" : string.Join(" | ", alerts);
+	}
+
+	private static string FormatLapDisplay(int? currentLap, int? totalLaps)
+	{
+		if (currentLap.HasValue && totalLaps.HasValue && totalLaps > 0)
+		{
+			return $"{currentLap}/{totalLaps}";
+		}
+
+		return "--/--";
+	}
+
+	private static string FormatLapTime(double? seconds)
+	{
+		if (!seconds.HasValue || seconds <= 0)
+		{
+			return "--";
+		}
+
+		var time = TimeSpan.FromSeconds(seconds.Value);
+		return $"{(int)time.TotalMinutes}:{time.Seconds:00}.{time.Milliseconds:000}";
+	}
+
+	private static string FormatLapDelta(double? lastSeconds, double? bestSeconds)
+	{
+		if (!lastSeconds.HasValue || !bestSeconds.HasValue || lastSeconds <= 0 || bestSeconds <= 0)
+		{
+			return "--";
+		}
+
+		var delta = lastSeconds.Value - bestSeconds.Value;
+		var sign = delta >= 0 ? "+" : "";
+		return $"{sign}{delta:0.000}";
 	}
 
 	public void UpdateRecommendation(RecommendationDto recommendation)
@@ -302,6 +458,11 @@ public partial class MainWindowViewModel : ViewModelBase
 		public Task<AgentConfigDto> UpdateConfigAsync(AgentConfigUpdateDto update, CancellationToken cancellationToken)
 		{
 			return Task.FromResult(new AgentConfigDto());
+		}
+
+		public Task<DiscoveryResultDto> RunDiscoveryAsync(CancellationToken cancellationToken)
+		{
+			return Task.FromResult(new DiscoveryResultDto());
 		}
 	}
 }

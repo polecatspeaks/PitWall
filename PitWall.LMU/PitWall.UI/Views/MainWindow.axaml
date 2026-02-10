@@ -20,7 +20,7 @@
             <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnSpacing="24">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <TextBlock Classes="label" Text="LAP" />
-                    <TextBlock Classes="value" Text="15/30" />
+                    <TextBlock Classes="value" Text="{Binding LapDisplay}" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1">
                     <TextBlock Classes="label" Text="POS" />
@@ -75,9 +75,9 @@
             <Border Classes="panel" Grid.Row="0" Grid.Column="3">
                 <StackPanel Spacing="8">
                     <TextBlock Classes="label" Text="TIMING" />
-                    <TextBlock Classes="value" Text="LAST 3:42.123" />
-                    <TextBlock Classes="label" Text="BEST 3:40.891" />
-                    <TextBlock Text="DELTA +1.232" />
+                    <TextBlock Classes="value" Text="{Binding TimingLastLap}" />
+                    <TextBlock Classes="label" Text="{Binding TimingBestLap}" />
+                    <TextBlock Text="{Binding TimingDelta}" />
                 </StackPanel>
             </Border>
 
@@ -92,7 +92,7 @@
             <Border Classes="panel" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
                 <StackPanel Spacing="8">
                     <TextBlock Classes="label" Text="ALERTS" />
-                    <TextBlock Text="None" />
+                    <TextBlock Text="{Binding AlertsDisplay}" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
         </Grid>
@@ -128,42 +128,95 @@
 
         <Border Classes="panel" Grid.Row="4">
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="24" RowSpacing="12">
-                <StackPanel Spacing="8">
+                <StackPanel Spacing="12">
                     <TextBlock Classes="label" Text="AGENT SETTINGS" />
+                    
+                    <!-- LLM Configuration -->
                     <CheckBox Content="Enable LLM" IsChecked="{Binding EnableLlm}" />
                     <CheckBox Content="Require pit for LLM" IsChecked="{Binding RequirePitForLlm}" />
+                    
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <!-- Provider -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Provider:" VerticalAlignment="Center" />
+                        <ComboBox Grid.Row="0" Grid.Column="1" Width="200" ItemsSource="{Binding LlmProviders}" SelectedItem="{Binding LlmProvider}" HorizontalAlignment="Left" />
+                        
+                        <!-- Endpoint -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Endpoint:" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Width="320" Watermark="e.g. http://localhost:11434" Text="{Binding LlmEndpoint, Mode=TwoWay}" HorizontalAlignment="Left" />
+                        
+                        <!-- Model -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Model:" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="2" Grid.Column="1" Width="320" Watermark="e.g. llama3, gpt-4" Text="{Binding LlmModel, Mode=TwoWay}" HorizontalAlignment="Left" />
+                    </Grid>
+                    
+                    <!-- Timeout -->
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Provider" VerticalAlignment="Center" />
-                        <ComboBox Width="180" ItemsSource="{Binding LlmProviders}" SelectedItem="{Binding LlmProvider}" />
+                        <TextBlock Text="Timeout (ms):" VerticalAlignment="Center" Width="100" />
+                        <TextBox Width="120" Watermark="30000" Text="{Binding LlmTimeoutMs, Mode=TwoWay}" />
                     </StackPanel>
-                    <TextBox Width="320" Watermark="LLM Endpoint" Text="{Binding LlmEndpoint, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="LLM Model" Text="{Binding LlmModel, Mode=TwoWay}" />
-                    <TextBox Width="160" Watermark="Timeout (ms)" Text="{Binding LlmTimeoutMs, Mode=TwoWay}" />
-                    <CheckBox Content="Enable discovery" IsChecked="{Binding EnableLlmDiscovery}" />
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBox Width="160" Watermark="Discovery Port" Text="{Binding LlmDiscoveryPort, Mode=TwoWay}" />
-                        <TextBox Width="160" Watermark="Concurrency" Text="{Binding LlmDiscoveryMaxConcurrency, Mode=TwoWay}" />
+                    
+                    <!-- Discovery Settings -->
+                    <CheckBox Content="Enable LLM Discovery (scan local network)" IsChecked="{Binding EnableLlmDiscovery}" Margin="0,8,0,0" />
+                    
+                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8" IsEnabled="{Binding EnableLlmDiscovery}">
+                        <TextBlock Grid.Column="0" Text="Port:" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Width="80" Watermark="11434" Text="{Binding LlmDiscoveryPort, Mode=TwoWay}" />
+                        
+                        <TextBlock Grid.Column="2" Text="Max Threads:" VerticalAlignment="Center" Margin="12,0,0,0" />
+                        <TextBox Grid.Column="3" Width="80" Watermark="10" Text="{Binding LlmDiscoveryMaxConcurrency, Mode=TwoWay}" />
+                    </Grid>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding EnableLlmDiscovery}">
+                        <TextBlock Text="Subnet:" VerticalAlignment="Center" Width="100" />
+                        <TextBox Width="200" Watermark="e.g. 192.168.1" Text="{Binding LlmDiscoverySubnetPrefix, Mode=TwoWay}" />
                     </StackPanel>
-                    <TextBox Width="320" Watermark="Subnet Prefix" Text="{Binding LlmDiscoverySubnetPrefix, Mode=TwoWay}" />
+                    
+                    <!-- Discovery Button -->
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                        <Button Content="Run Discovery" Command="{Binding RunDiscoveryCommand}" IsEnabled="{Binding EnableLlmDiscovery}" Padding="12,6" />
+                        <TextBlock Text="{Binding DiscoveryResultsMessage}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="300" />
+                    </StackPanel>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Spacing="10">
+                <StackPanel Grid.Column="1" Spacing="12">
                     <TextBlock Classes="label" Text="CLOUD PROVIDERS" />
-                    <TextBlock Text="OpenAI" Classes="value" />
-                    <TextBox Width="320" Watermark="OpenAI Endpoint" Text="{Binding OpenAiEndpoint, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="OpenAI Model" Text="{Binding OpenAiModel, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="OpenAI API Key" Text="{Binding OpenAiApiKey, Mode=TwoWay}" PasswordChar="*" />
-                    <TextBlock Text="Configured" IsVisible="{Binding OpenAiApiKeyConfigured}" />
+                    
+                    <!-- OpenAI Section -->
+                    <TextBlock Text="OpenAI" Classes="value" FontWeight="SemiBold" />
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Endpoint:" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Width="280" Watermark="https://api.openai.com/v1" Text="{Binding OpenAiEndpoint, Mode=TwoWay}" HorizontalAlignment="Left" />
+                        
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Model:" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Width="280" Watermark="gpt-4o, gpt-4-turbo" Text="{Binding OpenAiModel, Mode=TwoWay}" HorizontalAlignment="Left" />
+                        
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="API Key:" VerticalAlignment="Center" />
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="240" Watermark="sk-..." Text="{Binding OpenAiApiKey, Mode=TwoWay}" PasswordChar="*" />
+                            <TextBlock Text="✓" Foreground="LimeGreen" VerticalAlignment="Center" IsVisible="{Binding OpenAiApiKeyConfigured}" />
+                        </StackPanel>
+                    </Grid>
 
-                    <TextBlock Text="Anthropic" Classes="value" Margin="0,12,0,0" />
-                    <TextBox Width="320" Watermark="Anthropic Endpoint" Text="{Binding AnthropicEndpoint, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="Anthropic Model" Text="{Binding AnthropicModel, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="Anthropic API Key" Text="{Binding AnthropicApiKey, Mode=TwoWay}" PasswordChar="*" />
-                    <TextBlock Text="Configured" IsVisible="{Binding AnthropicApiKeyConfigured}" />
+                    <!-- Anthropic Section -->
+                    <TextBlock Text="Anthropic" Classes="value" FontWeight="SemiBold" Margin="0,16,0,0" />
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Endpoint:" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="0" Grid.Column="1" Width="280" Watermark="https://api.anthropic.com" Text="{Binding AnthropicEndpoint, Mode=TwoWay}" HorizontalAlignment="Left" />
+                        
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Model:" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Width="280" Watermark="claude-3-opus, claude-3-sonnet" Text="{Binding AnthropicModel, Mode=TwoWay}" HorizontalAlignment="Left" />
+                        
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="API Key:" VerticalAlignment="Center" />
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="240" Watermark="sk-ant-..." Text="{Binding AnthropicApiKey, Mode=TwoWay}" PasswordChar="*" />
+                            <TextBlock Text="✓" Foreground="LimeGreen" VerticalAlignment="Center" IsVisible="{Binding AnthropicApiKeyConfigured}" />
+                        </StackPanel>
+                    </Grid>
 
-                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-                        <Button Content="Reload" Command="{Binding LoadSettingsCommand}" />
-                        <Button Content="Save" Command="{Binding SaveSettingsCommand}" />
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,16,0,0">
+                        <Button Content="Reload Config" Command="{Binding LoadSettingsCommand}" Width="120" />
+                        <Button Content="Save Config" Command="{Binding SaveSettingsCommand}" Width="120" />
                     </StackPanel>
                 </StackPanel>
             </Grid>

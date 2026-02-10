@@ -8,5 +8,6 @@ namespace PitWall.UI.Services
     {
         Task<AgentConfigDto> GetConfigAsync(CancellationToken cancellationToken);
         Task<AgentConfigDto> UpdateConfigAsync(AgentConfigUpdateDto update, CancellationToken cancellationToken);
+        Task<DiscoveryResultDto> RunDiscoveryAsync(CancellationToken cancellationToken);
     }
 }

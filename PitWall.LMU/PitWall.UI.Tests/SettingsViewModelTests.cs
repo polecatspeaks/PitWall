@@ -71,6 +71,11 @@ namespace PitWall.UI.Tests
             {
                 return Task.FromResult(_config);
             }
+
+            public Task<DiscoveryResultDto> RunDiscoveryAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new DiscoveryResultDto());
+            }
         }
 
         private sealed class TrackingConfigClient : IAgentConfigClient
@@ -88,6 +93,11 @@ namespace PitWall.UI.Tests
                 Called = true;
                 LastUpdate = update;
                 return Task.FromResult(new AgentConfigDto());
+            }
+
+            public Task<DiscoveryResultDto> RunDiscoveryAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new DiscoveryResultDto());
             }
         }
 

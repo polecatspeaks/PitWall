@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
+using Avalonia.Threading;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using PitWall.UI.ViewModels;
@@ -27,7 +28,32 @@ public partial class App : Application
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
 
+            // Add global exception handlers
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                var ex = args.ExceptionObject as Exception;
+                Console.WriteLine($"[FATAL] Unhandled exception: {ex?.Message}");
+                Console.WriteLine($"Stack trace: {ex?.StackTrace}");
+            };
+
+            System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (sender, args) =>
+            {
+                Console.WriteLine($"[ERROR] Unobserved task exception: {args.Exception?.Message}");
+                Console.WriteLine($"Stack trace: {args.Exception?.StackTrace}");
+                args.SetObserved();
+            };
+
+            // Handle UI thread exceptions
+            Dispatcher.UIThread.UnhandledException += (sender, args) =>
+            {
+                Console.WriteLine($"[ERROR] UI Thread exception: {args.Exception?.Message}");
+                Console.WriteLine($"Stack trace: {args.Exception?.StackTrace}");
+                args.Handled = true; // Prevent crash, continue running
+            };
+
             var apiBase = Environment.GetEnvironmentVariable("PITWALL_API_BASE") ?? "http://localhost:5000";
+            Console.WriteLine($"PitWall UI starting with API base: {apiBase}");
+            
             var httpClient = new HttpClient { BaseAddress = new Uri(apiBase) };
 
             var wsBase = BuildWebSocketBase(apiBase);

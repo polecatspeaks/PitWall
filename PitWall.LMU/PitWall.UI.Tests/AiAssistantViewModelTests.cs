@@ -91,6 +91,11 @@ namespace PitWall.UI.Tests
             {
                 return Task.FromResult(new AgentConfigDto());
             }
+
+            public Task<DiscoveryResultDto> RunDiscoveryAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new DiscoveryResultDto());
+            }
         }
     }
 }

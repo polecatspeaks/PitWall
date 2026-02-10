@@ -1,0 +1,119 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start PitWall Agent (API)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": ["run", "--project", "${workspaceFolder}/PitWall.Agent/PitWall.Agent.csproj"],
+			"isBackground": true,
+			"problemMatcher": {
+				"pattern": {
+					"regexp": "^(.*)$",
+					"file": 1,
+					"location": 2,
+					"message": 3
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "^.*Building.*$",
+					"endsPattern": "^.*Application started.*|.*Now listening on.*$"
+				}
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false,
+				"group": "pitwall"
+			}
+		},
+		{
+			"label": "Start PitWall UI",
+			"type": "shell",
+			"command": "dotnet",
+			"args": ["run", "--project", "${workspaceFolder}/PitWall.UI/PitWall.UI.csproj"],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false,
+				"group": "pitwall"
+			}
+		},
+		{
+			"label": "Launch Full PitWall Stack",
+			"dependsOn": [
+				"Start PitWall Agent (API)",
+				"Start PitWall UI"
+			],
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false,
+				"group": "pitwall"
+			}
+		},
+		{
+			"label": "Build PitWall Solution",
+			"type": "shell",
+			"command": "dotnet",
+			"args": ["build", "${workspaceFolder}/PitWall.LMU.sln"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "Test PitWall Solution",
+			"type": "shell",
+			"command": "dotnet",
+			"args": ["test", "${workspaceFolder}/PitWall.LMU.sln", "--logger", "console;verbosity=minimal"],
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "Publish PitWall UI (Windows x64)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"publish",
+				"${workspaceFolder}/PitWall.UI/PitWall.UI.csproj",
+				"-c", "Release",
+				"-r", "win-x64",
+				"--self-contained"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "build PitWall.UI.Tests",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"PitWall.UI.Tests/PitWall.UI.Tests.csproj",
+				"/property:GenerateFullPaths=true",
+				"/p:Configuration=Debug",
+				"/p:Platform=AnyCPU",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
