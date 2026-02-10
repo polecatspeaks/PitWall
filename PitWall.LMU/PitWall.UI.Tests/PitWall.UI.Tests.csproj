@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PitWall.UI\PitWall.UI.csproj" />
+    <ProjectReference Include="..\PitWall.Core\PitWall.Core.csproj" />
   </ItemGroup>
 
   <!-- Temporarily exclude old tests that test pre-ref actor architecture -->
