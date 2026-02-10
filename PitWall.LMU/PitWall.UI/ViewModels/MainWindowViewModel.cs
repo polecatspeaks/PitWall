@@ -48,9 +48,9 @@ public partial class MainWindowViewModel : ViewModelBase
 		_telemetryStreamClient = telemetryStreamClient;
 		_telemetryBuffer = new TelemetryBuffer(10000);
 
-		// Initialize domain ViewModels
+		// Initialize domain ViewModels (pass buffer to TelemetryAnalysis)
 		Dashboard = new DashboardViewModel();
-		TelemetryAnalysis = new TelemetryAnalysisViewModel();
+		TelemetryAnalysis = new TelemetryAnalysisViewModel(_telemetryBuffer);
 		Strategy = new StrategyViewModel();
 		AiAssistant = new AiAssistantViewModel(agentQueryClient);
 		Settings = new SettingsViewModel(agentConfigClient);
@@ -102,8 +102,22 @@ public partial class MainWindowViewModel : ViewModelBase
 		// Update domain ViewModels
 		Dashboard.UpdateTelemetry(telemetry);
 		
-		// TODO: Update TelemetryAnalysis with latest data
-		// TODO: Update race context for AI Assistant
+		// Update telemetry analysis available laps periodically (every 10 samples to reduce overhead)
+		if (_telemetryBuffer.Count % 10 == 0)
+		{
+			TelemetryAnalysis.RefreshAvailableLaps();
+			
+			// Auto-load the most recent completed lap for analysis
+			var availableLaps = _telemetryBuffer.GetAvailableLaps();
+			if (availableLaps.Length > 0)
+			{
+				var latestCompletedLap = availableLaps[^1];
+				if (telemetry.LapNumber > latestCompletedLap && TelemetryAnalysis.CurrentLap != latestCompletedLap)
+				{
+					TelemetryAnalysis.LoadCurrentLapData(latestCompletedLap);
+				}
+			}
+		}
 	}
 
 	private async Task PollRecommendationsAsync(string sessionId, CancellationToken cancellationToken)

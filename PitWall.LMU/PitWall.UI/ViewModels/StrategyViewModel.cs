@@ -70,6 +70,26 @@ public partial class StrategyViewModel : ViewModelBase
 			Confidence = 82.0,
 			EstimatedFinishPosition = 4
 		});
+
+		// Add sample pit stop markers
+		PitStopMarkers.Add(new PitStopMarker
+		{
+			Lap = 18,
+			FuelToAdd = 45.5,
+			ChangeTires = true,
+			EstimatedDuration = 32.5
+		});
+
+		// Add sample competitor strategies
+		CompetitorStrategies.Add(new CompetitorStrategy
+		{
+			Position = 2,
+			CarNumber = "#23",
+			Driver = "Competitor A",
+			LastPitLap = 10,
+			EstimatedNextPit = 25,
+			StrategyType = "2-Stop"
+		});
 	}
 
 	[RelayCommand]
@@ -95,6 +115,33 @@ public partial class StrategyViewModel : ViewModelBase
 	{
 		RecommendedAction = recommendation.Recommendation ?? string.Empty;
 		StrategyConfidence = recommendation.Confidence;
+	}
+
+	/// <summary>
+	/// Updates stint status from telemetry
+	/// </summary>
+	public void UpdateStintStatus(double fuelPct, double tireWear, int lap, int stintLaps)
+	{
+		CurrentStintFuelPercentage = fuelPct;
+		CurrentStintTireWear = tireWear;
+		CurrentLap = lap;
+		StintLap = stintLaps;
+		StintDuration = stintLaps;
+	}
+
+	/// <summary>
+	/// Calculates optimal pit window based on fuel consumption and tire wear
+	/// </summary>
+	public void CalculatePitWindow(double fuelPerLap, double tireWearPerLap, double tankCapacity)
+	{
+		var fuelLapsRemaining = (int)((CurrentStintFuelPercentage / 100.0) * tankCapacity / fuelPerLap);
+		var tireLapsRemaining = (int)((100.0 - CurrentStintTireWear) / tireWearPerLap);
+		
+		var maxStintLaps = Math.Min(fuelLapsRemaining, tireLapsRemaining);
+		
+		OptimalPitLapStart = CurrentLap + maxStintLaps - 2; // 2-lap buffer
+		OptimalPitLapEnd = CurrentLap + maxStintLaps;
+		NextPitLap = CurrentLap + maxStintLaps - 1; // Middle of window
 	}
 }
 

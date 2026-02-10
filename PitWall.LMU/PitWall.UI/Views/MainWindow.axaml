@@ -203,32 +203,163 @@
 
             <!-- Tab 2: Telemetry Analysis -->
             <TabItem Header="📈 TELEMETRY">
-                <ScrollViewer>
-                    <Grid RowDefinitions="Auto,*" Margin="16" RowSpacing="16">
-                        <TextBlock Grid.Row="0" Classes="section-header" Text="TELEMETRY ANALYSIS (ScottPlot Integration - Phase 3)" />
-                        <Border Grid.Row="1" Classes="atlas-panel">
-                            <TextBlock Text="ATLAS waveform displays will be implemented here with ScottPlot" 
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      Foreground="{DynamicResource BrushTextSecondary}" FontSize="16" />
+                <Grid RowDefinitions="Auto,*,Auto" Margin="16" RowSpacing="16">
+                    
+                    <!-- Header with Controls -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <TextBlock Classes="section-header" Text="TELEMETRY ANALYSIS" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding TelemetryAnalysis.StatusMessage}" FontSize="12" 
+                                      Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        
+                        <!-- Lap Selector and Controls -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Reference Lap:" VerticalAlignment="Center" />
+                            <ComboBox Width="80" ItemsSource="{Binding TelemetryAnalysis.AvailableLaps}" 
+                                     SelectedItem="{Binding TelemetryAnalysis.SelectedReferenceLap}" />
+                            
+                            <Button Content="◀ Prev" Command="{Binding TelemetryAnalysis.PreviousSectorCommand}" Padding="8,4" />
+                            <Button Content="Next ▶" Command="{Binding TelemetryAnalysis.NextSectorCommand}" Padding="8,4" />
+                            <Button Content="Zoom In" Command="{Binding TelemetryAnalysis.ZoomInCommand}" Padding="8,4" />
+                            <Button Content="Zoom Out" Command="{Binding TelemetryAnalysis.ZoomOutCommand}" Padding="8,4" />
+                            <Button Content="Export CSV" Classes="atlas-button-primary" 
+                                   Command="{Binding TelemetryAnalysis.ExportToCsvCommand}" Padding="8,4" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Plots and Data Table -->
+                    <Grid Grid.Row="1" RowDefinitions="*,Auto" RowSpacing="16">
+                        
+                        <!-- Waveform Plots Placeholder -->
+                        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="12">
+                                <!-- Speed Plot -->
+                                <Border Classes="atlas-panel" Height="140">
+                                    <Grid RowDefinitions="Auto,*">
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="8">
+                                            <TextBlock Text="SPEED" FontWeight="Bold" FontSize="12" />
+                                            <TextBlock Text="(km/h)" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                        </StackPanel>
+                                        <Border Grid.Row="1" Background="#0D0D0D" Margin="8,0,8,8">
+                                            <TextBlock Text="Speed waveform: Current lap (red) vs Reference (blue)" 
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                      Foreground="{DynamicResource BrushTextSecondary}" FontSize="12" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Throttle Plot -->
+                                <Border Classes="atlas-panel" Height="140">
+                                    <Grid RowDefinitions="Auto,*">
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="8">
+                                            <TextBlock Text="THROTTLE" FontWeight="Bold" FontSize="12" />
+                                            <TextBlock Text="(%)" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                        </StackPanel>
+                                        <Border Grid.Row="1" Background="#0D0D0D" Margin="8,0,8,8">
+                                            <TextBlock Text="Throttle position: 0-100% application" 
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                      Foreground="{DynamicResource BrushTextSecondary}" FontSize="12" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Brake Plot -->
+                                <Border Classes="atlas-panel" Height="140">
+                                    <Grid RowDefinitions="Auto,*">
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="8">
+                                            <TextBlock Text="BRAKE" FontWeight="Bold" FontSize="12" />
+                                            <TextBlock Text="(%)" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                        </StackPanel>
+                                        <Border Grid.Row="1" Background="#0D0D0D" Margin="8,0,8,8">
+                                            <TextBlock Text="Brake pressure: 0-100%" 
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                      Foreground="{DynamicResource BrushTextSecondary}" FontSize="12" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Steering Plot -->
+                                <Border Classes="atlas-panel" Height="140">
+                                    <Grid RowDefinitions="Auto,*">
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="8">
+                                            <TextBlock Text="STEERING" FontWeight="Bold" FontSize="12" />
+                                            <TextBlock Text="(degrees)" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                        </StackPanel>
+                                        <Border Grid.Row="1" Background="#0D0D0D" Margin="8,0,8,8">
+                                            <TextBlock Text="Steering angle: Left (-) to Right (+)" 
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                      Foreground="{DynamicResource BrushTextSecondary}" FontSize="12" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Tire Temperature Plot -->
+                                <Border Classes="atlas-panel" Height="140">
+                                    <Grid RowDefinitions="Auto,*">
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="8">
+                                            <TextBlock Text="TIRE TEMPERATURE" FontWeight="Bold" FontSize="12" />
+                                            <TextBlock Text="(°C average)" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                        </StackPanel>
+                                        <Border Grid.Row="1" Background="#0D0D0D" Margin="8,0,8,8">
+                                            <TextBlock Text="Average tire temperature across all four corners" 
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                      Foreground="{DynamicResource BrushTextSecondary}" FontSize="12" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Cursor Data Table -->
+                        <Border Grid.Row="1" Classes="atlas-panel" MaxHeight="250">
+                            <Grid RowDefinitions="Auto,*">
+                                <TextBlock Grid.Row="0" Classes="section-header" Text="CURSOR DATA" Margin="8" />
+                                <DataGrid Grid.Row="1" ItemsSource="{Binding TelemetryAnalysis.CursorData}" 
+                                         AutoGenerateColumns="False" IsReadOnly="True" 
+                                         GridLinesVisibility="All" Background="#0D0D0D" 
+                                         HeadersVisibility="Column" CanUserReorderColumns="False"
+                                         CanUserResizeColumns="True" CanUserSortColumns="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Parameter" Binding="{Binding Parameter}" Width="150" />
+                                        <DataGridTextColumn Header="Current" Binding="{Binding CurrentValue}" Width="100" />
+                                        <DataGridTextColumn Header="Reference" Binding="{Binding ReferenceValue}" Width="100" />
+                                        <DataGridTextColumn Header="Delta" Binding="{Binding Delta}" Width="100" />
+                                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
                         </Border>
                     </Grid>
-                </ScrollViewer>
+
+                    <!-- Note about ScottPlot -->
+                    <Border Grid.Row="2" Background="{DynamicResource BrushInfo}" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="📊 ScottPlot Integration Note" FontWeight="Bold" FontSize="12" />
+                            <TextBlock TextWrapping="Wrap" FontSize="11">
+                                Full interactive ScottPlot waveforms will render here when connected to live telemetry.
+                                Features: Synchronized crosshair, zoom/pan, lap comparison, and CSV export.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </TabItem>
 
             <!-- Tab 3: Strategy -->
             <TabItem Header="🎯 STRATEGY">
                 <ScrollViewer>
-                    <Grid RowDefinitions="Auto,Auto,*" Margin="16" RowSpacing="16">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="16" RowSpacing="16">
                         <TextBlock Grid.Row="0" Classes="section-header" Text="RACE STRATEGY &amp; PIT PLANNING" />
                         
                         <!-- Current Stint Status -->
                         <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="16">
                             <Border Classes="atlas-panel">
                                 <StackPanel Spacing="8">
-                                    <TextBlock Classes="data-label" Text="FUEL STATUS" />
+                                    <TextBlock Classes="data-label" Text="FUEL REMAINING" />
                                     <ProgressBar Value="{Binding Strategy.CurrentStintFuelPercentage}" Maximum="100" 
                                                 Classes="atlas-progress" Height="12" Foreground="{DynamicResource BrushWarning}" />
-                                    <TextBlock Text="{Binding Strategy.CurrentStintFuelPercentage, StringFormat={}{0:0}%}" FontSize="18" />
+                                    <TextBlock Text="{Binding Strategy.CurrentStintFuelPercentage, StringFormat={}{0:0}%}" FontSize="20" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding Strategy.StintLap, StringFormat={}Lap {0} of stint}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" />
                                 </StackPanel>
                             </Border>
                             <Border Classes="atlas-panel" Grid.Column="1">
@@ -236,34 +367,79 @@
                                     <TextBlock Classes="data-label" Text="TIRE WEAR" />
                                     <ProgressBar Value="{Binding Strategy.CurrentStintTireWear}" Maximum="100" 
                                                 Classes="atlas-progress" Height="12" Foreground="{DynamicResource BrushSuccess}" />
-                                    <TextBlock Text="{Binding Strategy.CurrentStintTireWear, StringFormat={}{0:0}%}" FontSize="18" />
+                                    <TextBlock Text="{Binding Strategy.CurrentStintTireWear, StringFormat={}{0:0}%}" FontSize="20" FontWeight="Bold" />
+                                    <TextBlock Text="Within optimal range" FontSize="12" Foreground="{DynamicResource BrushSuccess}" />
                                 </StackPanel>
                             </Border>
                             <Border Classes="atlas-panel" Grid.Column="2">
                                 <StackPanel Spacing="8">
-                                    <TextBlock Classes="data-label" Text="RECOMMENDED ACTION" />
-                                    <TextBlock Text="{Binding Strategy.RecommendedAction}" FontSize="14" TextWrapping="Wrap" />
-                                    <Button Content="Override Strategy" Classes="atlas-button-primary" Command="{Binding Strategy.OverrideStrategyCommand}" />
+                                    <TextBlock Classes="data-label" Text="PIT WINDOW" />
+                                    <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                                        <TextBlock Text="LAP" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Strategy.OptimalPitLapStart}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
+                                        <TextBlock Text="–" FontSize="20" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Strategy.OptimalPitLapEnd}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat={}Recommended: Lap {0}}" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource BrushWarning}" />
                                 </StackPanel>
                             </Border>
                         </Grid>
 
+                        <!-- Strategy Timeline -->
+                        <Border Grid.Row="2" Classes="atlas-panel" MinHeight="140">
+                            <Grid RowDefinitions="Auto,*,Auto">
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="16" Margin="8">
+                                    <TextBlock Classes="section-header" Text="RACE TIMELINE" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Current: Lap" VerticalAlignment="Center" Foreground="{DynamicResource BrushTextSecondary}" />
+                                        <TextBlock Text="{Binding Strategy.CurrentLap}" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" />
+                                        <TextBlock Text="/" FontSize="16" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Strategy.TotalRaceLaps}" FontSize="16" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <Border Grid.Row="1" Background="#0D0D0D" Margin="8,4" CornerRadius="4" Padding="20">
+                                    <StackPanel Spacing="12" VerticalAlignment="Center">
+                                        <TextBlock Text="⬤────■────⬤" FontSize="32" HorizontalAlignment="Center" Foreground="#3A3A3A" />
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="24">
+                                            <TextBlock Text="Start" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                            <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat={}Pit Lap {0}}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BrushWarning}" />
+                                            <TextBlock Text="Finish" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                        </StackPanel>
+                                        <TextBlock Text="Timeline visualization with pit markers" HorizontalAlignment="Center" FontSize="11" Foreground="#4A4A4A" />
+                                    </StackPanel>
+                                </Border>
+                                <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="8">
+                                    <TextBlock Grid.Column="0" Text="{Binding Strategy.RecommendedAction}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource BrushTextSecondary}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Strategy.StrategyConfidence, StringFormat={}Confidence: {0:0}%}" FontSize="12" VerticalAlignment="Center" />
+                                    <Button Grid.Column="2" Content="Override Strategy" Command="{Binding Strategy.OverrideStrategyCommand}" Padding="8,4" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+
                         <!-- Alternative Strategies -->
-                        <Border Grid.Row="2" Classes="atlas-panel">
+                        <Border Grid.Row="3" Classes="atlas-panel">
                             <StackPanel Spacing="12">
-                                <TextBlock Classes="section-header" Text="ALTERNATIVE STRATEGIES" />
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <TextBlock Classes="section-header" Text="ALTERNATIVE STRATEGIES" VerticalAlignment="Center" />
+                                    <Button Content="{Binding Strategy.FuelSaveModeActive, Converter={StaticResource BoolToTextConverter}, ConverterParameter=Fuel Save: ON|Fuel Save: OFF}"
+                                           Command="{Binding Strategy.ToggleFuelSaveModeCommand}" Padding="10,6" VerticalAlignment="Center" />
+                                </StackPanel>
                                 <ItemsControl ItemsSource="{Binding Strategy.AlternativeStrategies}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="#1A1A1A" Padding="12" Margin="0,4" CornerRadius="4" 
+                                            <Border Background="#1A1A1A" Padding="14" Margin="0,6" CornerRadius="6" 
                                                    BorderBrush="#2A2A2A" BorderThickness="1">
-                                                <Grid ColumnDefinitions="*,Auto">
-                                                    <StackPanel Grid.Column="0" Spacing="4">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" />
-                                                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource BrushTextSecondary}" />
-                                                        <TextBlock Text="{Binding Confidence, StringFormat='Confidence: {0:P0}'}" FontSize="12" />
+                                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                                    <TextBlock Grid.Column="0" Text="●" FontSize="32" Foreground="{DynamicResource BrushInfo}" VerticalAlignment="Center" Margin="0,0,16,0" />
+                                                    <StackPanel Grid.Column="1" Spacing="6">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="17" />
+                                                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource BrushTextSecondary}" FontSize="13" TextWrapping="Wrap" />
                                                     </StackPanel>
-                                                    <Button Grid.Column="1" Content="Select" Padding="8,4" VerticalAlignment="Center" />
+                                                    <StackPanel Grid.Column="2" Spacing="4" Margin="20,0" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Confidence, StringFormat={}{0:0.1}% confidence}" FontSize="13" HorizontalAlignment="Right" />
+                                                        <TextBlock Text="{Binding EstimatedFinishPosition, StringFormat={}Est. P{0}}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Right" />
+                                                    </StackPanel>
+                                                    <Button Grid.Column="3" Content="Select" Padding="14,8" VerticalAlignment="Center" FontWeight="Bold" />
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
@@ -271,48 +447,118 @@
                                 </ItemsControl>
                             </StackPanel>
                         </Border>
+
+                        <!-- Competitor Strategies -->
+                        <Border Grid.Row="4" Classes="atlas-panel">
+                            <Grid RowDefinitions="Auto,Auto">
+                                <TextBlock Grid.Row="0" Classes="section-header" Text="COMPETITOR STRATEGIES" Margin="8,8,8,12" />
+                                <DataGrid Grid.Row="1" ItemsSource="{Binding Strategy.CompetitorStrategies}" 
+                                         AutoGenerateColumns="False" IsReadOnly="True" 
+                                         GridLinesVisibility="Horizontal" Background="#0D0D0D" 
+                                         HeadersVisibility="Column" CanUserReorderColumns="False"
+                                         CanUserResizeColumns="True" CanUserSortColumns="True"
+                                         MaxHeight="250" Margin="8,0,8,8">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Pos" Binding="{Binding Position}" Width="60" />
+                                        <DataGridTextColumn Header="Car #" Binding="{Binding CarNumber}" Width="85" />
+                                        <DataGridTextColumn Header="Driver" Binding="{Binding Driver}" Width="*" />
+                                        <DataGridTextColumn Header="Last Pit" Binding="{Binding LastPitLap, StringFormat={}L{0}}" Width="90" />
+                                        <DataGridTextColumn Header="Next Pit" Binding="{Binding EstimatedNextPit, StringFormat={}~L{0}}" Width="95" />
+                                        <DataGridTextColumn Header="Strategy" Binding="{Binding StrategyType}" Width="120" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </Border>
                     </Grid>
                 </ScrollViewer>
             </TabItem>
 
             <!-- Tab 4: AI Engineer -->
             <TabItem Header="🤖 AI ENGINEER">
-                <Grid RowDefinitions="Auto,*,Auto" Margin="16" RowSpacing="16">
-                    <TextBlock Grid.Row="0" Classes="section-header" Text="AI RACE ENGINEER ASSISTANT" />
+                <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Margin="16" RowSpacing="12">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
+                        <TextBlock Classes="section-header" Text="AI RACE ENGINEER" VerticalAlignment="Center" />
+                        <Button Content="Clear History" Command="{Binding AiAssistant.ClearHistoryCommand}" Padding="8,4" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Quick Query Buttons -->
+                    <Border Grid.Row="1" Classes="atlas-panel" Padding="12">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="QUICK QUERIES" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" />
+                            <WrapPanel>
+                                <Button Content="🔋 Fuel Status?" Command="{Binding AiAssistant.SendQuickQueryCommand}" CommandParameter="How much fuel do I have left?" Margin="0,0,8,8" Padding="10,6" />
+                                <Button Content="🏁 Pit Strategy?" Command="{Binding AiAssistant.SendQuickQueryCommand}" CommandParameter="When should I pit?" Margin="0,0,8,8" Padding="10,6" />
+                                <Button Content="🌡️ Tire Temps?" Command="{Binding AiAssistant.SendQuickQueryCommand}" CommandParameter="Are my tire temperatures optimal?" Margin="0,0,8,8" Padding="10,6" />
+                                <Button Content="⏱️ Pace Delta?" Command="{Binding AiAssistant.SendQuickQueryCommand}" CommandParameter="How is my lap time compared to the leader?" Margin="0,0,8,8" Padding="10,6" />
+                                <Button Content="⚠️ Issues?" Command="{Binding AiAssistant.SendQuickQueryCommand}" CommandParameter="Are there any critical issues I should know about?" Margin="0,0,8,8" Padding="10,6" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
                     
                     <!-- Chat History -->
-                    <ScrollViewer Grid.Row="1">
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding AiAssistant.Messages}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="0,8" Padding="12" CornerRadius="6"
-                                           Background="{Binding IsUserMessage, Converter={StaticResource BoolToBackgroundConverter}}"
-                                           HorizontalAlignment="{Binding IsUserMessage, Converter={StaticResource BoolToAlignmentConverter}}">
-                                        <StackPanel Spacing="8">
-                                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <TextBlock Text="{Binding Role}" FontWeight="Bold" FontSize="12" 
-                                                          Foreground="{DynamicResource BrushInfo}" />
-                                                <TextBlock Text="{Binding DisplayTimestamp}" FontSize="11" 
-                                                          Foreground="{DynamicResource BrushTextSecondary}" />
-                                                <TextBlock Text="{Binding DisplaySource}" FontSize="11" 
-                                                          Foreground="{DynamicResource BrushTextSecondary}" 
-                                                          IsVisible="{Binding IsAssistantMessage}" />
+                                    <Border Margin="0,0,0,12" MaxWidth="700"
+                                           HorizontalAlignment="{Binding IsUserMessage, Converter={StaticResource BoolToAlignmentUserConverter}}">
+                                        <Border Padding="14" CornerRadius="8"
+                                               Background="{Binding IsUserMessage, Converter={StaticResource BoolToMessageBackgroundConverter}}"
+                                               BorderBrush="{Binding IsUserMessage, Converter={StaticResource BoolToMessageBorderConverter}}"
+                                               BorderThickness="1">
+                                            <StackPanel Spacing="10">
+                                                <!-- Message Header -->
+                                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                                    <TextBlock Grid.Column="0" Text="{Binding Role}" FontWeight="Bold" FontSize="13" 
+                                                              Foreground="{Binding IsUserMessage, Converter={StaticResource BoolToRoleColorConverter}}" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding DisplayTimestamp}" FontSize="11" Margin="8,0,0,0"
+                                                              Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsAssistantMessage}">
+                                                        <TextBlock Text="{Binding DisplaySource}" FontSize="11" 
+                                                                  Foreground="{DynamicResource BrushSuccess}" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding ConfidenceDisplay}" FontSize="11" 
+                                                                  Foreground="{DynamicResource BrushInfo}" VerticalAlignment="Center"
+                                                                  IsVisible="{Binding HasConfidence}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                                
+                                                <!-- Message Text -->
+                                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="14" LineHeight="20" />
+                                                
+                                                <!-- Context Expander -->
+                                                <Expander Header="📊 Race Context" IsVisible="{Binding HasContext}" Margin="0,4,0,0">
+                                                    <Border Background="#0D0D0D" Padding="10" CornerRadius="4" Margin="0,4,0,0">
+                                                        <TextBlock Text="{Binding Context}" FontFamily="Cascadia Mono,Consolas" FontSize="11" 
+                                                                  Foreground="#888888" TextWrapping="Wrap" />
+                                                    </Border>
+                                                </Expander>
                                             </StackPanel>
-                                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="14" />
-                                        </StackPanel>
+                                        </Border>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
 
+                    <!-- Processing Indicator -->
+                    <Border Grid.Row="3" Background="{DynamicResource BrushInfo}" CornerRadius="4" Padding="10" 
+                           IsVisible="{Binding AiAssistant.IsProcessing}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⏳" FontSize="16" />
+                            <TextBlock Text="Processing your query..." FontSize="13" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
                     <!-- Input Area -->
-                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                         <TextBox Grid.Column="0" Text="{Binding AiAssistant.InputText, Mode=TwoWay}" 
-                                Watermark="Ask the race engineer..." Height="40" />
-                        <Button Grid.Column="1" Content="🎤" Width="40" Height="40" ToolTip.Tip="Voice Input (Coming Soon)" />
-                        <Button Grid.Column="2" Content="Send" Classes="atlas-button-primary" Height="40" 
-                               Command="{Binding AiAssistant.SendQueryCommand}" />
+                                Watermark="Ask the race engineer anything..." Height="44" FontSize="14"
+                                IsEnabled="{Binding !AiAssistant.IsProcessing}" />
+                        <Button Grid.Column="1" Content="🎤" Width="44" Height="44" ToolTip.Tip="Voice Input (Coming Soon)" 
+                               IsEnabled="False" Opacity="0.5" />
+                        <Button Grid.Column="2" Content="Send" Classes="atlas-button-primary" Height="44" Padding="20,0"
+                               Command="{Binding AiAssistant.SendQueryCommand}" 
+                               IsEnabled="{Binding !AiAssistant.IsProcessing}" />
                     </Grid>
                 </Grid>
             </TabItem>
