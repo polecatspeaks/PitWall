@@ -23,7 +23,8 @@ namespace PitWall.UI.Tests
                 new StubRecommendationClient(),
                 new StubTelemetryStreamClient(),
                 new StubAgentQueryClient(),
-                client);
+                client,
+                new StubSessionClient());
 
             await vm.LoadSettingsAsync(CancellationToken.None);
 
@@ -41,7 +42,8 @@ namespace PitWall.UI.Tests
                 new StubRecommendationClient(),
                 new StubTelemetryStreamClient(),
                 new StubAgentQueryClient(),
-                client);
+                client,
+                new StubSessionClient());
 
             vm.EnableLlm = false;
             vm.LlmProvider = "OpenAI";
@@ -101,9 +103,17 @@ namespace PitWall.UI.Tests
 
         private sealed class StubTelemetryStreamClient : ITelemetryStreamClient
         {
-            public Task ConnectAsync(int sessionId, System.Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
+            public Task ConnectAsync(int sessionId, int startRow, int endRow, int intervalMs, System.Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
             {
                 return Task.CompletedTask;
+            }
+        }
+
+        private sealed class StubSessionClient : ISessionClient
+        {
+            public Task<int> GetSessionCountAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(3);
             }
         }
 

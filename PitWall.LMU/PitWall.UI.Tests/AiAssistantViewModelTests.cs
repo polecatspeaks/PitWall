@@ -23,7 +23,8 @@ namespace PitWall.UI.Tests
                 new StubRecommendationClient(),
                 new StubTelemetryStreamClient(),
                 client,
-                new StubConfigClient());
+                new StubConfigClient(),
+                new StubSessionClient());
 
             vm.AiInput = "Fuel status?";
             await vm.SendAiQueryAsync(CancellationToken.None);
@@ -41,7 +42,8 @@ namespace PitWall.UI.Tests
                 new StubRecommendationClient(),
                 new StubTelemetryStreamClient(),
                 new StubAgentQueryClient(new AgentResponseDto()),
-                new StubConfigClient());
+                new StubConfigClient(),
+                new StubSessionClient());
 
             vm.AiInput = " ";
             await vm.SendAiQueryAsync(CancellationToken.None);
@@ -74,9 +76,17 @@ namespace PitWall.UI.Tests
 
         private sealed class StubTelemetryStreamClient : ITelemetryStreamClient
         {
-            public Task ConnectAsync(int sessionId, System.Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
+            public Task ConnectAsync(int sessionId, int startRow, int endRow, int intervalMs, System.Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
             {
                 return Task.CompletedTask;
+            }
+        }
+
+        private sealed class StubSessionClient : ISessionClient
+        {
+            public Task<int> GetSessionCountAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(2);
             }
         }
 
