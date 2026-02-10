@@ -3,171 +3,391 @@
         xmlns:vm="using:PitWall.UI.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
         x:Class="PitWall.UI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="PitWall LMU">
+        Title="PitWall LMU - Professional Race Engineering System"
+        Width="1920" Height="1080">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto" ColumnDefinitions="*" Margin="16" RowSpacing="16">
-        <Border Classes="panel" Grid.Row="0">
-            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnSpacing="24">
+    <Grid RowDefinitions="Auto,*" Margin="0" RowSpacing="0">
+        
+        <!-- Status Bar - Always Visible -->
+        <Border Grid.Row="0" Classes="panel" Margin="8,8,8,0" Padding="12">
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto" ColumnSpacing="32">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Classes="label" Text="LAP" />
-                    <TextBlock Classes="value" Text="15/30" />
+                    <TextBlock Classes="data-label" Text="LAP" VerticalAlignment="Center" />
+                    <TextBlock Classes="data-value" Text="{Binding CurrentLapDisplay}" FontSize="20" />
                 </StackPanel>
+                
                 <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1">
-                    <TextBlock Classes="label" Text="POS" />
-                    <TextBlock Classes="value" Text="P3" />
+                    <TextBlock Classes="data-label" Text="POS" VerticalAlignment="Center" />
+                    <TextBlock Classes="data-value" Text="{Binding PositionDisplay}" FontSize="20" Foreground="{DynamicResource BrushInfo}" />
                 </StackPanel>
+                
                 <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="2">
-                    <TextBlock Classes="label" Text="GAP" />
-                    <TextBlock Classes="value" Text="+2.3s" />
+                    <TextBlock Classes="data-label" Text="GAP" VerticalAlignment="Center" />
+                    <TextBlock Classes="data-value" Text="{Binding GapDisplay}" FontSize="20" />
                 </StackPanel>
+                
                 <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="3">
-                    <TextBlock Classes="label" Text="PIT WINDOW" />
-                    <TextBlock Classes="value" Text="L18" />
+                    <TextBlock Classes="data-label" Text="FUEL" VerticalAlignment="Center" />
+                    <TextBlock Classes="data-value" Text="{Binding Dashboard.FuelLaps}" FontSize="20" Foreground="{DynamicResource BrushWarning}" />
                 </StackPanel>
+                
                 <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="4">
-                    <TextBlock Classes="label" Text="FUEL" />
-                    <TextBlock Classes="value" Text="{Binding FuelLaps}" />
+                    <TextBlock Classes="data-label" Text="NEXT PIT" VerticalAlignment="Center" />
+                    <TextBlock Classes="data-value" Text="{Binding Strategy.NextPitLap, StringFormat='L{0}'}" FontSize="20" Foreground="{DynamicResource BrushInfo}" />
                 </StackPanel>
-                <Border Grid.Column="5" Background="{DynamicResource BrushCritical}" CornerRadius="4" Padding="8" HorizontalAlignment="Right">
-                    <TextBlock Text="ALERTS" FontWeight="Bold" />
+                
+                <Border Grid.Column="6" Background="{DynamicResource BrushCritical}" CornerRadius="4" Padding="12,4" 
+                        HorizontalAlignment="Right" IsVisible="{Binding Dashboard.Alerts.Count}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="⚠️" FontSize="16" />
+                        <TextBlock Text="{Binding Dashboard.Alerts.Count, StringFormat='{}{0} ALERTS'}" FontWeight="Bold" FontSize="13" />
+                    </StackPanel>
                 </Border>
             </Grid>
         </Border>
 
-        <Grid Grid.Row="1" RowDefinitions="Auto,Auto" ColumnDefinitions="2*,2*,2*,2*" RowSpacing="16" ColumnSpacing="16">
-            <Border Classes="panel" Grid.Row="0" Grid.Column="0">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="label" Text="FUEL" />
-                    <TextBlock Classes="value" Text="{Binding FuelLiters}" />
-                    <TextBlock Classes="label" Text="{Binding FuelLaps}" />
-                    <Border Background="{DynamicResource BrushWarning}" Height="8" CornerRadius="4" />
-                </StackPanel>
-            </Border>
+        <!-- Main TabControl -->
+        <TabControl Grid.Row="1" Margin="8" Classes="atlas-tabs" SelectedIndex="{Binding SelectedTabIndex}">
+            
+            <!-- Tab 1: Dashboard -->
+            <TabItem Header="📊 DASHBOARD">
+                <ScrollViewer>
+                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*" RowSpacing="16" Margin="16">
+                        
+                        <!-- Row 1: Primary Panels (Fuel, Tires, Strategy, Timing) -->
+                        <Grid Grid.Row="0" ColumnDefinitions="1*,1*,1*,1*" ColumnSpacing="16">
+                            
+                            <!-- Fuel Panel -->
+                            <Border Classes="atlas-panel" Grid.Column="0">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Classes="section-header" Text="FUEL" />
+                                    <TextBlock Classes="data-value" Text="{Binding Dashboard.FuelLiters}" Foreground="{DynamicResource BrushWarning}" />
+                                    <TextBlock Classes="label" Text="{Binding Dashboard.FuelLaps}" FontSize="14" />
+                                    <ProgressBar Classes="atlas-progress" Value="{Binding Dashboard.FuelPercentage}" Maximum="100" 
+                                                Foreground="{DynamicResource BrushWarning}" Height="12" />
+                                    <TextBlock Classes="data-label" Text="{Binding Dashboard.FuelConsumptionRate, StringFormat='Consumption: {0}'}" />
+                                </StackPanel>
+                            </Border>
 
-            <Border Classes="panel" Grid.Row="0" Grid.Column="1">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="label" Text="TIRES" />
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="12">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding TiresLine1}" />
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding TiresLine2}" />
-                    </Grid>
-                </StackPanel>
-            </Border>
+                            <!-- Tires Panel -->
+                            <Border Classes="atlas-panel" Grid.Column="1">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Classes="section-header" Text="TIRES" />
+                                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="16">
+                                        <!-- Front Left -->
+                                        <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="FL" Classes="data-label" />
+                                            <TextBlock Text="{Binding Dashboard.TireFLTemp, StringFormat='{0:0}°C'}" FontSize="18" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Dashboard.TireFLWear, StringFormat='{0:0}%'}" FontSize="14" />
+                                        </StackPanel>
+                                        <!-- Front Right -->
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="FR" Classes="data-label" />
+                                            <TextBlock Text="{Binding Dashboard.TireFRTemp, StringFormat='{0:0}°C'}" FontSize="18" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Dashboard.TireFRWear, StringFormat='{0:0}%'}" FontSize="14" />
+                                        </StackPanel>
+                                        <!-- Rear Left -->
+                                        <StackPanel Grid.Row="1" Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="RL" Classes="data-label" />
+                                            <TextBlock Text="{Binding Dashboard.TireRLTemp, StringFormat='{0:0}°C'}" FontSize="18" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Dashboard.TireRLWear, StringFormat='{0:0}%'}" FontSize="14" />
+                                        </StackPanel>
+                                        <!-- Rear Right -->
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="RR" Classes="data-label" />
+                                            <TextBlock Text="{Binding Dashboard.TireRRTemp, StringFormat='{0:0}°C'}" FontSize="18" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Dashboard.TireRRWear, StringFormat='{0:0}%'}" FontSize="14" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
 
-            <Border Classes="panel" Grid.Row="0" Grid.Column="2">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="label" Text="STRATEGY" />
-                    <TextBlock Classes="value" Text="{Binding StrategyMessage}" />
-                    <TextBlock Classes="label" Text="{Binding StrategyConfidence}" />
-                </StackPanel>
-            </Border>
+                            <!-- Strategy Panel -->
+                            <Border Classes="atlas-panel" Grid.Column="2">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Classes="section-header" Text="STRATEGY" />
+                                    <TextBlock Classes="data-value" Text="{Binding Dashboard.StrategyMessage}" TextWrapping="Wrap" FontSize="16" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Classes="label" Text="Confidence:" />
+                                        <TextBlock Text="{Binding Dashboard.StrategyConfidence, StringFormat='{0:P0}'}" FontWeight="Bold" FontSize="14" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Classes="label" Text="Next Pit:" />
+                                        <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat='Lap {0}'}" FontWeight="Bold" FontSize="14" 
+                                                  Foreground="{DynamicResource BrushInfo}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
 
-            <Border Classes="panel" Grid.Row="0" Grid.Column="3">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="label" Text="TIMING" />
-                    <TextBlock Classes="value" Text="LAST 3:42.123" />
-                    <TextBlock Classes="label" Text="BEST 3:40.891" />
-                    <TextBlock Text="DELTA +1.232" />
-                </StackPanel>
-            </Border>
+                            <!-- Timing Panel -->
+                            <Border Classes="atlas-panel" Grid.Column="3">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Classes="section-header" Text="TIMING" />
+                                    <StackPanel Spacing="6">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="LAST" Width="60" />
+                                            <TextBlock Text="{Binding Dashboard.LastLapTime}" FontSize="16" FontFamily="Cascadia Mono, Consolas" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="BEST" Width="60" />
+                                            <TextBlock Text="{Binding Dashboard.BestLapTime}" FontSize="16" FontFamily="Cascadia Mono, Consolas" 
+                                                      Foreground="{DynamicResource BrushSuccess}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="DELTA" Width="60" />
+                                            <TextBlock Text="{Binding Dashboard.LapTimeDelta}" FontSize="16" FontFamily="Cascadia Mono, Consolas" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
 
-            <Border Classes="panel" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="label" Text="WEATHER" />
-                    <TextBlock Classes="value" Text="CLEAR 32C TRACK" />
-                    <TextBlock Classes="label" Text="WIND 5 KPH" />
-                </StackPanel>
-            </Border>
+                        <!-- Row 2: Weather and Track Map Placeholder -->
+                        <Grid Grid.Row="1" ColumnDefinitions="1*,2*" ColumnSpacing="16">
+                            
+                            <!-- Weather Panel -->
+                            <Border Classes="atlas-panel" Grid.Column="0">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Classes="section-header" Text="WEATHER & TRACK" />
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="{Binding Dashboard.WeatherConditions}" FontSize="18" FontWeight="Bold" />
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="Track Temp:" />
+                                            <TextBlock Text="{Binding Dashboard.TrackTempC, StringFormat='{0}°C'}" FontSize="14" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="Grip:" />
+                                            <TextBlock Text="{Binding Dashboard.GripPercentage, StringFormat='{0:0}%'}" FontSize="14" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
 
-            <Border Classes="panel" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="label" Text="ALERTS" />
-                    <TextBlock Text="None" />
-                </StackPanel>
-            </Border>
-        </Grid>
+                            <!-- Track Map Placeholder -->
+                            <Border Classes="atlas-panel" Grid.Column="1">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Classes="section-header" Text="TRACK MAP" />
+                                    <Border Background="#1A1A1A" Height="200" CornerRadius="4">
+                                        <TextBlock Text="Track map visualization - Coming Soon" 
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                  Foreground="{DynamicResource BrushTextSecondary}" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
 
-        <Border Classes="panel" Grid.Row="2">
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <Button Content="Telemetry" />
-                <Button Content="Competitors" />
-                <Button Content="AI Assistant" />
-                <Button Content="Settings" />
-            </StackPanel>
-        </Border>
-
-        <Border Classes="panel" Grid.Row="3">
-            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*" RowSpacing="8">
-                <TextBlock Classes="label" Text="AI ASSISTANT" />
-                <ItemsControl Grid.Row="0" ItemsSource="{Binding AiMessages}" Margin="0,20,0,0">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{Binding Role}" Classes="label" />
-                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+                        <!-- Row 3: Alerts -->
+                        <Border Grid.Row="2" Classes="atlas-panel" IsVisible="{Binding Dashboard.Alerts.Count}">
+                            <StackPanel Spacing="8">
+                                <TextBlock Classes="section-header" Text="⚠️ ALERTS" />
+                                <ItemsControl ItemsSource="{Binding Dashboard.Alerts}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="14" Margin="0,4" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
-                    <TextBox Width="600" Text="{Binding AiInput, Mode=TwoWay}" Watermark="Ask the race engineer..." />
-                    <Button Content="Send" Command="{Binding SendAiQueryCommand}" />
-                </StackPanel>
-            </Grid>
-        </Border>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
 
-        <Border Classes="panel" Grid.Row="4">
-            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="24" RowSpacing="12">
-                <StackPanel Spacing="8">
-                    <TextBlock Classes="label" Text="AGENT SETTINGS" />
-                    <CheckBox Content="Enable LLM" IsChecked="{Binding EnableLlm}" />
-                    <CheckBox Content="Require pit for LLM" IsChecked="{Binding RequirePitForLlm}" />
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Provider" VerticalAlignment="Center" />
-                        <ComboBox Width="180" ItemsSource="{Binding LlmProviders}" SelectedItem="{Binding LlmProvider}" />
-                    </StackPanel>
-                    <TextBox Width="320" Watermark="LLM Endpoint" Text="{Binding LlmEndpoint, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="LLM Model" Text="{Binding LlmModel, Mode=TwoWay}" />
-                    <TextBox Width="160" Watermark="Timeout (ms)" Text="{Binding LlmTimeoutMs, Mode=TwoWay}" />
-                    <CheckBox Content="Enable discovery" IsChecked="{Binding EnableLlmDiscovery}" />
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBox Width="160" Watermark="Discovery Port" Text="{Binding LlmDiscoveryPort, Mode=TwoWay}" />
-                        <TextBox Width="160" Watermark="Concurrency" Text="{Binding LlmDiscoveryMaxConcurrency, Mode=TwoWay}" />
-                    </StackPanel>
-                    <TextBox Width="320" Watermark="Subnet Prefix" Text="{Binding LlmDiscoverySubnetPrefix, Mode=TwoWay}" />
-                </StackPanel>
+            <!-- Tab 2: Telemetry Analysis -->
+            <TabItem Header="📈 TELEMETRY">
+                <ScrollViewer>
+                    <Grid RowDefinitions="Auto,*" Margin="16" RowSpacing="16">
+                        <TextBlock Grid.Row="0" Classes="section-header" Text="TELEMETRY ANALYSIS (ScottPlot Integration - Phase 3)" />
+                        <Border Grid.Row="1" Classes="atlas-panel">
+                            <TextBlock Text="ATLAS waveform displays will be implemented here with ScottPlot" 
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Foreground="{DynamicResource BrushTextSecondary}" FontSize="16" />
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
 
-                <StackPanel Grid.Column="1" Spacing="10">
-                    <TextBlock Classes="label" Text="CLOUD PROVIDERS" />
-                    <TextBlock Text="OpenAI" Classes="value" />
-                    <TextBox Width="320" Watermark="OpenAI Endpoint" Text="{Binding OpenAiEndpoint, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="OpenAI Model" Text="{Binding OpenAiModel, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="OpenAI API Key" Text="{Binding OpenAiApiKey, Mode=TwoWay}" PasswordChar="*" />
-                    <TextBlock Text="Configured" IsVisible="{Binding OpenAiApiKeyConfigured}" />
+            <!-- Tab 3: Strategy -->
+            <TabItem Header="🎯 STRATEGY">
+                <ScrollViewer>
+                    <Grid RowDefinitions="Auto,Auto,*" Margin="16" RowSpacing="16">
+                        <TextBlock Grid.Row="0" Classes="section-header" Text="RACE STRATEGY & PIT PLANNING" />
+                        
+                        <!-- Current Stint Status -->
+                        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="16">
+                            <Border Classes="atlas-panel">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Classes="data-label" Text="FUEL STATUS" />
+                                    <ProgressBar Value="{Binding Strategy.CurrentStintFuelPercentage}" Maximum="100" 
+                                                Classes="atlas-progress" Height="12" Foreground="{DynamicResource BrushWarning}" />
+                                    <TextBlock Text="{Binding Strategy.CurrentStintFuelPercentage, StringFormat='{0:0}%'}" FontSize="18" />
+                                </StackPanel>
+                            </Border>
+                            <Border Classes="atlas-panel" Grid.Column="1">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Classes="data-label" Text="TIRE WEAR" />
+                                    <ProgressBar Value="{Binding Strategy.CurrentStintTireWear}" Maximum="100" 
+                                                Classes="atlas-progress" Height="12" Foreground="{DynamicResource BrushSuccess}" />
+                                    <TextBlock Text="{Binding Strategy.CurrentStintTireWear, StringFormat='{0:0}%'}" FontSize="18" />
+                                </StackPanel>
+                            </Border>
+                            <Border Classes="atlas-panel" Grid.Column="2">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Classes="data-label" Text="RECOMMENDED ACTION" />
+                                    <TextBlock Text="{Binding Strategy.RecommendedAction}" FontSize="14" TextWrapping="Wrap" />
+                                    <Button Content="Override Strategy" Classes="atlas-button-primary" Command="{Binding Strategy.OverrideStrategyCommand}" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
 
-                    <TextBlock Text="Anthropic" Classes="value" Margin="0,12,0,0" />
-                    <TextBox Width="320" Watermark="Anthropic Endpoint" Text="{Binding AnthropicEndpoint, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="Anthropic Model" Text="{Binding AnthropicModel, Mode=TwoWay}" />
-                    <TextBox Width="320" Watermark="Anthropic API Key" Text="{Binding AnthropicApiKey, Mode=TwoWay}" PasswordChar="*" />
-                    <TextBlock Text="Configured" IsVisible="{Binding AnthropicApiKeyConfigured}" />
+                        <!-- Alternative Strategies -->
+                        <Border Grid.Row="2" Classes="atlas-panel">
+                            <StackPanel Spacing="12">
+                                <TextBlock Classes="section-header" Text="ALTERNATIVE STRATEGIES" />
+                                <ItemsControl ItemsSource="{Binding Strategy.AlternativeStrategies}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#1A1A1A" Padding="12" Margin="0,4" CornerRadius="4" 
+                                                   BorderBrush="#2A2A2A" BorderThickness="1">
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <StackPanel Grid.Column="0" Spacing="4">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" />
+                                                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource BrushTextSecondary}" />
+                                                        <TextBlock Text="{Binding Confidence, StringFormat='Confidence: {0:P0}'}" FontSize="12" />
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1" Content="Select" Padding="8,4" VerticalAlignment="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
 
-                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-                        <Button Content="Reload" Command="{Binding LoadSettingsCommand}" />
-                        <Button Content="Save" Command="{Binding SaveSettingsCommand}" />
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
-        </Border>
+            <!-- Tab 4: AI Engineer -->
+            <TabItem Header="🤖 AI ENGINEER">
+                <Grid RowDefinitions="Auto,*,Auto" Margin="16" RowSpacing="16">
+                    <TextBlock Grid.Row="0" Classes="section-header" Text="AI RACE ENGINEER ASSISTANT" />
+                    
+                    <!-- Chat History -->
+                    <ScrollViewer Grid.Row="1">
+                        <ItemsControl ItemsSource="{Binding AiAssistant.Messages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,8" Padding="12" CornerRadius="6"
+                                           Background="{Binding IsUserMessage, Converter={StaticResource BoolToBackgroundConverter}}"
+                                           HorizontalAlignment="{Binding IsUserMessage, Converter={StaticResource BoolToAlignmentConverter}}">
+                                        <StackPanel Spacing="8">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Role}" FontWeight="Bold" FontSize="12" 
+                                                          Foreground="{DynamicResource BrushInfo}" />
+                                                <TextBlock Text="{Binding DisplayTimestamp}" FontSize="11" 
+                                                          Foreground="{DynamicResource BrushTextSecondary}" />
+                                                <TextBlock Text="{Binding DisplaySource}" FontSize="11" 
+                                                          Foreground="{DynamicResource BrushTextSecondary}" 
+                                                          IsVisible="{Binding IsAssistantMessage}" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="14" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Input Area -->
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <TextBox Grid.Column="0" Text="{Binding AiAssistant.InputText, Mode=TwoWay}" 
+                                Watermark="Ask the race engineer..." Height="40" />
+                        <Button Grid.Column="1" Content="🎤" Width="40" Height="40" ToolTip.Tip="Voice Input (Coming Soon)" />
+                        <Button Grid.Column="2" Content="Send" Classes="atlas-button-primary" Height="40" 
+                               Command="{Binding AiAssistant.SendQueryCommand}" />
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab 5: Settings -->
+            <TabItem Header="⚙️ SETTINGS">
+                <ScrollViewer>
+                    <Grid RowDefinitions="Auto,*" Margin="16" RowSpacing="16">
+                        <TextBlock Grid.Row="0" Classes="section-header" Text="AGENT CONFIGURATION" />
+                        
+                        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="24" RowSpacing="12">
+                            <!-- Local LLM Settings -->
+                            <StackPanel Grid.Column="0" Spacing="12">
+                                <Border Classes="atlas-panel">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Classes="data-label" Text="LOCAL LLM SETTINGS" FontSize="14" FontWeight="Bold" />
+                                        <CheckBox Content="Enable LLM" IsChecked="{Binding Settings.EnableLlm}" />
+                                        <CheckBox Content="Require pit for LLM" IsChecked="{Binding Settings.RequirePitForLlm}" />
+                                        
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="Provider:" VerticalAlignment="Center" Width="100" />
+                                            <ComboBox Width="200" ItemsSource="{Binding Settings.LlmProviders}" 
+                                                     SelectedItem="{Binding Settings.LlmProvider}" />
+                                        </StackPanel>
+                                        
+                                        <TextBox Watermark="LLM Endpoint" Text="{Binding Settings.LlmEndpoint, Mode=TwoWay}" />
+                                        <TextBox Watermark="LLM Model" Text="{Binding Settings.LlmModel, Mode=TwoWay}" />
+                                        <TextBox Watermark="Timeout (ms)" Text="{Binding Settings.LlmTimeoutMs, Mode=TwoWay}" />
+                                        
+                                        <CheckBox Content="Enable discovery" IsChecked="{Binding Settings.EnableLlmDiscovery}" />
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                            <TextBox Grid.Column="0" Watermark="Discovery Port" Text="{Binding Settings.LlmDiscoveryPort, Mode=TwoWay}" />
+                                            <TextBox Grid.Column="1" Watermark="Concurrency" Text="{Binding Settings.LlmDiscoveryMaxConcurrency, Mode=TwoWay}" />
+                                        </Grid>
+                                        <TextBox Watermark="Subnet Prefix" Text="{Binding Settings.LlmDiscoverySubnetPrefix, Mode=TwoWay}" />
+                                        
+                                        <Button Content="Discover Endpoints" Command="{Binding Settings.DiscoverLlmEndpointsCommand}" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Cloud Provider Settings -->
+                            <StackPanel Grid.Column="1" Spacing="12">
+                                <Border Classes="atlas-panel">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Classes="data-label" Text="CLOUD PROVIDERS" FontSize="14" FontWeight="Bold" />
+                                        
+                                        <TextBlock Text="OpenAI" FontSize="16" FontWeight="Bold" Margin="0,8,0,0" />
+                                        <TextBox Watermark="OpenAI Endpoint" Text="{Binding Settings.OpenAiEndpoint, Mode=TwoWay}" />
+                                        <TextBox Watermark="OpenAI Model" Text="{Binding Settings.OpenAiModel, Mode=TwoWay}" />
+                                        <TextBox Watermark="OpenAI API Key" Text="{Binding Settings.OpenAiApiKey, Mode=TwoWay}" PasswordChar="*" />
+                                        <TextBlock Text="✓ Configured" IsVisible="{Binding Settings.OpenAiApiKeyConfigured}" 
+                                                  Foreground="{DynamicResource BrushSuccess}" />
+
+                                        <TextBlock Text="Anthropic" FontSize="16" FontWeight="Bold" Margin="0,16,0,0" />
+                                        <TextBox Watermark="Anthropic Endpoint" Text="{Binding Settings.AnthropicEndpoint, Mode=TwoWay}" />
+                                        <TextBox Watermark="Anthropic Model" Text="{Binding Settings.AnthropicModel, Mode=TwoWay}" />
+                                        <TextBox Watermark="Anthropic API Key" Text="{Binding Settings.AnthropicApiKey, Mode=TwoWay}" PasswordChar="*" />
+                                        <TextBlock Text="✓ Configured" IsVisible="{Binding Settings.AnthropicApiKeyConfigured}" 
+                                                  Foreground="{DynamicResource BrushSuccess}" />
+                                    </StackPanel>
+                                </Border>
+                                
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button Content="Reload Settings" Command="{Binding Settings.LoadSettingsCommand}" />
+                                    <Button Content="Save Settings" Classes="atlas-button-primary" Command="{Binding Settings.SaveSettingsCommand}" />
+                                </StackPanel>
+                                
+                                <TextBlock Text="{Binding Settings.StatusMessage}" Foreground="{DynamicResource BrushInfo}" 
+                                          IsVisible="{Binding Settings.StatusMessage}" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
     </Grid>
-
 </Window>

@@ -10,16 +10,31 @@ using PitWall.UI.Services;
 
 namespace PitWall.UI.ViewModels;
 
+/// <summary>
+/// Main orchestrator ViewModel for the PitWall application.
+/// Manages WebSocket connections, telemetry streaming, and delegates
+/// to domain-specific ViewModels.
+/// </summary>
 public partial class MainWindowViewModel : ViewModelBase
 {
 	private readonly IRecommendationClient _recommendationClient;
 	private readonly ITelemetryStreamClient _telemetryStreamClient;
-	private readonly IAgentQueryClient _agentQueryClient;
-	private readonly IAgentConfigClient _agentConfigClient;
+	private readonly TelemetryBuffer _telemetryBuffer;
 	private CancellationTokenSource? _cts;
 
+	// Domain-specific ViewModels
+	public DashboardViewModel Dashboard { get; }
+	public TelemetryAnalysisViewModel TelemetryAnalysis { get; }
+	public StrategyViewModel Strategy { get; }
+	public AiAssistantViewModel AiAssistant { get; }
+	public SettingsViewModel Settings { get; }
+
 	public MainWindowViewModel()
-		: this(new NullRecommendationClient(), new NullTelemetryStreamClient(), new NullAgentQueryClient(), new NullAgentConfigClient())
+		: this(
+			new NullRecommendationClient(), 
+			new NullTelemetryStreamClient(), 
+			new NullAgentQueryClient(), 
+			new NullAgentConfigClient())
 	{
 	}
 
@@ -31,126 +46,27 @@ public partial class MainWindowViewModel : ViewModelBase
 	{
 		_recommendationClient = recommendationClient;
 		_telemetryStreamClient = telemetryStreamClient;
-		_agentQueryClient = agentQueryClient;
-		_agentConfigClient = agentConfigClient;
-		SendAiQueryCommand = new AsyncRelayCommand(() => SendAiQueryAsync(CancellationToken.None));
-		LoadSettingsCommand = new AsyncRelayCommand(() => LoadSettingsAsync(CancellationToken.None));
-		SaveSettingsCommand = new AsyncRelayCommand(() => SaveSettingsAsync(CancellationToken.None));
+		_telemetryBuffer = new TelemetryBuffer(10000);
+
+		// Initialize domain ViewModels
+		Dashboard = new DashboardViewModel();
+		TelemetryAnalysis = new TelemetryAnalysisViewModel();
+		Strategy = new StrategyViewModel();
+		AiAssistant = new AiAssistantViewModel(agentQueryClient);
+		Settings = new SettingsViewModel(agentConfigClient);
 	}
 
 	[ObservableProperty]
-	private string fuelLiters = "-- L";
+	private int selectedTabIndex;
 
 	[ObservableProperty]
-	private string fuelLaps = "-- LAPS";
+	private string currentLapDisplay = "15/30";
 
 	[ObservableProperty]
-	private string speedDisplay = "-- KPH";
+	private string positionDisplay = "P3";
 
 	[ObservableProperty]
-	private string tiresLine1 = "FL --  --  |  FR --  --";
-
-	[ObservableProperty]
-	private string tiresLine2 = "RL --  --  |  RR --  --";
-
-	[ObservableProperty]
-	private string strategyMessage = "Awaiting strategy...";
-
-	[ObservableProperty]
-	private string strategyConfidence = "CONF --";
-
-	[ObservableProperty]
-	private string aiInput = string.Empty;
-
-	[ObservableProperty]
-	private bool enableLlm;
-
-	[ObservableProperty]
-	private string llmProvider = "Ollama";
-
-	[ObservableProperty]
-	private string llmEndpoint = string.Empty;
-
-	[ObservableProperty]
-	private string llmModel = string.Empty;
-
-	[ObservableProperty]
-	private int llmTimeoutMs;
-
-	[ObservableProperty]
-	private bool requirePitForLlm;
-
-	[ObservableProperty]
-	private bool enableLlmDiscovery;
-
-	[ObservableProperty]
-	private int llmDiscoveryTimeoutMs;
-
-	[ObservableProperty]
-	private int llmDiscoveryPort;
-
-	[ObservableProperty]
-	private int llmDiscoveryMaxConcurrency;
-
-	[ObservableProperty]
-	private string? llmDiscoverySubnetPrefix;
-
-	[ObservableProperty]
-	private string openAiEndpoint = string.Empty;
-
-	[ObservableProperty]
-	private string openAiModel = string.Empty;
-
-	[ObservableProperty]
-	private string openAiApiKey = string.Empty;
-
-	[ObservableProperty]
-	private bool openAiApiKeyConfigured;
-
-	[ObservableProperty]
-	private string anthropicEndpoint = string.Empty;
-
-	[ObservableProperty]
-	private string anthropicModel = string.Empty;
-
-	[ObservableProperty]
-	private string anthropicApiKey = string.Empty;
-
-	[ObservableProperty]
-	private bool anthropicApiKeyConfigured;
-
-	public ObservableCollection<AiMessage> AiMessages { get; } = new();
-
-	public IAsyncRelayCommand SendAiQueryCommand { get; }
-	public IAsyncRelayCommand LoadSettingsCommand { get; }
-	public IAsyncRelayCommand SaveSettingsCommand { get; }
-
-	public IReadOnlyList<string> LlmProviders { get; } = new[] { "Ollama", "OpenAI", "Anthropic" };
-
-	public async Task SendAiQueryAsync(CancellationToken cancellationToken)
-	{
-		if (string.IsNullOrWhiteSpace(AiInput))
-		{
-			return;
-		}
-
-		var userMessage = new AiMessage
-		{
-			Role = "User",
-			Text = AiInput.Trim()
-		};
-
-		AiMessages.Add(userMessage);
-		AiInput = string.Empty;
-
-		var response = await _agentQueryClient.SendQueryAsync(userMessage.Text, cancellationToken);
-		AiMessages.Add(new AiMessage
-		{
-			Role = "Assistant",
-			Text = response.Answer,
-			Source = response.Source
-		});
-	}
+	private string gapDisplay = "+2.3s";
 
 	public Task StartAsync(string sessionId, CancellationToken cancellationToken)
 	{
@@ -165,59 +81,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
 		_ = Task.Run(() => PollRecommendationsAsync(sessionId, _cts.Token), _cts.Token);
 
+		// Load settings on startup
+		_ = Settings.LoadSettingsAsync();
+
 		return Task.CompletedTask;
-	}
-
-	public async Task LoadSettingsAsync(CancellationToken cancellationToken)
-	{
-		var config = await _agentConfigClient.GetConfigAsync(cancellationToken);
-		EnableLlm = config.EnableLLM;
-		LlmProvider = string.IsNullOrWhiteSpace(config.LLMProvider) ? "Ollama" : config.LLMProvider;
-		LlmEndpoint = config.LLMEndpoint ?? string.Empty;
-		LlmModel = config.LLMModel ?? string.Empty;
-		LlmTimeoutMs = config.LLMTimeoutMs;
-		RequirePitForLlm = config.RequirePitForLlm;
-		EnableLlmDiscovery = config.EnableLLMDiscovery;
-		LlmDiscoveryTimeoutMs = config.LLMDiscoveryTimeoutMs;
-		LlmDiscoveryPort = config.LLMDiscoveryPort;
-		LlmDiscoveryMaxConcurrency = config.LLMDiscoveryMaxConcurrency;
-		LlmDiscoverySubnetPrefix = config.LLMDiscoverySubnetPrefix;
-		OpenAiEndpoint = config.OpenAIEndpoint ?? string.Empty;
-		OpenAiModel = config.OpenAIModel ?? string.Empty;
-		OpenAiApiKeyConfigured = config.OpenAiApiKeyConfigured;
-		AnthropicEndpoint = config.AnthropicEndpoint ?? string.Empty;
-		AnthropicModel = config.AnthropicModel ?? string.Empty;
-		AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
-	}
-
-	public async Task SaveSettingsAsync(CancellationToken cancellationToken)
-	{
-		var update = new AgentConfigUpdateDto
-		{
-			EnableLLM = EnableLlm,
-			LLMProvider = LlmProvider,
-			LLMEndpoint = LlmEndpoint,
-			LLMModel = LlmModel,
-			LLMTimeoutMs = LlmTimeoutMs,
-			RequirePitForLlm = RequirePitForLlm,
-			EnableLLMDiscovery = EnableLlmDiscovery,
-			LLMDiscoveryTimeoutMs = LlmDiscoveryTimeoutMs,
-			LLMDiscoveryPort = LlmDiscoveryPort,
-			LLMDiscoveryMaxConcurrency = LlmDiscoveryMaxConcurrency,
-			LLMDiscoverySubnetPrefix = LlmDiscoverySubnetPrefix,
-			OpenAiEndpoint = OpenAiEndpoint,
-			OpenAiModel = OpenAiModel,
-			OpenAiApiKey = string.IsNullOrWhiteSpace(OpenAiApiKey) ? null : OpenAiApiKey,
-			AnthropicEndpoint = AnthropicEndpoint,
-			AnthropicModel = AnthropicModel,
-			AnthropicApiKey = string.IsNullOrWhiteSpace(AnthropicApiKey) ? null : AnthropicApiKey
-		};
-
-		var config = await _agentConfigClient.UpdateConfigAsync(update, cancellationToken);
-		OpenAiApiKey = string.Empty;
-		AnthropicApiKey = string.Empty;
-		OpenAiApiKeyConfigured = config.OpenAiApiKeyConfigured;
-		AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
 	}
 
 	public void Stop()
@@ -227,30 +94,16 @@ public partial class MainWindowViewModel : ViewModelBase
 		_cts = null;
 	}
 
-	public void UpdateTelemetry(TelemetrySampleDto telemetry)
+	private void UpdateTelemetry(TelemetrySampleDto telemetry)
 	{
-		FuelLiters = $"{telemetry.FuelLiters:0.0} L";
-		SpeedDisplay = $"{telemetry.SpeedKph:0.0} KPH";
+		// Add to buffer
+		_telemetryBuffer.Add(telemetry);
 
-		if (telemetry.TyreTempsC.Length >= 4)
-		{
-			TiresLine1 = $"FL {telemetry.TyreTempsC[0]:0}C  --  |  FR {telemetry.TyreTempsC[1]:0}C  --";
-			TiresLine2 = $"RL {telemetry.TyreTempsC[2]:0}C  --  |  RR {telemetry.TyreTempsC[3]:0}C  --";
-		}
-		else
-		{
-			TiresLine1 = "FL --  --  |  FR --  --";
-			TiresLine2 = "RL --  --  |  RR --  --";
-		}
-	}
-
-	public void UpdateRecommendation(RecommendationDto recommendation)
-	{
-		StrategyMessage = string.IsNullOrWhiteSpace(recommendation.Recommendation)
-			? "Awaiting strategy..."
-			: recommendation.Recommendation;
-
-		StrategyConfidence = $"CONF {recommendation.Confidence:0.00}";
+		// Update domain ViewModels
+		Dashboard.UpdateTelemetry(telemetry);
+		
+		// TODO: Update TelemetryAnalysis with latest data
+		// TODO: Update race context for AI Assistant
 	}
 
 	private async Task PollRecommendationsAsync(string sessionId, CancellationToken cancellationToken)
@@ -258,11 +111,20 @@ public partial class MainWindowViewModel : ViewModelBase
 		using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
 		while (await timer.WaitForNextTickAsync(cancellationToken))
 		{
-			var recommendation = await _recommendationClient.GetRecommendationAsync(sessionId, cancellationToken);
-			UpdateRecommendation(recommendation);
+			try
+			{
+				var recommendation = await _recommendationClient.GetRecommendationAsync(sessionId, cancellationToken);
+				Dashboard.UpdateRecommendation(recommendation);
+				Strategy.UpdateFromRecommendation(recommendation);
+			}
+			catch
+			{
+				// Silently continue on errors
+			}
 		}
 	}
 
+	// Null implementations for design-time support
 	private sealed class NullRecommendationClient : IRecommendationClient
 	{
 		public Task<RecommendationDto> GetRecommendationAsync(string sessionId, CancellationToken cancellationToken)
@@ -276,32 +138,6 @@ public partial class MainWindowViewModel : ViewModelBase
 		public Task ConnectAsync(int sessionId, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
 		{
 			return Task.CompletedTask;
-		}
-	}
-
-	private sealed class NullAgentQueryClient : IAgentQueryClient
-	{
-		public Task<AgentResponseDto> SendQueryAsync(string query, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(new AgentResponseDto
-			{
-				Answer = "",
-				Source = "",
-				Success = false
-			});
-		}
-	}
-
-	private sealed class NullAgentConfigClient : IAgentConfigClient
-	{
-		public Task<AgentConfigDto> GetConfigAsync(CancellationToken cancellationToken)
-		{
-			return Task.FromResult(new AgentConfigDto());
-		}
-
-		public Task<AgentConfigDto> UpdateConfigAsync(AgentConfigUpdateDto update, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(new AgentConfigDto());
 		}
 	}
 }
