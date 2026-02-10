@@ -85,26 +85,26 @@
                                         <!-- Front Left -->
                                         <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
                                             <TextBlock Text="FL" Classes="data-label" />
-                                            <TextBlock Text="{Binding Dashboard.TireFLTemp, StringFormat='{0:0}°C'}" FontSize="18" FontWeight="Bold" />
-                                            <TextBlock Text="{Binding Dashboard.TireFLWear, StringFormat='{0:0}%'}" FontSize="14" />
+                                            <TextBlock Text="{Binding Dashboard.TireFLTemp, StringFormat={}{0:0}°C}" FontSize="18" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Dashboard.TireFLWear, StringFormat={}{0:0}%}" FontSize="14" />
                                         </StackPanel>
                                         <!-- Front Right -->
                                         <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
                                             <TextBlock Text="FR" Classes="data-label" />
-                                            <TextBlock Text="{Binding Dashboard.TireFRTemp, StringFormat='{0:0}°C'}" FontSize="18" FontWeight="Bold" />
-                                            <TextBlock Text="{Binding Dashboard.TireFRWear, StringFormat='{0:0}%'}" FontSize="14" />
+                                            <TextBlock Text="{Binding Dashboard.TireFRTemp, StringFormat={}{0:0}°C}" FontSize="18" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Dashboard.TireFRWear, StringFormat={}{0:0}%}" FontSize="14" />
                                         </StackPanel>
                                         <!-- Rear Left -->
                                         <StackPanel Grid.Row="1" Grid.Column="0" Spacing="4">
                                             <TextBlock Text="RL" Classes="data-label" />
-                                            <TextBlock Text="{Binding Dashboard.TireRLTemp, StringFormat='{0:0}°C'}" FontSize="18" FontWeight="Bold" />
-                                            <TextBlock Text="{Binding Dashboard.TireRLWear, StringFormat='{0:0}%'}" FontSize="14" />
+                                            <TextBlock Text="{Binding Dashboard.TireRLTemp, StringFormat={}{0:0}°C}" FontSize="18" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Dashboard.TireRLWear, StringFormat={}{0:0}%}" FontSize="14" />
                                         </StackPanel>
                                         <!-- Rear Right -->
                                         <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4">
                                             <TextBlock Text="RR" Classes="data-label" />
-                                            <TextBlock Text="{Binding Dashboard.TireRRTemp, StringFormat='{0:0}°C'}" FontSize="18" FontWeight="Bold" />
-                                            <TextBlock Text="{Binding Dashboard.TireRRWear, StringFormat='{0:0}%'}" FontSize="14" />
+                                            <TextBlock Text="{Binding Dashboard.TireRRTemp, StringFormat={}{0:0}°C}" FontSize="18" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding Dashboard.TireRRWear, StringFormat={}{0:0}%}" FontSize="14" />
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -117,11 +117,11 @@
                                     <TextBlock Classes="data-value" Text="{Binding Dashboard.StrategyMessage}" TextWrapping="Wrap" FontSize="16" />
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <TextBlock Classes="label" Text="Confidence:" />
-                                        <TextBlock Text="{Binding Dashboard.StrategyConfidence, StringFormat='{0:P0}'}" FontWeight="Bold" FontSize="14" />
+                                        <TextBlock Text="{Binding Dashboard.StrategyConfidence, StringFormat={}{0:P0}}" FontWeight="Bold" FontSize="14" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <TextBlock Classes="label" Text="Next Pit:" />
-                                        <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat='Lap {0}'}" FontWeight="Bold" FontSize="14" 
+                                        <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat={}Lap {0}}" FontWeight="Bold" FontSize="14" 
                                                   Foreground="{DynamicResource BrushInfo}" />
                                     </StackPanel>
                                 </StackPanel>
@@ -156,16 +156,16 @@
                             <!-- Weather Panel -->
                             <Border Classes="atlas-panel" Grid.Column="0">
                                 <StackPanel Spacing="12">
-                                    <TextBlock Classes="section-header" Text="WEATHER & TRACK" />
+                                    <TextBlock Classes="section-header" Text="WEATHER &amp; TRACK" />
                                     <StackPanel Spacing="6">
                                         <TextBlock Text="{Binding Dashboard.WeatherConditions}" FontSize="18" FontWeight="Bold" />
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <TextBlock Classes="label" Text="Track Temp:" />
-                                            <TextBlock Text="{Binding Dashboard.TrackTempC, StringFormat='{0}°C'}" FontSize="14" />
+                                            <TextBlock Text="{Binding Dashboard.TrackTempC, StringFormat={}{0}°C}" FontSize="14" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <TextBlock Classes="label" Text="Grip:" />
-                                            <TextBlock Text="{Binding Dashboard.GripPercentage, StringFormat='{0:0}%'}" FontSize="14" />
+                                            <TextBlock Text="{Binding Dashboard.GripPercentage, StringFormat={}{0:0}%}" FontSize="14" />
                                         </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
@@ -219,7 +219,7 @@
             <TabItem Header="🎯 STRATEGY">
                 <ScrollViewer>
                     <Grid RowDefinitions="Auto,Auto,*" Margin="16" RowSpacing="16">
-                        <TextBlock Grid.Row="0" Classes="section-header" Text="RACE STRATEGY & PIT PLANNING" />
+                        <TextBlock Grid.Row="0" Classes="section-header" Text="RACE STRATEGY &amp; PIT PLANNING" />
                         
                         <!-- Current Stint Status -->
                         <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="16">
@@ -228,7 +228,7 @@
                                     <TextBlock Classes="data-label" Text="FUEL STATUS" />
                                     <ProgressBar Value="{Binding Strategy.CurrentStintFuelPercentage}" Maximum="100" 
                                                 Classes="atlas-progress" Height="12" Foreground="{DynamicResource BrushWarning}" />
-                                    <TextBlock Text="{Binding Strategy.CurrentStintFuelPercentage, StringFormat='{0:0}%'}" FontSize="18" />
+                                    <TextBlock Text="{Binding Strategy.CurrentStintFuelPercentage, StringFormat={}{0:0}%}" FontSize="18" />
                                 </StackPanel>
                             </Border>
                             <Border Classes="atlas-panel" Grid.Column="1">
@@ -236,7 +236,7 @@
                                     <TextBlock Classes="data-label" Text="TIRE WEAR" />
                                     <ProgressBar Value="{Binding Strategy.CurrentStintTireWear}" Maximum="100" 
                                                 Classes="atlas-progress" Height="12" Foreground="{DynamicResource BrushSuccess}" />
-                                    <TextBlock Text="{Binding Strategy.CurrentStintTireWear, StringFormat='{0:0}%'}" FontSize="18" />
+                                    <TextBlock Text="{Binding Strategy.CurrentStintTireWear, StringFormat={}{0:0}%}" FontSize="18" />
                                 </StackPanel>
                             </Border>
                             <Border Classes="atlas-panel" Grid.Column="2">

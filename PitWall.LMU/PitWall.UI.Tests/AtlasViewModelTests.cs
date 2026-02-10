@@ -182,7 +182,7 @@ public class StrategyViewModelTests
 /// <summary>
 /// Tests for AiAssistantViewModel message handling and queries.
 /// </summary>
-public class AiAssistantViewModelTests
+public class AtlasAiAssistantViewModelTests
 {
 	[Fact]
 	public async Task SendQuery_WithEmptyInput_DoesNothing()
@@ -261,7 +261,7 @@ public class AiAssistantViewModelTests
 /// <summary>
 /// Tests for SettingsViewModel configuration management.
 /// </summary>
-public class SettingsViewModelTests
+public class AtlasSettingsViewModelTests
 {
 	[Fact]
 	public void Constructor_InitializesDefaults()
@@ -457,5 +457,32 @@ internal class NullAgentQueryClient : IAgentQueryClient
 			Source = "Test",
 			Success = true
 		});
+	}
+}
+
+/// <summary>
+/// Null config client for testing without dependencies.
+/// </summary>
+internal class NullAgentConfigClient : IAgentConfigClient
+{
+	public Task<AgentConfigDto> GetConfigAsync(CancellationToken cancellationToken)
+	{
+		return Task.FromResult(new AgentConfigDto
+		{
+			EnableLLM = false,
+			LLMProvider = "Ollama",
+			LLMTimeoutMs = 5000,
+			RequirePitForLlm = false,
+			EnableLLMDiscovery = false,
+			LLMDiscoveryTimeoutMs = 2000,
+			LLMDiscoveryPort = 11434,
+			LLMDiscoveryMaxConcurrency = 50,
+			LLMDiscoverySubnetPrefix = "192.168.1"
+		});
+	}
+
+	public Task<AgentConfigDto> UpdateConfigAsync(AgentConfigUpdateDto update, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(new AgentConfigDto());
 	}
 }

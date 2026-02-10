@@ -93,7 +93,7 @@ public partial class StrategyViewModel : ViewModelBase
 
 	public void UpdateFromRecommendation(RecommendationDto recommendation)
 	{
-		RecommendedAction = recommendation.Recommendation;
+		RecommendedAction = recommendation.Recommendation ?? string.Empty;
 		StrategyConfidence = recommendation.Confidence;
 	}
 }

@@ -82,7 +82,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		_ = Task.Run(() => PollRecommendationsAsync(sessionId, _cts.Token), _cts.Token);
 
 		// Load settings on startup
-		_ = Settings.LoadSettingsAsync();
+		_ = Settings.LoadSettingsCommand.ExecuteAsync(null);
 
 		return Task.CompletedTask;
 	}

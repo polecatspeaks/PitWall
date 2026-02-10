@@ -6,5 +6,6 @@ namespace PitWall.UI.Models
         public string Source { get; set; } = string.Empty;
         public double Confidence { get; set; }
         public bool Success { get; set; }
+        public string? Context { get; set; }
     }
 }
