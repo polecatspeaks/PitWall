@@ -3,6 +3,7 @@
              x:Class="PitWall.UI.App"
              xmlns:local="using:PitWall.UI"
              xmlns:models="using:PitWall.UI.Models"
+             xmlns:converters="using:PitWall.UI.Converters"
              RequestedThemeVariant="Dark">
 
     <Application.DataTemplates>
@@ -37,6 +38,13 @@
         <models:TireWearConverter x:Key="TireWearConverter" />
         <models:TireTempConverter x:Key="TireTempConverter" />
         <models:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter" />
+        
+        <!-- ATLAS UI Converters -->
+        <converters:BoolToTextConverter x:Key="BoolToTextConverter" />
+        <converters:BoolToAlignmentUserConverter x:Key="BoolToAlignmentUserConverter" />
+        <converters:BoolToMessageBackgroundConverter x:Key="BoolToMessageBackgroundConverter" />
+        <converters:BoolToMessageBorderConverter x:Key="BoolToMessageBorderConverter" />
+        <converters:BoolToRoleColorConverter x:Key="BoolToRoleColorConverter" />
         <models:BoolToAlignmentConverter x:Key="BoolToAlignmentConverter" />
     </Application.Resources>
 

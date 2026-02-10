@@ -7,6 +7,6 @@ namespace PitWall.UI.Services
 {
     public interface ITelemetryStreamClient
     {
-        Task ConnectAsync(int sessionId, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken);
+        Task ConnectAsync(int sessionId, int startRow, int endRow, int intervalMs, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken);
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using PitWall.UI.Models;
@@ -8,5 +9,6 @@ namespace PitWall.UI.Services
     {
         Task<AgentConfigDto> GetConfigAsync(CancellationToken cancellationToken);
         Task<AgentConfigDto> UpdateConfigAsync(AgentConfigUpdateDto update, CancellationToken cancellationToken);
+        Task<IReadOnlyList<string>> DiscoverEndpointsAsync(CancellationToken cancellationToken);
     }
 }

@@ -16,10 +16,10 @@ namespace PitWall.UI.Services
             _baseUri = baseUri;
         }
 
-        public async Task ConnectAsync(int sessionId, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
+        public async Task ConnectAsync(int sessionId, int startRow, int endRow, int intervalMs, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
         {
             using var socket = new ClientWebSocket();
-            var uri = new Uri(_baseUri, $"/ws/state?sessionId={sessionId}");
+            var uri = new Uri(_baseUri, $"/ws/state?sessionId={sessionId}&startRow={startRow}&endRow={endRow}&intervalMs={intervalMs}");
 
             await socket.ConnectAsync(uri, cancellationToken);
 

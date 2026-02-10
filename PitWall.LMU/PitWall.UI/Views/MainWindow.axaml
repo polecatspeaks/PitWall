@@ -439,7 +439,9 @@
                                                         <TextBlock Text="{Binding Confidence, StringFormat={}{0:0.1}% confidence}" FontSize="13" HorizontalAlignment="Right" />
                                                         <TextBlock Text="{Binding EstimatedFinishPosition, StringFormat={}Est. P{0}}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Right" />
                                                     </StackPanel>
-                                                    <Button Grid.Column="3" Content="Select" Padding="14,8" VerticalAlignment="Center" FontWeight="Bold" />
+                                                    <Button Grid.Column="3" Content="Select" Padding="14,8" VerticalAlignment="Center" FontWeight="Bold"
+                                                           Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).Strategy.SelectAlternativeStrategyCommand}"
+                                                           CommandParameter="{Binding}" />
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
@@ -595,7 +597,77 @@
                                         </Grid>
                                         <TextBox Watermark="Subnet Prefix" Text="{Binding Settings.LlmDiscoverySubnetPrefix, Mode=TwoWay}" />
                                         
-                                        <Button Content="Discover Endpoints" Command="{Binding Settings.DiscoverLlmEndpointsCommand}" />
+                                        <Button Content="Discover Endpoints" Command="{Binding Settings.DiscoverLlmEndpointsCommand}" 
+                                               IsEnabled="{Binding !Settings.IsDiscovering}" />
+                                        
+                                        <!-- Discovered Endpoints List -->
+                                        <Border Background="#1A1A1A" CornerRadius="4" Padding="10" Margin="0,8,0,0"
+                                               IsVisible="{Binding Settings.DiscoveredEndpoints.Count}">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Text="DISCOVERED ENDPOINTS" FontSize="12" FontWeight="Bold" 
+                                                          Foreground="{DynamicResource BrushSuccess}" />
+                                                <ScrollViewer MaxHeight="200">
+                                                    <ItemsControl ItemsSource="{Binding Settings.DiscoveredEndpoints}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Border Background="#0D0D0D" Padding="8" Margin="0,2" CornerRadius="4"
+                                                                       BorderBrush="#2A2A2A" BorderThickness="1">
+                                                                    <Grid ColumnDefinitions="*,Auto">
+                                                                        <TextBlock Grid.Column="0" Text="{Binding}" FontFamily="Cascadia Mono,Consolas" 
+                                                                                  FontSize="12" VerticalAlignment="Center" />
+                                                                        <Button Grid.Column="1" Content="Use" Padding="8,4" 
+                                                                               Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).Settings.SelectEndpointCommand}"
+                                                                               CommandParameter="{Binding}" />
+                                                                    </Grid>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </ScrollViewer>
+                                            </StackPanel>
+                                        </Border>
+                                        
+                                        <!-- Discovery Status -->
+                                        <Border Background="{DynamicResource BrushInfo}" CornerRadius="4" Padding="8" 
+                                               IsVisible="{Binding Settings.IsDiscovering}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="⏳" FontSize="14" />
+                                                <TextBlock Text="Scanning network..." FontSize="12" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="atlas-panel">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Classes="data-label" Text="REPLAY CONTROLS" FontSize="14" FontWeight="Bold" />
+                                        <CheckBox Content="Enable replay" IsChecked="{Binding ReplayEnabled}" />
+
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="Session:" VerticalAlignment="Center" Width="80" />
+                                            <ComboBox Width="120" ItemsSource="{Binding AvailableSessions}" 
+                                                     SelectedItem="{Binding SelectedSessionId}" />
+                                            <Button Content="Reload" Command="{Binding LoadSessionsCommand}" />
+                                        </StackPanel>
+
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsEnabled="{Binding ReplayEnabled}">
+                                            <TextBox Grid.Column="0" Watermark="Start Row" Text="{Binding ReplayStartRow, Mode=TwoWay}" />
+                                            <TextBox Grid.Column="1" Watermark="End Row" Text="{Binding ReplayEndRow, Mode=TwoWay}" />
+                                        </Grid>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
+                                            <TextBlock Text="Interval (ms):" VerticalAlignment="Center" Width="100" />
+                                            <ComboBox Width="120" ItemsSource="{Binding ReplayIntervalsMs}" 
+                                                     SelectedItem="{Binding ReplayIntervalMs}" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
+                                            <Button Content="Play/Pause" Command="{Binding ToggleReplayCommand}" />
+                                            <Button Content="Restart" Command="{Binding RestartReplayCommand}" />
+                                            <Button Content="Apply" Command="{Binding ApplyReplaySettingsCommand}" />
+                                        </StackPanel>
+
+                                        <TextBlock Text="{Binding ReplayStatusMessage}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>

@@ -27,18 +27,22 @@ public partial class App : Application
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
 
-            var apiBase = Environment.GetEnvironmentVariable("PITWALL_API_BASE") ?? "http://localhost:5000";
-            var httpClient = new HttpClient { BaseAddress = new Uri(apiBase) };
+            var apiBase = Environment.GetEnvironmentVariable("PITWALL_API_BASE") ?? "http://localhost:5236";
+            var agentBase = Environment.GetEnvironmentVariable("PITWALL_AGENT_BASE") ?? "http://localhost:5139";
+
+            var apiClient = new HttpClient { BaseAddress = new Uri(apiBase) };
+            var agentClientHttp = new HttpClient { BaseAddress = new Uri(agentBase) };
 
             var wsBase = BuildWebSocketBase(apiBase);
             var telemetryClient = new TelemetryStreamClient(wsBase);
-            var recommendationClient = new RecommendationClient(httpClient);
-            var agentClient = new AgentQueryClient(httpClient);
-            var agentConfigClient = new AgentConfigClient(httpClient);
+            var recommendationClient = new RecommendationClient(apiClient);
+            var sessionClient = new SessionClient(apiClient);
+            var agentClient = new AgentQueryClient(agentClientHttp);
+            var agentConfigClient = new AgentConfigClient(agentClientHttp);
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(recommendationClient, telemetryClient, agentClient, agentConfigClient),
+                DataContext = new MainWindowViewModel(recommendationClient, telemetryClient, agentClient, agentConfigClient, sessionClient),
             };
         }
 

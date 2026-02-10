@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -46,5 +49,18 @@ namespace PitWall.UI.Services
 
             return result ?? new AgentConfigDto();
         }
+
+        public async Task<IReadOnlyList<string>> DiscoverEndpointsAsync(CancellationToken cancellationToken)
+        {
+            var response = await _httpClient.GetAsync("/agent/llm/discover", cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync(cancellationToken);
+            var result = JsonSerializer.Deserialize<DiscoveryResponse>(json, Options);
+
+            return result?.Endpoints ?? Array.Empty<string>();
+        }
+
+        private record DiscoveryResponse(string[] Endpoints);
     }
 }

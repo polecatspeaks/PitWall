@@ -19,8 +19,10 @@ public partial class MainWindowViewModel : ViewModelBase
 {
 	private readonly IRecommendationClient _recommendationClient;
 	private readonly ITelemetryStreamClient _telemetryStreamClient;
+	private readonly ISessionClient _sessionClient;
 	private readonly TelemetryBuffer _telemetryBuffer;
 	private CancellationTokenSource? _cts;
+	private CancellationTokenSource? _telemetryCts;
 
 	// Domain-specific ViewModels
 	public DashboardViewModel Dashboard { get; }
@@ -34,7 +36,8 @@ public partial class MainWindowViewModel : ViewModelBase
 			new NullRecommendationClient(), 
 			new NullTelemetryStreamClient(), 
 			new NullAgentQueryClient(), 
-			new NullAgentConfigClient())
+			new NullAgentConfigClient(),
+			new NullSessionClient())
 	{
 	}
 
@@ -42,10 +45,12 @@ public partial class MainWindowViewModel : ViewModelBase
 		IRecommendationClient recommendationClient,
 		ITelemetryStreamClient telemetryStreamClient,
 		IAgentQueryClient agentQueryClient,
-		IAgentConfigClient agentConfigClient)
+		IAgentConfigClient agentConfigClient,
+		ISessionClient sessionClient)
 	{
 		_recommendationClient = recommendationClient;
 		_telemetryStreamClient = telemetryStreamClient;
+		_sessionClient = sessionClient;
 		_telemetryBuffer = new TelemetryBuffer(10000);
 
 		// Initialize domain ViewModels (pass buffer to TelemetryAnalysis)
@@ -54,6 +59,11 @@ public partial class MainWindowViewModel : ViewModelBase
 		Strategy = new StrategyViewModel();
 		AiAssistant = new AiAssistantViewModel(agentQueryClient);
 		Settings = new SettingsViewModel(agentConfigClient);
+
+		LoadSessionsCommand = new AsyncRelayCommand(() => LoadSessionsAsync(CancellationToken.None));
+		ToggleReplayCommand = new RelayCommand(ToggleReplay);
+		RestartReplayCommand = new RelayCommand(RestartReplay);
+		ApplyReplaySettingsCommand = new RelayCommand(ApplyReplaySettings);
 	}
 
 	[ObservableProperty]
@@ -68,18 +78,47 @@ public partial class MainWindowViewModel : ViewModelBase
 	[ObservableProperty]
 	private string gapDisplay = "+2.3s";
 
+	[ObservableProperty]
+	private bool replayEnabled = true;
+
+	[ObservableProperty]
+	private int selectedSessionId = 1;
+
+	[ObservableProperty]
+	private int replayStartRow;
+
+	[ObservableProperty]
+	private int replayEndRow = -1;
+
+	[ObservableProperty]
+	private int replayIntervalMs = 100;
+
+	[ObservableProperty]
+	private bool isReplayPlaying = true;
+
+	[ObservableProperty]
+	private string replayStatusMessage = "Replay ready";
+
+	public ObservableCollection<int> AvailableSessions { get; } = new();
+
+	public IAsyncRelayCommand LoadSessionsCommand { get; }
+	public IRelayCommand ToggleReplayCommand { get; }
+	public IRelayCommand RestartReplayCommand { get; }
+	public IRelayCommand ApplyReplaySettingsCommand { get; }
+
+	public IReadOnlyList<int> ReplayIntervalsMs { get; } = new[] { 50, 100, 250, 500, 1000 };
+
 	public Task StartAsync(string sessionId, CancellationToken cancellationToken)
 	{
 		_cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+		if (int.TryParse(sessionId, out var parsed) && parsed > 0)
+		{
+			SelectedSessionId = parsed;
+		}
 
-		_ = Task.Run(() =>
-			_telemetryStreamClient.ConnectAsync(
-				int.TryParse(sessionId, out var parsed) ? parsed : 1,
-				UpdateTelemetry,
-				_cts.Token),
-			_cts.Token);
-
-		_ = Task.Run(() => PollRecommendationsAsync(sessionId, _cts.Token), _cts.Token);
+		_ = LoadSessionsAsync(CancellationToken.None);
+		StartReplay();
+		_ = Task.Run(() => PollRecommendationsAsync(_cts.Token), _cts.Token);
 
 		// Load settings on startup
 		_ = Settings.LoadSettingsCommand.ExecuteAsync(null);
@@ -87,11 +126,90 @@ public partial class MainWindowViewModel : ViewModelBase
 		return Task.CompletedTask;
 	}
 
+	private async Task LoadSessionsAsync(CancellationToken cancellationToken)
+	{
+		try
+		{
+			ReplayStatusMessage = "Loading sessions...";
+			var count = await _sessionClient.GetSessionCountAsync(cancellationToken);
+			AvailableSessions.Clear();
+
+			if (count <= 0)
+			{
+				ReplayStatusMessage = "No sessions found in telemetry database.";
+				return;
+			}
+
+			for (var i = 1; i <= count; i++)
+			{
+				AvailableSessions.Add(i);
+			}
+
+			if (!AvailableSessions.Contains(SelectedSessionId))
+			{
+				SelectedSessionId = AvailableSessions[0];
+			}
+
+			ReplayStatusMessage = $"Loaded {count} session(s).";
+		}
+		catch (Exception ex)
+		{
+			ReplayStatusMessage = $"Failed to load sessions: {ex.Message}";
+		}
+	}
+
 	public void Stop()
 	{
 		_cts?.Cancel();
 		_cts?.Dispose();
 		_cts = null;
+		StopReplay();
+	}
+
+	private void StartReplay()
+	{
+		if (_cts == null || !ReplayEnabled || !IsReplayPlaying)
+		{
+			return;
+		}
+
+		StopReplay();
+		_telemetryCts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
+
+		var sessionId = SelectedSessionId > 0 ? SelectedSessionId : 1;
+		var startRow = Math.Max(0, ReplayStartRow);
+		var endRow = ReplayEndRow;
+		var intervalMs = Math.Max(0, ReplayIntervalMs);
+
+		ReplayStatusMessage = $"Replaying session {sessionId}...";
+		_ = Task.Run(() =>
+			_telemetryStreamClient.ConnectAsync(sessionId, startRow, endRow, intervalMs, UpdateTelemetry, _telemetryCts.Token),
+			_telemetryCts.Token);
+	}
+
+	private void StopReplay()
+	{
+		_telemetryCts?.Cancel();
+		_telemetryCts?.Dispose();
+		_telemetryCts = null;
+	}
+
+	private void ToggleReplay()
+	{
+		IsReplayPlaying = !IsReplayPlaying;
+		ReplayStatusMessage = IsReplayPlaying ? "Replay running" : "Replay paused";
+	}
+
+	private void RestartReplay()
+	{
+		ReplayStartRow = 0;
+		ReplayEndRow = -1;
+		StartReplay();
+	}
+
+	private void ApplyReplaySettings()
+	{
+		StartReplay();
 	}
 
 	private void UpdateTelemetry(TelemetrySampleDto telemetry)
@@ -120,14 +238,14 @@ public partial class MainWindowViewModel : ViewModelBase
 		}
 	}
 
-	private async Task PollRecommendationsAsync(string sessionId, CancellationToken cancellationToken)
+	private async Task PollRecommendationsAsync(CancellationToken cancellationToken)
 	{
 		using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
 		while (await timer.WaitForNextTickAsync(cancellationToken))
 		{
 			try
 			{
-				var recommendation = await _recommendationClient.GetRecommendationAsync(sessionId, cancellationToken);
+				var recommendation = await _recommendationClient.GetRecommendationAsync(SelectedSessionId.ToString(), cancellationToken);
 				Dashboard.UpdateRecommendation(recommendation);
 				Strategy.UpdateFromRecommendation(recommendation);
 			}
@@ -135,6 +253,39 @@ public partial class MainWindowViewModel : ViewModelBase
 			{
 				// Silently continue on errors
 			}
+		}
+	}
+
+	partial void OnSelectedSessionIdChanged(int value)
+	{
+		if (ReplayEnabled && IsReplayPlaying)
+		{
+			StartReplay();
+		}
+	}
+
+	partial void OnReplayEnabledChanged(bool value)
+	{
+		if (value)
+		{
+			StartReplay();
+		}
+		else
+		{
+			StopReplay();
+			ReplayStatusMessage = "Replay disabled";
+		}
+	}
+
+	partial void OnIsReplayPlayingChanged(bool value)
+	{
+		if (value)
+		{
+			StartReplay();
+		}
+		else
+		{
+			StopReplay();
 		}
 	}
 
@@ -149,9 +300,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
 	private sealed class NullTelemetryStreamClient : ITelemetryStreamClient
 	{
-		public Task ConnectAsync(int sessionId, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
+		public Task ConnectAsync(int sessionId, int startRow, int endRow, int intervalMs, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
 		{
 			return Task.CompletedTask;
+		}
+	}
+
+	private sealed class NullSessionClient : ISessionClient
+	{
+		public Task<int> GetSessionCountAsync(CancellationToken cancellationToken)
+		{
+			return Task.FromResult(0);
 		}
 	}
 }

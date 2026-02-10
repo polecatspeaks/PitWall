@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -92,6 +94,11 @@ public partial class SettingsViewModel : ViewModelBase
 
 	[ObservableProperty]
 	private string? statusMessage;
+
+	[ObservableProperty]
+	private bool isDiscovering;
+
+	public ObservableCollection<string> DiscoveredEndpoints { get; } = new();
 
 	public IReadOnlyList<string> LlmProviders { get; } = new[] { "Ollama", "OpenAI", "Anthropic" };
 
@@ -186,10 +193,42 @@ public partial class SettingsViewModel : ViewModelBase
 	[RelayCommand]
 	private async Task DiscoverLlmEndpointsAsync()
 	{
-		StatusMessage = "Discovering LLM endpoints...";
-		// TODO: Implement discovery functionality
-		await Task.Delay(1000);
-		StatusMessage = "Discovery complete";
+		IsDiscovering = true;
+		StatusMessage = "Discovering LLM endpoints on your network...";
+		DiscoveredEndpoints.Clear();
+
+		try
+		{
+			var endpoints = await _agentConfigClient.DiscoverEndpointsAsync(CancellationToken.None);
+			
+			if (endpoints.Count == 0)
+			{
+				StatusMessage = "⚠️ No LLM endpoints found on the network. Check your subnet prefix, port, and ensure discovery is enabled.";
+			}
+			else
+			{
+				foreach (var endpoint in endpoints)
+				{
+					DiscoveredEndpoints.Add(endpoint);
+				}
+				StatusMessage = $"✓ Discovery complete! Found {endpoints.Count} endpoint(s). Click 'Use' to select one.";
+			}
+		}
+		catch (Exception ex)
+		{
+			StatusMessage = $"❌ Discovery failed: {ex.Message}";
+		}
+		finally
+		{
+			IsDiscovering = false;
+		}
+	}
+
+	[RelayCommand]
+	private void SelectEndpoint(string endpoint)
+	{
+		LlmEndpoint = endpoint;
+		StatusMessage = $"✓ Selected endpoint: {endpoint}";
 	}
 }
 
@@ -204,5 +243,10 @@ internal sealed class NullAgentConfigClient : IAgentConfigClient
 	public Task<AgentConfigDto> UpdateConfigAsync(AgentConfigUpdateDto update, CancellationToken cancellationToken)
 	{
 		return Task.FromResult(new AgentConfigDto());
+	}
+
+	public Task<IReadOnlyList<string>> DiscoverEndpointsAsync(CancellationToken cancellationToken)
+	{
+		return Task.FromResult<IReadOnlyList<string>>(new[] { "http://localhost:11434", "http://192.168.1.100:11434" });
 	}
 }

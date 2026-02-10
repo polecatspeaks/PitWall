@@ -1,0 +1,22 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run PitWall UI + Agent",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"Set-Location \"${workspaceFolder}\"; Start-Process dotnet -ArgumentList 'run --project PitWall.Agent\\PitWall.Agent.csproj'; Start-Process dotnet -ArgumentList 'run --project PitWall.Api\\PitWall.Api.csproj'; Start-Sleep -Seconds 2; dotnet run --project PitWall.UI\\PitWall.UI.csproj"
+			],
+			"isBackground": false,
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
