@@ -19,7 +19,7 @@ namespace PitWall.Tests
             _output = output;
         }
 
-        [Fact]
+        [Fact(Skip = "Exploratory test for diagnostics only - not part of CI")]
         public void CheckTableSchema()
         {
             if (!File.Exists(DbPath))
@@ -64,7 +64,7 @@ namespace PitWall.Tests
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Exploratory test for diagnostics only - not part of CI")]
         public void ExploreSession276Data()
         {
             if (!File.Exists(DbPath))

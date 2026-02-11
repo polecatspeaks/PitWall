@@ -361,14 +361,11 @@ temps_map AS (
 ),
 lap_map AS (
     SELECT t.rn,
-           COALESCE((
-               SELECT l.lap 
-               FROM lap l, clock_map c 
-               WHERE c.rn = t.rn AND l.ts <= c.gps_time 
-               ORDER BY l.ts DESC 
-               LIMIT 1
-           ), 0) AS lap
+           COALESCE(MAX(l.lap), 0) AS lap
     FROM throttle t
+    LEFT JOIN clock_map c ON c.rn = t.rn
+    LEFT JOIN lap l ON l.ts <= c.gps_time
+    GROUP BY t.rn
 ),
 gps_lat_map AS (
     SELECT t.rn,

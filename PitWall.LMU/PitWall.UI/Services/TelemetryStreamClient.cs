@@ -30,7 +30,9 @@ namespace PitWall.UI.Services
             _logger.LogInformation("Telemetry stream connected. Session {SessionId}", sessionId);
 
             var buffer = new byte[4096];
+            var messageBuilder = new StringBuilder();
             int messageCount = 0;
+            
             while (socket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
             {
                 var result = await socket.ReceiveAsync(buffer, cancellationToken);
@@ -40,7 +42,17 @@ namespace PitWall.UI.Services
                     break;
                 }
 
-                var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                // Append fragment to message builder
+                messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                
+                // Only process when we have a complete message
+                if (!result.EndOfMessage)
+                {
+                    continue;
+                }
+
+                var json = messageBuilder.ToString();
+                messageBuilder.Clear();
                 
                 // Check for completion message (simple but safe check)
                 try
