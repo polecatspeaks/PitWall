@@ -30,7 +30,9 @@ namespace PitWall.UI.Services
             _logger.LogInformation("Telemetry stream connected. Session {SessionId}", sessionId);
 
             var buffer = new byte[4096];
+            var messageBuilder = new StringBuilder();
             int messageCount = 0;
+            
             while (socket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
             {
                 var result = await socket.ReceiveAsync(buffer, cancellationToken);
@@ -40,7 +42,33 @@ namespace PitWall.UI.Services
                     break;
                 }
 
-                var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                // Append fragment to message builder
+                messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                
+                // Only process when we have a complete message
+                if (!result.EndOfMessage)
+                {
+                    continue;
+                }
+
+                var json = messageBuilder.ToString();
+                messageBuilder.Clear();
+                
+                // Check for completion message (simple but safe check)
+                try
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("type", out var typeElement) && 
+                        typeElement.GetString() == "complete")
+                    {
+                        _logger.LogInformation("Received completion message from server.");
+                        break;
+                    }
+                }
+                catch
+                {
+                    // Not a JSON object or doesn't have type property - treat as telemetry data
+                }
                 
                 // Log every 10th message to avoid spam
                 if (++messageCount % 10 == 0)

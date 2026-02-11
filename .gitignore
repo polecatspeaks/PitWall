@@ -27,6 +27,9 @@
 *.so
 *.so.*
 *.dylib
+# Except for native libraries needed for runtime
+!PitWall.LMU/native/duckdb/*.dll
+!PitWall.LMU/native/duckdb/*.so
 
 # Executables
 *.exe
@@ -48,6 +51,8 @@
 .tmp_versions/
 modules.order
 Module.symvers
+# Except for demo scripts
+!PitWall.LMU/demo_telemetry_fix.cmd
 Mkfile.old
 dkms.conf
 
