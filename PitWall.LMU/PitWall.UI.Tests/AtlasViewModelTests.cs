@@ -818,6 +818,628 @@ public class TelemetryBufferTests
 		Assert.Equal(0, buffer.Count);
 		Assert.Null(buffer.GetLatest());
 	}
+
+	#region GetLapFraction Tests
+
+	[Fact]
+	public void GetLapFraction_ReturnsNull_WhenLapNumberNegative()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var sample = CreateSampleWithLap(0, 100, -1);
+		buffer.Add(sample);
+
+		// Act
+		var fraction = buffer.GetLapFraction(-1, sample);
+
+		// Assert
+		Assert.Null(fraction);
+	}
+
+	[Fact]
+	public void GetLapFraction_ReturnsNull_WhenBufferHasLessThanTwoSamples()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var sample = CreateSampleWithLap(0, 100, 1);
+		buffer.Add(sample);
+
+		// Act
+		var fraction = buffer.GetLapFraction(1, sample);
+
+		// Assert
+		Assert.Null(fraction);
+	}
+
+	[Fact]
+	public void GetLapFraction_CalculatesProgressBasedOnPreviousLapLength()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+
+		// Complete lap 1 with 4 samples
+		for (int i = 0; i < 4; i++)
+		{
+			buffer.Add(CreateSampleWithLap(i, 100, 1));
+		}
+
+		// Lap 2 - test progress
+		buffer.Add(CreateSampleWithLap(4, 100, 2));  // Start of lap 2
+		buffer.Add(CreateSampleWithLap(5, 100, 2));  // 1/3 through
+		buffer.Add(CreateSampleWithLap(6, 100, 2));  // 2/3 through
+
+		// Act
+		var sample = buffer.GetAll()[5];  // Second sample of lap 2
+		var fraction = buffer.GetLapFraction(2, sample);
+
+		// Assert
+		Assert.NotNull(fraction);
+		Assert.True(fraction.Value >= 0.0 && fraction.Value <= 1.0);
+		Assert.True(fraction.Value > 0.0);  // Should be > 0 as it's not at start
+		Assert.True(fraction.Value < 1.0);  // Should be < 1 as it's not at end
+	}
+
+	[Fact]
+	public void GetLapFraction_UsesTimestampsWhenPreviousLapTooShort()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var baseTime = DateTime.UtcNow;
+
+		// Previous lap (lap 1) with only 1 sample - too short
+		buffer.Add(CreateSampleWithTimestamp(0, 100, 1, baseTime));
+
+		// Current lap (lap 2) 
+		buffer.Add(CreateSampleWithTimestamp(1, 100, 2, baseTime.AddSeconds(0)));
+		buffer.Add(CreateSampleWithTimestamp(2, 100, 2, baseTime.AddSeconds(30)));
+		buffer.Add(CreateSampleWithTimestamp(3, 100, 2, baseTime.AddSeconds(60)));
+
+		// Act
+		var sample = buffer.GetAll()[2]; // 30 seconds into lap 2
+		var fraction = buffer.GetLapFraction(2, sample);
+
+		// Assert
+		Assert.NotNull(fraction);
+		// Default lap duration is 90 seconds, so 30/90 = 0.333...
+		Assert.True(fraction.Value >= 0.3 && fraction.Value <= 0.4);
+	}
+
+	[Fact]
+	public void GetLapFraction_ClampsBetweenZeroAndOne()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+
+		// Lap 1 with samples
+		for (int i = 0; i < 3; i++)
+		{
+			buffer.Add(CreateSampleWithLap(i, 100, 1));
+		}
+
+		// Lap 2 at start
+		buffer.Add(CreateSampleWithLap(3, 100, 2));
+
+		// Act
+		var firstSampleLap2 = buffer.GetAll()[3];
+		var fraction = buffer.GetLapFraction(2, firstSampleLap2);
+
+		// Assert
+		Assert.NotNull(fraction);
+		Assert.InRange(fraction.Value, 0.0, 1.0);
+	}
+
+	[Fact]
+	public void GetLapFraction_HandlesTimestampBasedCalculation()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var baseTime = DateTime.UtcNow;
+
+		// Complete lap 1 with 3 samples over 90 seconds
+		buffer.Add(CreateSampleWithTimestamp(0, 100, 1, baseTime));
+		buffer.Add(CreateSampleWithTimestamp(1, 100, 1, baseTime.AddSeconds(45)));
+		buffer.Add(CreateSampleWithTimestamp(2, 100, 1, baseTime.AddSeconds(90)));
+
+		// Lap 2 - 45 seconds in (should be ~0.5)
+		buffer.Add(CreateSampleWithTimestamp(3, 100, 2, baseTime.AddSeconds(90)));
+		buffer.Add(CreateSampleWithTimestamp(4, 100, 2, baseTime.AddSeconds(135)));
+
+		// Act
+		var sample = buffer.GetAll()[4]; // 45 seconds into lap 2
+		var fraction = buffer.GetLapFraction(2, sample);
+
+		// Assert
+		Assert.NotNull(fraction);
+		Assert.True(fraction.Value >= 0.45 && fraction.Value <= 0.55);
+	}
+
+	[Fact]
+	public void GetLapFraction_HandlesSampleNotFoundInBuffer()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+
+		for (int i = 0; i < 5; i++)
+		{
+			buffer.Add(CreateSampleWithLap(i, 100, 1));
+		}
+
+		// Act - Sample not in buffer
+		var externalSample = CreateSampleWithLap(99, 100, 1);
+		var fraction = buffer.GetLapFraction(1, externalSample);
+
+		// Assert - Should still return a value based on last sample
+		Assert.NotNull(fraction);
+	}
+
+	[Fact]
+	public void GetLapFraction_HandlesEmptyBuffer()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var sample = CreateSampleWithLap(0, 100, 1);
+
+		// Act
+		var fraction = buffer.GetLapFraction(1, sample);
+
+		// Assert
+		Assert.Null(fraction);
+	}
+
+	[Fact]
+	public void GetLapFraction_HandlesSampleMatchByTimestamp()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var baseTime = DateTime.UtcNow;
+
+		// Previous lap
+		buffer.Add(CreateSampleWithTimestamp(0, 100, 1, baseTime));
+		buffer.Add(CreateSampleWithTimestamp(1, 100, 1, baseTime.AddSeconds(90)));
+
+		// Current lap
+		buffer.Add(CreateSampleWithTimestamp(2, 100, 2, baseTime.AddSeconds(90)));
+		buffer.Add(CreateSampleWithTimestamp(3, 100, 2, baseTime.AddSeconds(135)));
+
+		// Act - Create a new sample object with same timestamp as one in buffer
+		var sampleWithMatchingTimestamp = CreateSampleWithTimestamp(99, 100, 2, baseTime.AddSeconds(135));
+		var fraction = buffer.GetLapFraction(2, sampleWithMatchingTimestamp);
+
+		// Assert
+		Assert.NotNull(fraction);
+		Assert.InRange(fraction.Value, 0.0, 1.0);
+	}
+
+	#endregion
+
+	#region FindPreviousLapDurationSeconds Tests (via GetLapFraction)
+
+	[Fact]
+	public void FindPreviousLapDurationSeconds_CalculatesCorrectDuration()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var baseTime = DateTime.UtcNow;
+
+		// Lap 1: 0 to 80 seconds (80 second lap)
+		buffer.Add(CreateSampleWithTimestamp(0, 100, 1, baseTime));
+		buffer.Add(CreateSampleWithTimestamp(1, 100, 1, baseTime.AddSeconds(40)));
+		buffer.Add(CreateSampleWithTimestamp(2, 100, 1, baseTime.AddSeconds(80)));
+
+		// Lap 2: start at 80 seconds
+		buffer.Add(CreateSampleWithTimestamp(3, 100, 2, baseTime.AddSeconds(80)));
+		buffer.Add(CreateSampleWithTimestamp(4, 100, 2, baseTime.AddSeconds(120)));
+
+		// Act
+		var sample = buffer.GetAll()[4];
+		var fraction = buffer.GetLapFraction(2, sample);
+
+		// Assert
+		// Previous lap was 80 seconds, we're 40 seconds into lap 2
+		// So fraction should be 40/80 = 0.5
+		Assert.NotNull(fraction);
+		Assert.True(fraction.Value >= 0.45 && fraction.Value <= 0.55);
+	}
+
+	[Fact]
+	public void FindPreviousLapDurationSeconds_ReturnsZero_WhenAtFirstLap()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var baseTime = DateTime.UtcNow;
+
+		// Only lap 1 samples
+		buffer.Add(CreateSampleWithTimestamp(0, 100, 1, baseTime));
+		buffer.Add(CreateSampleWithTimestamp(1, 100, 1, baseTime.AddSeconds(30)));
+
+		// Act
+		var sample = buffer.GetAll()[1];
+		var fraction = buffer.GetLapFraction(1, sample);
+
+		// Assert - When on first lap, there's no previous lap to calculate from
+		// Should still return a fraction using fallback methods
+		Assert.NotNull(fraction);
+	}
+
+	[Fact]
+	public void FindPreviousLapDurationSeconds_HandlesNoTimestamps()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+
+		// Lap 1 without timestamps
+		buffer.Add(CreateSampleWithLap(0, 100, 1));
+
+		// Lap 2 without timestamps
+		buffer.Add(CreateSampleWithLap(1, 100, 2));
+		buffer.Add(CreateSampleWithLap(2, 100, 2));
+
+		// Act
+		var sample = buffer.GetAll()[2];
+		var fraction = buffer.GetLapFraction(2, sample);
+
+		// Assert - Should fall back to sample-based calculation
+		Assert.NotNull(fraction);
+	}
+
+	#endregion
+
+	#region FindNextLapDurationSeconds Tests
+
+	[Fact]
+	public void FindNextLapDurationSeconds_WorksForMultipleLapTransitions()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+		var baseTime = DateTime.UtcNow;
+
+		// Lap 1: 100 seconds
+		buffer.Add(CreateSampleWithTimestamp(0, 100, 1, baseTime));
+		buffer.Add(CreateSampleWithTimestamp(1, 100, 1, baseTime.AddSeconds(50)));
+		buffer.Add(CreateSampleWithTimestamp(2, 100, 1, baseTime.AddSeconds(100)));
+
+		// Lap 2: 80 seconds - uses lap 1's duration for estimation
+		buffer.Add(CreateSampleWithTimestamp(3, 100, 2, baseTime.AddSeconds(100)));
+		buffer.Add(CreateSampleWithTimestamp(4, 100, 2, baseTime.AddSeconds(140)));
+		buffer.Add(CreateSampleWithTimestamp(5, 100, 2, baseTime.AddSeconds(180)));
+
+		// Lap 3: should use lap 2's duration (80 seconds)
+		buffer.Add(CreateSampleWithTimestamp(6, 100, 3, baseTime.AddSeconds(180)));
+		buffer.Add(CreateSampleWithTimestamp(7, 100, 3, baseTime.AddSeconds(220)));
+
+		// Act
+		var sample = buffer.GetAll()[7]; // 40 seconds into lap 3
+		var fraction = buffer.GetLapFraction(3, sample);
+
+		// Assert
+		Assert.NotNull(fraction);
+		// 40 / 80 = 0.5
+		Assert.True(fraction.Value >= 0.45 && fraction.Value <= 0.55, $"Expected fraction between 0.45 and 0.55, got {fraction.Value}");
+	}
+
+	#endregion
+
+	#region Additional Coverage Tests
+
+	[Fact]
+	public void ReplaceAll_ThrowsArgumentNullException_WhenSamplesNull()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer();
+
+		// Act & Assert
+		Assert.Throws<ArgumentNullException>(() => buffer.ReplaceAll(null!));
+	}
+
+	[Fact]
+	public void ReplaceAll_ReplacesExistingSamples()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		buffer.Add(CreateSampleWithLap(0, 100, 1));
+
+		var newSamples = new[] { 
+			CreateSampleWithLap(1, 200, 2), 
+			CreateSampleWithLap(2, 300, 2) 
+		};
+
+		// Act
+		buffer.ReplaceAll(newSamples);
+
+		// Assert
+		Assert.Equal(2, buffer.Count);
+		var all = buffer.GetAll();
+		Assert.Equal(200, all[0].SpeedKph);
+		Assert.Equal(300, all[1].SpeedKph);
+	}
+
+	[Fact]
+	public void ReplaceAll_ExpandsCapacity_WhenNeeded()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(2);
+		var samples = Enumerable.Range(0, 10)
+			.Select(i => CreateSampleWithLap(i, 100 + i, 1))
+			.ToArray();
+
+		// Act
+		buffer.ReplaceAll(samples);
+
+		// Assert
+		Assert.Equal(10, buffer.Count);
+	}
+
+	[Fact]
+	public void GetRange_ReturnsCorrectSubset()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		buffer.Add(CreateSampleWithLap(0, 100, 1));
+		buffer.Add(CreateSampleWithLap(1, 200, 1));
+		buffer.Add(CreateSampleWithLap(2, 300, 1));
+		buffer.Add(CreateSampleWithLap(3, 400, 1));
+
+		// Act
+		var range = buffer.GetRange(1, 2);
+
+		// Assert
+		Assert.Equal(2, range.Length);
+		Assert.Equal(200, range[0].SpeedKph);
+		Assert.Equal(300, range[1].SpeedKph);
+	}
+
+	[Fact]
+	public void GetRange_ReturnsEmpty_WhenStartIndexInvalid()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		buffer.Add(CreateSampleWithLap(0, 100, 1));
+
+		// Act & Assert
+		var range = buffer.GetRange(-1, 1);
+		Assert.Empty(range);
+
+		range = buffer.GetRange(10, 1);
+		Assert.Empty(range);
+	}
+
+	[Fact]
+	public void GetRange_TruncatesCount_WhenExceedingAvailable()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		buffer.Add(CreateSampleWithLap(0, 100, 1));
+		buffer.Add(CreateSampleWithLap(1, 200, 1));
+		buffer.Add(CreateSampleWithLap(2, 300, 1));
+
+		// Act
+		var range = buffer.GetRange(1, 10);
+
+		// Assert
+		Assert.Equal(2, range.Length);
+	}
+
+	[Fact]
+	public void GetValueAtIndex_ReturnsAllMetrics()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		var sample = new TelemetrySampleDto
+		{
+			SpeedKph = 150,
+			FuelLiters = 25.5,
+			ThrottlePosition = 0.8,
+			BrakePosition = 0.2,
+			SteeringAngle = 15.5,
+			TyreTempsC = new[] { 90.0, 92.0, 88.0, 91.0 }
+		};
+		buffer.Add(sample);
+
+		// Act
+		var values = buffer.GetValueAtIndex(0);
+
+		// Assert
+		Assert.Equal(150, values["Speed"]);
+		Assert.Equal(25.5, values["Fuel"]);
+		Assert.Equal(80, values["Throttle"]);
+		Assert.Equal(20, values["Brake"]);
+		Assert.Equal(15.5, values["Steering"]);
+		Assert.Equal(90, values["TyreFL"]);
+		Assert.Equal(92, values["TyreFR"]);
+		Assert.Equal(88, values["TyreRL"]);
+		Assert.Equal(91, values["TyreRR"]);
+	}
+
+	[Fact]
+	public void GetValueAtIndex_ReturnsEmpty_WhenIndexInvalid()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		buffer.Add(CreateSampleWithLap(0, 100, 1));
+
+		// Act & Assert
+		var values = buffer.GetValueAtIndex(-1);
+		Assert.Empty(values);
+
+		values = buffer.GetValueAtIndex(10);
+		Assert.Empty(values);
+	}
+
+	[Fact]
+	public void GetValueAtIndex_HandlesEmptyTyreArray()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		var sample = new TelemetrySampleDto
+		{
+			SpeedKph = 150,
+			TyreTempsC = Array.Empty<double>()
+		};
+		buffer.Add(sample);
+
+		// Act
+		var values = buffer.GetValueAtIndex(0);
+
+		// Assert
+		Assert.Equal(0, values["TyreFL"]);
+		Assert.Equal(0, values["TyreFR"]);
+		Assert.Equal(0, values["TyreRL"]);
+		Assert.Equal(0, values["TyreRR"]);
+	}
+
+	[Fact]
+	public void GetAll_ReturnsEmpty_WhenBufferEmpty()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+
+		// Act
+		var all = buffer.GetAll();
+
+		// Assert
+		Assert.Empty(all);
+	}
+
+	[Fact]
+	public void GetAll_ReturnsCorrectOrder_WhenBufferWrapped()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(3);
+		buffer.Add(CreateSampleWithLap(0, 100, 1));
+		buffer.Add(CreateSampleWithLap(1, 200, 1));
+		buffer.Add(CreateSampleWithLap(2, 300, 1));
+		buffer.Add(CreateSampleWithLap(3, 400, 1));
+		buffer.Add(CreateSampleWithLap(4, 500, 1));
+
+		// Act
+		var all = buffer.GetAll();
+
+		// Assert
+		Assert.Equal(3, all.Length);
+		Assert.Equal(300, all[0].SpeedKph);
+		Assert.Equal(400, all[1].SpeedKph);
+		Assert.Equal(500, all[2].SpeedKph);
+	}
+
+	[Fact]
+	public void GetAvailableLaps_ExcludesNegativeLapNumbers()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		buffer.Add(CreateSampleWithLap(0, 100, -1));
+		buffer.Add(CreateSampleWithLap(1, 200, 0));
+		buffer.Add(CreateSampleWithLap(2, 300, 1));
+
+		// Act
+		var laps = buffer.GetAvailableLaps();
+
+		// Assert
+		Assert.Equal(2, laps.Length);
+		Assert.Equal(new[] { 0, 1 }, laps);
+	}
+
+	[Fact]
+	public void GetLapData_ReturnsEmpty_WhenLapNotFound()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(10);
+		buffer.Add(CreateSampleWithLap(0, 100, 1));
+
+		// Act
+		var data = buffer.GetLapData(99);
+
+		// Assert
+		Assert.Empty(data);
+	}
+
+	[Fact]
+	public void GetLatest_ReturnsNull_WhenEmpty()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer();
+
+		// Act & Assert
+		Assert.Null(buffer.GetLatest());
+	}
+
+	[Fact]
+	public void Constructor_InitializesWithDefaultCapacity()
+	{
+		// Arrange & Act
+		var buffer = new TelemetryBuffer();
+
+		// Assert
+		Assert.Equal(0, buffer.Count);
+	}
+
+	[Fact]
+	public void Constructor_InitializesWithCustomCapacity()
+	{
+		// Arrange & Act
+		var buffer = new TelemetryBuffer(100);
+
+		// Assert
+		Assert.Equal(0, buffer.Count);
+	}
+
+	[Fact]
+	public void GetLapFraction_HandlesLapWithOneSample()
+	{
+		// Arrange
+		var buffer = new TelemetryBuffer(100);
+
+		// Previous lap with multiple samples
+		for (int i = 0; i < 4; i++)
+		{
+			buffer.Add(CreateSampleWithLap(i, 100, 1));
+		}
+
+		// Current lap with just one sample
+		buffer.Add(CreateSampleWithLap(4, 100, 2));
+
+		// Act
+		var sample = buffer.GetAll()[4];
+		var fraction = buffer.GetLapFraction(2, sample);
+
+		// Assert
+		Assert.NotNull(fraction);
+		Assert.Equal(0.0, fraction.Value, 3); // At start of lap
+	}
+
+	#endregion
+
+	#region Helper Methods
+
+	private static TelemetrySampleDto CreateSampleWithLap(int id, double speed, int lapNumber)
+	{
+		return new TelemetrySampleDto
+		{
+			SpeedKph = speed,
+			FuelLiters = 50,
+			TyreTempsC = new[] { 80.0, 80.0, 80.0, 80.0 },
+			ThrottlePosition = 0.5,
+			BrakePosition = 0,
+			SteeringAngle = 0,
+			LapNumber = lapNumber
+		};
+	}
+
+	private static TelemetrySampleDto CreateSampleWithTimestamp(int id, double speed, int lapNumber, DateTime timestamp)
+	{
+		return new TelemetrySampleDto
+		{
+			Timestamp = timestamp,
+			SpeedKph = speed,
+			FuelLiters = 50,
+			TyreTempsC = new[] { 80.0, 80.0, 80.0, 80.0 },
+			ThrottlePosition = 0.5,
+			BrakePosition = 0,
+			SteeringAngle = 0,
+			LapNumber = lapNumber
+		};
+	}
+
+	#endregion
 }
 
 /// <summary>
