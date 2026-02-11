@@ -104,21 +104,23 @@ CREATE TABLE ""TyresTempCentre"" (value1 FLOAT, value2 FLOAT, value3 FLOAT, valu
 
             using var command = connection.CreateCommand();
             command.CommandText = @"
-CREATE TABLE ""GPS Speed"" (value FLOAT);
-CREATE TABLE ""GPS Time"" (value DOUBLE);
-CREATE TABLE ""Throttle Pos"" (value FLOAT);
-CREATE TABLE ""Brake Pos"" (value FLOAT);
-CREATE TABLE ""Steering Pos"" (value FLOAT);
-CREATE TABLE ""Fuel Level"" (value FLOAT);
-CREATE TABLE ""TyresTempCentre"" (value1 FLOAT, value2 FLOAT, value3 FLOAT, value4 FLOAT);
+CREATE TABLE ""GPS Speed"" (value FLOAT, session_id INTEGER);
+CREATE TABLE ""GPS Time"" (value DOUBLE, session_id INTEGER);
+CREATE TABLE ""Throttle Pos"" (value FLOAT, session_id INTEGER);
+CREATE TABLE ""Brake Pos"" (value FLOAT, session_id INTEGER);
+CREATE TABLE ""Steering Pos"" (value FLOAT, session_id INTEGER);
+CREATE TABLE ""Fuel Level"" (value FLOAT, session_id INTEGER);
+CREATE TABLE ""TyresTempCentre"" (value1 FLOAT, value2 FLOAT, value3 FLOAT, value4 FLOAT, session_id INTEGER);
+CREATE TABLE ""Lap"" (ts DOUBLE, value USMALLINT, session_id INTEGER);
 
-INSERT INTO ""GPS Speed"" VALUES (10.0), (11.0);
-INSERT INTO ""GPS Time"" VALUES (100.0), (101.0);
-INSERT INTO ""Throttle Pos"" VALUES (0.4), (0.5);
-INSERT INTO ""Brake Pos"" VALUES (0.1), (0.2);
-INSERT INTO ""Steering Pos"" VALUES (-0.1), (-0.2);
-INSERT INTO ""Fuel Level"" VALUES (55.5), (55.0);
-INSERT INTO ""TyresTempCentre"" VALUES (80, 81, 82, 83), (84, 85, 86, 87);";
+INSERT INTO ""GPS Speed"" VALUES (10.0, 1), (11.0, 1);
+INSERT INTO ""GPS Time"" VALUES (100.0, 1), (101.0, 1);
+INSERT INTO ""Throttle Pos"" VALUES (40.0, 1), (50.0, 1);
+INSERT INTO ""Brake Pos"" VALUES (10.0, 1), (20.0, 1);
+INSERT INTO ""Steering Pos"" VALUES (-0.1, 1), (-0.2, 1);
+INSERT INTO ""Fuel Level"" VALUES (55.5, 1), (55.0, 1);
+INSERT INTO ""TyresTempCentre"" VALUES (80, 81, 82, 83, 1), (84, 85, 86, 87, 1);
+INSERT INTO ""Lap"" VALUES (100.0, 1, 1);";
             command.ExecuteNonQuery();
 
             return path;

@@ -272,7 +272,7 @@ temps AS (
     WHERE session_id = ?
 ),
 lap AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS lap
+    SELECT ts, value AS lap
     FROM main.""Lap""
     WHERE session_id = ?
 ),
@@ -361,12 +361,14 @@ temps_map AS (
 ),
 lap_map AS (
     SELECT t.rn,
-           l.lap
+           COALESCE((
+               SELECT l.lap 
+               FROM lap l, clock_map c 
+               WHERE c.rn = t.rn AND l.ts <= c.gps_time 
+               ORDER BY l.ts DESC 
+               LIMIT 1
+           ), 0) AS lap
     FROM throttle t
-    CROSS JOIN lap_count lc
-    CROSS JOIN throttle_count tc
-    LEFT JOIN lap l
-        ON l.rn = CAST(FLOOR((t.rn - 1) * lc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
 ),
 gps_lat_map AS (
     SELECT t.rn,
