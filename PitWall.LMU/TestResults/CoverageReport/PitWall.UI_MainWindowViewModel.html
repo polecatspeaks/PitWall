@@ -886,12 +886,12 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <div class="card">
 <div class="card-header">Branch coverage</div>
 <div class="card-body">
-<div class="large cardpercentagebar cardpercentagebar45">55%</div>
+<div class="large cardpercentagebar cardpercentagebar46">54%</div>
 <div class="table">
 <table>
 <tr>
 <th>Covered branches:</th>
-<td class="limit-width right" title="108">108</td>
+<td class="limit-width right" title="107">107</td>
 </tr>
 <tr>
 <th>Total branches:</th>
@@ -899,7 +899,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 </tr>
 <tr>
 <th>Branch coverage:</th>
-<td class="limit-width right" title="108 of 196">55.1%</td>
+<td class="limit-width right" title="107 of 196">54.5%</td>
 </tr>
 </table>
 </div>
@@ -957,7 +957,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <tr><td title="Stop()"><a href="#file0_line275" class="navigatetohash">Stop()</a></td><td>50%</td><td>4</td><td>4</td><td>100%</td></tr>
 <tr><td title="StartReplay()"><a href="#file0_line283" class="navigatetohash">StartReplay()</a></td><td>87.5%</td><td>8</td><td>8</td><td>100%</td></tr>
 <tr><td title="RunPreloadedReplayAsync()"><a href="#file0_line306" class="navigatetohash">RunPreloadedReplayAsync()</a></td><td>0%</td><td>288.14</td><td>18</td><td>5.88%</td></tr>
-<tr><td title="EnsurePreloadedAsync()"><a href="#file0_line370" class="navigatetohash">EnsurePreloadedAsync()</a></td><td>50%</td><td>8.16</td><td>6</td><td>60.86%</td></tr>
+<tr><td title="EnsurePreloadedAsync()"><a href="#file0_line370" class="navigatetohash">EnsurePreloadedAsync()</a></td><td>33.33%</td><td>8.16</td><td>6</td><td>60.86%</td></tr>
 <tr><td title="LoadAllSamplesAsync()"><a href="#file0_line407" class="navigatetohash">LoadAllSamplesAsync()</a></td><td>25%</td><td>5.02</td><td>4</td><td>60%</td></tr>
 <tr><td title="StopReplay()"><a href="#file0_line437" class="navigatetohash">StopReplay()</a></td><td>100%</td><td>4</td><td>4</td><td>100%</td></tr>
 <tr><td title="ToggleReplay()"><a href="#file0_line446" class="navigatetohash">ToggleReplay()</a></td><td>50%</td><td>2</td><td>2</td><td>100%</td></tr>
@@ -1374,7 +1374,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line368"></a><code>368</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line369"></a><code>369</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;private&nbsp;async&nbsp;Task&nbsp;EnsurePreloadedAsync(int&nbsp;sessionId,&nbsp;CancellationToken&nbsp;cancellationToken)</code></td></tr>
 <tr class="coverableline" title="Covered (5 visits)" data-coverage="{'AllTestMethods': {'VC': '5', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">5</td><td class="rightmargin right"><a id="file0_line370"></a><code>370</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Partially covered (5 visits, 3 of 4 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '5', 'LVS': 'orange'}}"><td class="orange">&nbsp;</td><td class="leftmargin rightmargin right">5</td><td class="rightmargin right"><a id="file0_line371"></a><code>371</code></td><td class="percentagebar percentagebar70"><i class="icon-fork"></i></td><td class="lightorange"><code>&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(_preloadedSessionId&nbsp;==&nbsp;sessionId&nbsp;&amp;&amp;&nbsp;_preloadedSamples.Count&nbsp;&gt;&nbsp;0)</code></td></tr>
+<tr class="coverableline" title="Partially covered (5 visits, 2 of 4 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '5', 'LVS': 'orange'}}"><td class="orange">&nbsp;</td><td class="leftmargin rightmargin right">5</td><td class="rightmargin right"><a id="file0_line371"></a><code>371</code></td><td class="percentagebar percentagebar50"><i class="icon-fork"></i></td><td class="lightorange"><code>&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(_preloadedSessionId&nbsp;==&nbsp;sessionId&nbsp;&amp;&amp;&nbsp;_preloadedSamples.Count&nbsp;&gt;&nbsp;0)</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line372"></a><code>372</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line373"></a><code>373</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_usePreloadedReplay&nbsp;=&nbsp;true;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line374"></a><code>374</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return;</code></td></tr>
@@ -1905,7 +1905,7 @@ code { font-family: Consolas, monospace; font-size: 0.9em; }
 </tbody>
 </table>
 </div>
-<div class="footer">Generated by: ReportGenerator 5.3.9.0<br />02/11/2026 - 19:06:00<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="https://reportgenerator.io">reportgenerator.io</a></div></div>
+<div class="footer">Generated by: ReportGenerator 5.3.9.0<br />02/11/2026 - 19:13:59<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="https://reportgenerator.io">reportgenerator.io</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>

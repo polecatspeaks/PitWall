@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.4093" branch-rate="0.40659999999999996" version="1.9" timestamp="1770836747" lines-covered="2146" lines-valid="5242" branches-covered="577" branches-valid="1419">
+<coverage line-rate="0.4093" branch-rate="0.40590000000000004" version="1.9" timestamp="1770837226" lines-covered="2146" lines-valid="5242" branches-covered="576" branches-valid="1419">
   <sources>
     <source>/home/runner/work/PitWall/PitWall/PitWall.LMU/</source>
   </sources>
   <packages>
-    <package name="PitWall.UI" line-rate="0.48560000000000003" branch-rate="0.47409999999999997" complexity="1569">
+    <package name="PitWall.UI" line-rate="0.48560000000000003" branch-rate="0.4732" complexity="1569">
       <classes>
         <class name="PitWall.UI.App" filename="PitWall.UI/App.axaml.cs" line-rate="0" branch-rate="0" complexity="13">
           <methods>
@@ -4550,14 +4550,14 @@
             <line number="425" hits="0" branch="False" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.MainWindowViewModel/&lt;EnsurePreloadedAsync&gt;d__127" filename="PitWall.UI/ViewModels/MainWindowViewModel.cs" line-rate="0.6086" branch-rate="0.5" complexity="6">
+        <class name="PitWall.UI.ViewModels.MainWindowViewModel/&lt;EnsurePreloadedAsync&gt;d__127" filename="PitWall.UI/ViewModels/MainWindowViewModel.cs" line-rate="0.6086" branch-rate="0.3333" complexity="6">
           <methods>
-            <method name="MoveNext" signature="()" line-rate="0.6086" branch-rate="0.5" complexity="6">
+            <method name="MoveNext" signature="()" line-rate="0.6086" branch-rate="0.3333" complexity="6">
               <lines>
                 <line number="370" hits="5" branch="False" />
-                <line number="371" hits="5" branch="True" condition-coverage="75% (3/4)">
+                <line number="371" hits="5" branch="True" condition-coverage="50% (2/4)">
                   <conditions>
-                    <condition number="46" type="jump" coverage="100%" />
+                    <condition number="46" type="jump" coverage="50%" />
                     <condition number="72" type="jump" coverage="50%" />
                   </conditions>
                 </line>
@@ -4591,9 +4591,9 @@
           </methods>
           <lines>
             <line number="370" hits="5" branch="False" />
-            <line number="371" hits="5" branch="True" condition-coverage="75% (3/4)">
+            <line number="371" hits="5" branch="True" condition-coverage="50% (2/4)">
               <conditions>
-                <condition number="46" type="jump" coverage="100%" />
+                <condition number="46" type="jump" coverage="50%" />
                 <condition number="72" type="jump" coverage="50%" />
               </conditions>
             </line>
