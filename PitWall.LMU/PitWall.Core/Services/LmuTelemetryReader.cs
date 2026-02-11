@@ -273,7 +273,7 @@ temps AS (
 ),
 lap AS (
     SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS lap
-    FROM ""Lap""
+    FROM main.""Lap""
     WHERE session_id = ?
 ),
 gps_lat AS (
