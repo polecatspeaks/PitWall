@@ -28,7 +28,6 @@
   <!-- Temporarily exclude old tests that test pre-ref actor architecture -->
   <ItemGroup>
     <Compile Remove="SettingsViewModelTests.cs" />
-    <Compile Remove="MainWindowViewModelTests.cs" />
     <Compile Remove="AiAssistantViewModelTests.cs" />
   </ItemGroup>
 
