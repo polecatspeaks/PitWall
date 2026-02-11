@@ -213,10 +213,13 @@ namespace PitWall.Tests
             foreach (var table in requiredTables)
             {
                 using var cmd = connection.CreateCommand();
-                cmd.CommandText = $@"
+                cmd.CommandText = @"
                     SELECT column_name 
                     FROM information_schema.columns 
-                    WHERE table_name = '{table}' AND column_name = 'ts';";
+                    WHERE table_name = ? AND column_name = 'ts';";
+                var tableParam = cmd.CreateParameter();
+                tableParam.Value = table;
+                cmd.Parameters.Add(tableParam);
                 using var reader = cmd.ExecuteReader();
                 var hasTs = reader.Read();
                 _output.WriteLine($"{table}: {(hasTs ? "YES" : "NO")}");

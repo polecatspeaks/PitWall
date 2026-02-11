@@ -42,11 +42,20 @@ namespace PitWall.UI.Services
 
                 var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
                 
-                // Check for completion message
-                if (json.Contains("\"type\":\"complete\""))
+                // Check for completion message (simple but safe check)
+                try
                 {
-                    _logger.LogInformation("Received completion message from server.");
-                    break;
+                    using var doc = System.Text.Json.JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("type", out var typeElement) && 
+                        typeElement.GetString() == "complete")
+                    {
+                        _logger.LogInformation("Received completion message from server.");
+                        break;
+                    }
+                }
+                catch
+                {
+                    // Not a JSON object or doesn't have type property - treat as telemetry data
                 }
                 
                 // Log every 10th message to avoid spam
