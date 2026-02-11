@@ -23,6 +23,9 @@
 *.lo
 
 # Shared objects (inc. Windows DLLs)
+# Except for native libraries needed for runtime
+!PitWall.LMU/native/duckdb/*.dll
+!PitWall.LMU/native/duckdb/*.so
 *.dll
 *.so
 *.so.*
@@ -43,6 +46,8 @@
 *.pdb
 
 # Kernel Module Compile Results
+# Except for demo scripts
+!PitWall.LMU/demo_telemetry_fix.cmd
 *.mod*
 *.cmd
 .tmp_versions/
