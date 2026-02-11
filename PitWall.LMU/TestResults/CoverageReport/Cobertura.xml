@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage line-rate="0.29440529267941895" branch-rate="0.18462434478741993" lines-covered="2047" lines-valid="6953" branches-covered="317" branches-valid="1717" complexity="2225" version="0" timestamp="1770812286">
+<coverage line-rate="0.29643419733638837" branch-rate="0.18287711124053582" lines-covered="2070" lines-valid="6983" branches-covered="314" branches-valid="1717" complexity="2225" version="0" timestamp="1770831414">
   <sources>
-    <source>C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\</source>
+    <source>/home/runner/work/PitWall/PitWall/PitWall.LMU/</source>
   </sources>
   <packages>
     <package name="PitWall.Agent" line-rate="0.6137724550898204" branch-rate="0.4066666666666667" complexity="265">
       <classes>
-        <class name="PitWall.Agent.Models.AgentConfigResponse" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Models\AgentConfigResponse.cs" line-rate="1" branch-rate="1" complexity="17">
+        <class name="PitWall.Agent.Models.AgentConfigResponse" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Models/AgentConfigResponse.cs" line-rate="1" branch-rate="1" complexity="17">
           <methods>
             <method name="get_EnableLLM" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -115,7 +115,7 @@
             <line number="25" hits="9" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Models.AgentConfigUpdate" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Models\AgentConfigUpdate.cs" line-rate="1" branch-rate="1" complexity="18">
+        <class name="PitWall.Agent.Models.AgentConfigUpdate" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Models/AgentConfigUpdate.cs" line-rate="1" branch-rate="1" complexity="18">
           <methods>
             <method name="get_Extra" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -229,7 +229,7 @@
             <line number="32" hits="6" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Models.AgentOptions" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Models\AgentOptions.cs" line-rate="1" branch-rate="1" complexity="17">
+        <class name="PitWall.Agent.Models.AgentOptions" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Models/AgentOptions.cs" line-rate="1" branch-rate="1" complexity="17">
           <methods>
             <method name="get_EnableLLM" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -337,7 +337,7 @@
             <line number="27" hits="11" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Models.AgentRequest" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Models\AgentRequest.cs" line-rate="1" branch-rate="1" complexity="2">
+        <class name="PitWall.Agent.Models.AgentRequest" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Models/AgentRequest.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
             <method name="get_Query" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -355,7 +355,7 @@
             <line number="8" hits="30" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Models.AgentResponse" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Models\AgentResponse.cs" line-rate="1" branch-rate="1" complexity="6">
+        <class name="PitWall.Agent.Models.AgentResponse" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Models/AgentResponse.cs" line-rate="1" branch-rate="1" complexity="6">
           <methods>
             <method name="get_Answer" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -397,7 +397,7 @@
             <line number="10" hits="2" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Models.ParsedQuery" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Models\QueryIntent.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.Agent.Models.ParsedQuery" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Models/QueryIntent.cs" line-rate="0" branch-rate="1" complexity="3">
           <methods>
             <method name="get_Intent" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -421,7 +421,7 @@
             <line number="22" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Models.RaceContext" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Models\RaceContext.cs" line-rate="1" branch-rate="0.5" complexity="22">
+        <class name="PitWall.Agent.Models.RaceContext" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Models/RaceContext.cs" line-rate="1" branch-rate="0.5" complexity="22">
           <methods>
             <method name="get_TrackName" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -553,7 +553,7 @@
             <line number="32" hits="1" branch="true" condition-coverage="50% (1/2)" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Program" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Program.cs" line-rate="0.8190954773869347" branch-rate="0.3333333333333333" complexity="12">
+        <class name="PitWall.Agent.Program" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Program.cs" line-rate="0.8190954773869347" branch-rate="0.3333333333333333" complexity="12">
           <methods>
             <method name="Main" signature="(System.String[])" line-rate="0.8190954773869347" branch-rate="0.3333333333333333" complexity="12">
               <lines>
@@ -961,7 +961,7 @@
             <line number="234" hits="6" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.AgentService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\AgentService.cs" line-rate="0.6883116883116883" branch-rate="0.6666666666666666" complexity="14">
+        <class name="PitWall.Agent.Services.AgentService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/AgentService.cs" line-rate="0.6883116883116883" branch-rate="0.6666666666666666" complexity="14">
           <methods>
             <method name="BuildRaceContext" signature="(PitWall.Agent.Models.AgentRequest)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -1133,7 +1133,7 @@
             <line number="115" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.JsonAgentOptionsStore" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\JsonAgentOptionsStore.cs" line-rate="1" branch-rate="1" complexity="5">
+        <class name="PitWall.Agent.Services.JsonAgentOptionsStore" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/JsonAgentOptionsStore.cs" line-rate="1" branch-rate="1" complexity="5">
           <methods>
             <method name=".ctor" signature="(System.String)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -1193,7 +1193,7 @@
             <line number="36" hits="4" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.LLM.AnthropicLlmService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\LLM\AnthropicLlmService.cs" line-rate="0.5104166666666666" branch-rate="0.5" complexity="10">
+        <class name="PitWall.Agent.Services.LLM.AnthropicLlmService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/LLM/AnthropicLlmService.cs" line-rate="0.5104166666666666" branch-rate="0.5" complexity="10">
           <methods>
             <method name="get_IsEnabled" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -1411,7 +1411,7 @@
             <line number="141" hits="1" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.LLM.LLMContextBuilder" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\LLM\LLMContextBuilder.cs" line-rate="1" branch-rate="1" complexity="1">
+        <class name="PitWall.Agent.Services.LLM.LLMContextBuilder" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/LLM/LLMContextBuilder.cs" line-rate="1" branch-rate="1" complexity="1">
           <methods>
             <method name="BuildSystemPrompt" signature="(PitWall.Agent.Models.RaceContext)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -1457,7 +1457,7 @@
             <line number="25" hits="2" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.LLM.LocalSubnetEndpointEnumerator" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\LLM\LocalSubnetEndpointEnumerator.cs" line-rate="0" branch-rate="0" complexity="11">
+        <class name="PitWall.Agent.Services.LLM.LocalSubnetEndpointEnumerator" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/LLM/LocalSubnetEndpointEnumerator.cs" line-rate="0" branch-rate="0" complexity="11">
           <methods>
             <method name="GetCandidateEndpoints" signature="()" line-rate="0" branch-rate="0" complexity="6">
               <lines>
@@ -1557,7 +1557,7 @@
             <line number="73" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.LLM.OllamaDiscoveryService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\LLM\OllamaDiscoveryService.cs" line-rate="0.8275862068965517" branch-rate="0.6666666666666666" complexity="8">
+        <class name="PitWall.Agent.Services.LLM.OllamaDiscoveryService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/LLM/OllamaDiscoveryService.cs" line-rate="0.8275862068965517" branch-rate="0.6666666666666666" complexity="8">
           <methods>
             <method name=".ctor" signature="(System.Net.Http.HttpClient,PitWall.Agent.Models.AgentOptions,PitWall.Agent.Services.LLM.ILlmEndpointEnumerator,Microsoft.Extensions.Logging.ILogger`1&lt;PitWall.Agent.Services.LLM.OllamaDiscoveryService&gt;)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -1712,7 +1712,7 @@
             <line number="90" hits="2" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.LLM.OllamaLLMService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\LLM\OllamaLLMService.cs" line-rate="0" branch-rate="0" complexity="13">
+        <class name="PitWall.Agent.Services.LLM.OllamaLLMService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/LLM/OllamaLLMService.cs" line-rate="0" branch-rate="0" complexity="13">
           <methods>
             <method name="get_IsEnabled" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -1944,7 +1944,7 @@
             <line number="148" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.LLM.OpenAiLlmService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\LLM\OpenAiLlmService.cs" line-rate="0.5204081632653061" branch-rate="0.5" complexity="10">
+        <class name="PitWall.Agent.Services.LLM.OpenAiLlmService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/LLM/OpenAiLlmService.cs" line-rate="0.5204081632653061" branch-rate="0.5" complexity="10">
           <methods>
             <method name="get_IsEnabled" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -2166,7 +2166,7 @@
             <line number="142" hits="1" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.RaceContextProvider" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\RaceContextProvider.cs" line-rate="0.7761194029850746" branch-rate="0.42857142857142855" complexity="43">
+        <class name="PitWall.Agent.Services.RaceContextProvider" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/RaceContextProvider.cs" line-rate="0.7761194029850746" branch-rate="0.42857142857142855" complexity="43">
           <methods>
             <method name="BuildAsync" signature="(PitWall.Agent.Models.AgentRequest,System.Threading.CancellationToken)" line-rate="1" branch-rate="0.9166666666666666" complexity="12">
               <lines>
@@ -2326,7 +2326,7 @@
             <line number="97" hits="1" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.RulesEngine.QueryPatterns" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\RulesEngine\QueryPatterns.cs" line-rate="1" branch-rate="1" complexity="8">
+        <class name="PitWall.Agent.Services.RulesEngine.QueryPatterns" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/RulesEngine/QueryPatterns.cs" line-rate="1" branch-rate="1" complexity="8">
           <methods>
             <method name="IsFuelQuery" signature="(System.String)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -2406,7 +2406,7 @@
             <line number="36" hits="16" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Agent.Services.RulesEngine.RulesEngine" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\Services\RulesEngine\RulesEngine.cs" line-rate="0.48" branch-rate="0.4" complexity="45">
+        <class name="PitWall.Agent.Services.RulesEngine.RulesEngine" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Agent/Services/RulesEngine/RulesEngine.cs" line-rate="0.48" branch-rate="0.4" complexity="45">
           <methods>
             <method name="TryAnswer" signature="(System.String,PitWall.Agent.Models.RaceContext)" line-rate="0.48936170212765956" branch-rate="0.6666666666666666" complexity="12">
               <lines>
@@ -2712,9 +2712,9 @@
         </class>
       </classes>
     </package>
-    <package name="PitWall.Api" line-rate="0.22074074074074074" branch-rate="0.12096774193548387" complexity="155">
+    <package name="PitWall.Api" line-rate="0.21481481481481482" branch-rate="0.12903225806451613" complexity="155">
       <classes>
-        <class name="PitWall.Api.Models.SessionMetadata" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Models\SessionMetadata.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.Api.Models.SessionMetadata" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Models/SessionMetadata.cs" line-rate="0" branch-rate="1" complexity="3">
           <methods>
             <method name="get_Track" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -2738,7 +2738,7 @@
             <line number="7" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Models.SessionMetadataUpdate" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Models\SessionMetadataUpdate.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.Api.Models.SessionMetadataUpdate" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Models/SessionMetadataUpdate.cs" line-rate="0" branch-rate="1" complexity="3">
           <methods>
             <method name="get_Track" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -2762,7 +2762,7 @@
             <line number="7" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Models.SessionSummary" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Models\SessionSummary.cs" line-rate="0" branch-rate="1" complexity="6">
+        <class name="PitWall.Api.Models.SessionSummary" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Models/SessionSummary.cs" line-rate="0" branch-rate="1" complexity="6">
           <methods>
             <method name="get_SessionId" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -2804,7 +2804,7 @@
             <line number="12" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.DuckDbSessionMetadataStore" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Services\DuckDbSessionMetadataStore.cs" line-rate="0" branch-rate="0" complexity="36">
+        <class name="PitWall.Api.Services.DuckDbSessionMetadataStore" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/DuckDbSessionMetadataStore.cs" line-rate="0" branch-rate="0" complexity="36">
           <methods>
             <method name="GetAllAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="0" complexity="14">
               <lines>
@@ -3126,7 +3126,7 @@
             <line number="208" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.JsonSessionMetadataStore" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Services\JsonSessionMetadataStore.cs" line-rate="0" branch-rate="0" complexity="19">
+        <class name="PitWall.Api.Services.JsonSessionMetadataStore" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/JsonSessionMetadataStore.cs" line-rate="0" branch-rate="0" complexity="19">
           <methods>
             <method name="GetAllAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -3306,7 +3306,7 @@
             <line number="112" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.NullSessionMetadataStore" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Services\NullSessionMetadataStore.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.Api.Services.NullSessionMetadataStore" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/NullSessionMetadataStore.cs" line-rate="0" branch-rate="1" complexity="3">
           <methods>
             <method name="GetAllAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -3342,7 +3342,7 @@
             <line number="23" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.NullSessionSummaryService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Services\NullSessionSummaryService.cs" line-rate="0" branch-rate="1" complexity="2">
+        <class name="PitWall.Api.Services.NullSessionSummaryService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/NullSessionSummaryService.cs" line-rate="0" branch-rate="1" complexity="2">
           <methods>
             <method name="GetSessionSummariesAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -3368,7 +3368,7 @@
             <line number="18" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.RecommendationResponse" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Services\RecommendationResponse.cs" line-rate="1" branch-rate="1" complexity="5">
+        <class name="PitWall.Api.Services.RecommendationResponse" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/RecommendationResponse.cs" line-rate="1" branch-rate="1" complexity="5">
           <methods>
             <method name="get_SessionId" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -3404,7 +3404,7 @@
             <line number="14" hits="8" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.RecommendationService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Services\RecommendationService.cs" line-rate="1" branch-rate="0.875" complexity="9">
+        <class name="PitWall.Api.Services.RecommendationService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/RecommendationService.cs" line-rate="1" branch-rate="0.875" complexity="9">
           <methods>
             <method name="GetRecommendation" signature="(System.String,PitWall.Core.Storage.ITelemetryWriter)" line-rate="1" branch-rate="0.875" complexity="8">
               <lines>
@@ -3482,7 +3482,7 @@
             <line number="66" hits="5" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.SessionService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Services\SessionService.cs" line-rate="0" branch-rate="0" complexity="5">
+        <class name="PitWall.Api.Services.SessionService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/SessionService.cs" line-rate="0" branch-rate="0" complexity="5">
           <methods>
             <method name=".ctor" signature="(PitWall.Core.Services.ILmuTelemetryReader,Microsoft.Extensions.Logging.ILogger`1&lt;PitWall.Api.Services.SessionService&gt;)" line-rate="0" branch-rate="0" complexity="2">
               <lines>
@@ -3542,7 +3542,7 @@
             <line number="50" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.SessionSummaryService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Services\SessionSummaryService.cs" line-rate="0" branch-rate="0" complexity="50">
+        <class name="PitWall.Api.Services.SessionSummaryService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/SessionSummaryService.cs" line-rate="0" branch-rate="0" complexity="50">
           <methods>
             <method name="BuildSessionSummaryQuery" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -3772,9 +3772,9 @@
             <line number="152" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="Program" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\Program.cs" line-rate="0.4132841328413284" branch-rate="0.5714285714285714" complexity="14">
+        <class name="Program" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Program.cs" line-rate="0.3985239852398524" branch-rate="0.6428571428571429" complexity="14">
           <methods>
-            <method name="&lt;Main&gt;$" signature="(System.String[])" line-rate="0.37398373983739835" branch-rate="0.5" complexity="4">
+            <method name="&lt;Main&gt;$" signature="(System.String[])" line-rate="0.3617886178861789" branch-rate="0.5" complexity="4">
               <lines>
                 <line number="13" hits="2" branch="false" />
                 <line number="15" hits="2" branch="false" />
@@ -3792,28 +3792,28 @@
                 <line number="28" hits="2" branch="false" />
                 <line number="31" hits="2" branch="false" />
                 <line number="34" hits="2" branch="true" condition-coverage="50% (1/2)" />
-                <line number="35" hits="2" branch="false" />
-                <line number="36" hits="2" branch="false" />
+                <line number="35" hits="0" branch="false" />
+                <line number="36" hits="0" branch="false" />
                 <line number="37" hits="0" branch="false" />
                 <line number="38" hits="0" branch="false" />
                 <line number="39" hits="0" branch="false" />
-                <line number="40" hits="2" branch="false" />
-                <line number="41" hits="2" branch="false" />
+                <line number="40" hits="0" branch="false" />
+                <line number="41" hits="0" branch="false" />
                 <line number="42" hits="0" branch="false" />
                 <line number="43" hits="0" branch="false" />
                 <line number="44" hits="0" branch="false" />
-                <line number="45" hits="2" branch="false" />
-                <line number="46" hits="2" branch="false" />
-                <line number="47" hits="2" branch="false" />
-                <line number="48" hits="2" branch="false" />
-                <line number="49" hits="2" branch="false" />
-                <line number="50" hits="2" branch="false" />
-                <line number="52" hits="0" branch="false" />
-                <line number="53" hits="0" branch="false" />
-                <line number="55" hits="0" branch="false" />
-                <line number="56" hits="0" branch="false" />
-                <line number="57" hits="0" branch="false" />
-                <line number="58" hits="0" branch="false" />
+                <line number="45" hits="0" branch="false" />
+                <line number="46" hits="0" branch="false" />
+                <line number="47" hits="0" branch="false" />
+                <line number="48" hits="0" branch="false" />
+                <line number="49" hits="0" branch="false" />
+                <line number="50" hits="0" branch="false" />
+                <line number="52" hits="2" branch="false" />
+                <line number="53" hits="2" branch="false" />
+                <line number="55" hits="2" branch="false" />
+                <line number="56" hits="2" branch="false" />
+                <line number="57" hits="2" branch="false" />
+                <line number="58" hits="2" branch="false" />
                 <line number="61" hits="2" branch="false" />
                 <line number="62" hits="2" branch="false" />
                 <line number="64" hits="2" branch="false" />
@@ -3918,7 +3918,7 @@
                 <line number="179" hits="2" branch="false" />
                 <line number="180" hits="2" branch="false" />
                 <line number="181" hits="0" branch="false" />
-                <line number="182" hits="0" branch="false" />
+                <line number="182" hits="2" branch="false" />
                 <line number="183" hits="2" branch="false" />
                 <line number="184" hits="2" branch="false" />
                 <line number="186" hits="2" branch="false" />
@@ -4034,26 +4034,26 @@
                 <line number="297" hits="2" branch="false" />
                 <line number="298" hits="2" branch="false" />
                 <line number="299" hits="2" branch="true" condition-coverage="50% (1/2)" />
-                <line number="300" hits="2" branch="false" />
-                <line number="301" hits="2" branch="false" />
-                <line number="304" hits="0" branch="false" />
-                <line number="305" hits="0" branch="false" />
+                <line number="300" hits="0" branch="false" />
+                <line number="301" hits="0" branch="false" />
+                <line number="304" hits="2" branch="false" />
+                <line number="305" hits="2" branch="false" />
                 <line number="306" hits="2" branch="false" />
               </lines>
             </method>
-            <method name="FindInParents" signature="()" line-rate="0.9166666666666666" branch-rate="0.6666666666666666" complexity="6">
+            <method name="FindInParents" signature="()" line-rate="0.8333333333333334" branch-rate="0.8333333333333334" complexity="6">
               <lines>
                 <line number="309" hits="2" branch="false" />
                 <line number="310" hits="2" branch="false" />
-                <line number="311" hits="20" branch="true" condition-coverage="50% (2/4)" />
-                <line number="312" hits="10" branch="false" />
-                <line number="313" hits="10" branch="false" />
-                <line number="314" hits="10" branch="true" condition-coverage="100% (2/2)" />
-                <line number="315" hits="2" branch="false" />
-                <line number="316" hits="2" branch="false" />
-                <line number="319" hits="8" branch="false" />
-                <line number="320" hits="8" branch="false" />
-                <line number="322" hits="0" branch="false" />
+                <line number="311" hits="32" branch="true" condition-coverage="100% (4/4)" />
+                <line number="312" hits="14" branch="false" />
+                <line number="313" hits="14" branch="false" />
+                <line number="314" hits="14" branch="true" condition-coverage="50% (1/2)" />
+                <line number="315" hits="0" branch="false" />
+                <line number="316" hits="0" branch="false" />
+                <line number="319" hits="14" branch="false" />
+                <line number="320" hits="14" branch="false" />
+                <line number="322" hits="2" branch="false" />
                 <line number="323" hits="2" branch="false" />
               </lines>
             </method>
@@ -4075,28 +4075,28 @@
             <line number="28" hits="2" branch="false" />
             <line number="31" hits="2" branch="false" />
             <line number="34" hits="2" branch="true" condition-coverage="50% (1/2)" />
-            <line number="35" hits="2" branch="false" />
-            <line number="36" hits="2" branch="false" />
+            <line number="35" hits="0" branch="false" />
+            <line number="36" hits="0" branch="false" />
             <line number="37" hits="0" branch="false" />
             <line number="38" hits="0" branch="false" />
             <line number="39" hits="0" branch="false" />
-            <line number="40" hits="2" branch="false" />
-            <line number="41" hits="2" branch="false" />
+            <line number="40" hits="0" branch="false" />
+            <line number="41" hits="0" branch="false" />
             <line number="42" hits="0" branch="false" />
             <line number="43" hits="0" branch="false" />
             <line number="44" hits="0" branch="false" />
-            <line number="45" hits="2" branch="false" />
-            <line number="46" hits="2" branch="false" />
-            <line number="47" hits="2" branch="false" />
-            <line number="48" hits="2" branch="false" />
-            <line number="49" hits="2" branch="false" />
-            <line number="50" hits="2" branch="false" />
-            <line number="52" hits="0" branch="false" />
-            <line number="53" hits="0" branch="false" />
-            <line number="55" hits="0" branch="false" />
-            <line number="56" hits="0" branch="false" />
-            <line number="57" hits="0" branch="false" />
-            <line number="58" hits="0" branch="false" />
+            <line number="45" hits="0" branch="false" />
+            <line number="46" hits="0" branch="false" />
+            <line number="47" hits="0" branch="false" />
+            <line number="48" hits="0" branch="false" />
+            <line number="49" hits="0" branch="false" />
+            <line number="50" hits="0" branch="false" />
+            <line number="52" hits="2" branch="false" />
+            <line number="53" hits="2" branch="false" />
+            <line number="55" hits="2" branch="false" />
+            <line number="56" hits="2" branch="false" />
+            <line number="57" hits="2" branch="false" />
+            <line number="58" hits="2" branch="false" />
             <line number="61" hits="2" branch="false" />
             <line number="62" hits="2" branch="false" />
             <line number="64" hits="2" branch="false" />
@@ -4201,7 +4201,7 @@
             <line number="179" hits="2" branch="false" />
             <line number="180" hits="2" branch="false" />
             <line number="181" hits="0" branch="false" />
-            <line number="182" hits="0" branch="false" />
+            <line number="182" hits="2" branch="false" />
             <line number="183" hits="2" branch="false" />
             <line number="184" hits="2" branch="false" />
             <line number="186" hits="2" branch="false" />
@@ -4313,30 +4313,30 @@
             <line number="297" hits="2" branch="false" />
             <line number="298" hits="2" branch="false" />
             <line number="299" hits="2" branch="true" condition-coverage="50% (1/2)" />
-            <line number="300" hits="2" branch="false" />
-            <line number="301" hits="2" branch="false" />
-            <line number="304" hits="0" branch="false" />
-            <line number="305" hits="0" branch="false" />
+            <line number="300" hits="0" branch="false" />
+            <line number="301" hits="0" branch="false" />
+            <line number="304" hits="2" branch="false" />
+            <line number="305" hits="2" branch="false" />
             <line number="306" hits="2" branch="false" />
             <line number="309" hits="2" branch="false" />
             <line number="310" hits="2" branch="false" />
-            <line number="311" hits="20" branch="true" condition-coverage="50% (2/4)" />
-            <line number="312" hits="10" branch="false" />
-            <line number="313" hits="10" branch="false" />
-            <line number="314" hits="10" branch="true" condition-coverage="100% (2/2)" />
-            <line number="315" hits="2" branch="false" />
-            <line number="316" hits="2" branch="false" />
-            <line number="319" hits="8" branch="false" />
-            <line number="320" hits="8" branch="false" />
-            <line number="322" hits="0" branch="false" />
+            <line number="311" hits="32" branch="true" condition-coverage="100% (4/4)" />
+            <line number="312" hits="14" branch="false" />
+            <line number="313" hits="14" branch="false" />
+            <line number="314" hits="14" branch="true" condition-coverage="50% (1/2)" />
+            <line number="315" hits="0" branch="false" />
+            <line number="316" hits="0" branch="false" />
+            <line number="319" hits="14" branch="false" />
+            <line number="320" hits="14" branch="false" />
+            <line number="322" hits="2" branch="false" />
             <line number="323" hits="2" branch="false" />
           </lines>
         </class>
       </classes>
     </package>
-    <package name="PitWall.Core" line-rate="0.6719319562575942" branch-rate="0.4642857142857143" complexity="221">
+    <package name="PitWall.Core" line-rate="0.6512758201701093" branch-rate="0.44387755102040816" complexity="221">
       <classes>
-        <class name="PitWall.Core.Models.ChannelInfo" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Models\ChannelInfo.cs" line-rate="0.5" branch-rate="1" complexity="2">
+        <class name="PitWall.Core.Models.ChannelInfo" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Models/ChannelInfo.cs" line-rate="0.5" branch-rate="1" complexity="2">
           <methods>
             <method name="get_Name" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -4354,7 +4354,7 @@
             <line number="7" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Models.TelemetrySample" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Models\TelemetrySample.cs" line-rate="1" branch-rate="1" complexity="12">
+        <class name="PitWall.Core.Models.TelemetrySample" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Models/TelemetrySample.cs" line-rate="1" branch-rate="1" complexity="12">
           <methods>
             <method name="get_Timestamp" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -4388,7 +4388,7 @@
             </method>
             <method name="get_Steering" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="12" hits="2022" branch="false" />
+                <line number="12" hits="2019" branch="false" />
               </lines>
             </method>
             <method name="get_LapNumber" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -4413,26 +4413,26 @@
             </method>
             <method name=".ctor" signature="(System.DateTime,System.Double,System.Double[],System.Double,System.Double,System.Double,System.Double)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="5" hits="2020" branch="false" />
+                <line number="5" hits="2017" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="5" hits="2020" branch="false" />
+            <line number="5" hits="2017" branch="false" />
             <line number="6" hits="6" branch="false" />
             <line number="7" hits="8" branch="false" />
             <line number="8" hits="20" branch="false" />
             <line number="9" hits="19" branch="false" />
             <line number="10" hits="2015" branch="false" />
             <line number="11" hits="6" branch="false" />
-            <line number="12" hits="2022" branch="false" />
+            <line number="12" hits="2019" branch="false" />
             <line number="14" hits="6022" branch="false" />
             <line number="15" hits="2002" branch="false" />
             <line number="16" hits="2002" branch="false" />
             <line number="17" hits="2002" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Services.LmuTelemetryReader" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Services\LmuTelemetryReader.cs" line-rate="0.9656992084432717" branch-rate="0.7903225806451613" complexity="63">
+        <class name="PitWall.Core.Services.LmuTelemetryReader" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Services/LmuTelemetryReader.cs" line-rate="0.9656992084432717" branch-rate="0.7903225806451613" complexity="63">
           <methods>
             <method name="GetSessionCountAsync" signature="(System.Threading.CancellationToken)" line-rate="0.7368421052631579" branch-rate="0.25" complexity="4">
               <lines>
@@ -5228,7 +5228,7 @@
             <line number="462" hits="28028" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Services.NullLmuTelemetryReader" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Services\NullLmuTelemetryReader.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.Core.Services.NullLmuTelemetryReader" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Services/NullLmuTelemetryReader.cs" line-rate="0" branch-rate="1" complexity="3">
           <methods>
             <method name="GetSessionCountAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -5266,11 +5266,11 @@
             <line number="29" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Services.SharedMemoryReader" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Services\SharedMemoryReader.cs" line-rate="0.49572649572649574" branch-rate="0.39473684210526316" complexity="41">
+        <class name="PitWall.Core.Services.SharedMemoryReader" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Services/SharedMemoryReader.cs" line-rate="0.3504273504273504" branch-rate="0.2894736842105263" complexity="41">
           <methods>
             <method name="get_IsConnected" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="22" hits="7" branch="false" />
+                <line number="22" hits="5" branch="false" />
               </lines>
             </method>
             <method name="get_PollingFrequency" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -5324,23 +5324,23 @@
                 <line number="155" hits="3" branch="false" />
                 <line number="157" hits="3" branch="false" />
                 <line number="159" hits="3" branch="false" />
-                <line number="160" hits="3" branch="false" />
+                <line number="160" hits="1" branch="false" />
                 <line number="161" hits="3" branch="false" />
-                <line number="162" hits="3" branch="false" />
-                <line number="163" hits="13" branch="false" />
-                <line number="164" hits="3" branch="false" />
-                <line number="165" hits="3" branch="false" />
-                <line number="166" hits="2" branch="false" />
-                <line number="167" hits="1" branch="false" />
-                <line number="168" hits="3" branch="false" />
-                <line number="169" hits="0" branch="false" />
-                <line number="170" hits="0" branch="false" />
-                <line number="171" hits="0" branch="false" />
-                <line number="172" hits="0" branch="false" />
-                <line number="173" hits="0" branch="false" />
-                <line number="174" hits="6" branch="false" />
+                <line number="162" hits="1" branch="false" />
+                <line number="163" hits="3" branch="false" />
+                <line number="164" hits="0" branch="false" />
+                <line number="165" hits="0" branch="false" />
+                <line number="166" hits="0" branch="false" />
+                <line number="167" hits="0" branch="false" />
+                <line number="168" hits="0" branch="false" />
+                <line number="169" hits="1" branch="false" />
+                <line number="170" hits="1" branch="false" />
+                <line number="171" hits="1" branch="false" />
+                <line number="172" hits="1" branch="false" />
+                <line number="173" hits="1" branch="false" />
+                <line number="174" hits="3" branch="false" />
                 <line number="176" hits="3" branch="false" />
-                <line number="177" hits="3" branch="false" />
+                <line number="177" hits="4" branch="false" />
               </lines>
             </method>
             <method name="StopAsync" signature="()" line-rate="1" branch-rate="0.5" complexity="4">
@@ -5372,36 +5372,36 @@
                 <line number="34" hits="7" branch="false" />
               </lines>
             </method>
-            <method name="StreamSamples" signature="()" line-rate="0.4444444444444444" branch-rate="0.22727272727272727" complexity="22">
+            <method name="StreamSamples" signature="()" line-rate="0.06666666666666667" branch-rate="0.045454545454545456" complexity="22">
               <lines>
-                <line number="39" hits="3" branch="false" />
-                <line number="40" hits="3" branch="true" condition-coverage="50% (1/2)" />
-                <line number="41" hits="0" branch="false" />
-                <line number="43" hits="3" branch="false" />
-                <line number="44" hits="3" branch="false" />
-                <line number="45" hits="3" branch="false" />
-                <line number="49" hits="3" branch="false" />
-                <line number="50" hits="3" branch="false" />
+                <line number="39" hits="1" branch="false" />
+                <line number="40" hits="1" branch="true" condition-coverage="50% (1/2)" />
+                <line number="41" hits="1" branch="false" />
+                <line number="43" hits="0" branch="false" />
+                <line number="44" hits="0" branch="false" />
+                <line number="45" hits="0" branch="false" />
+                <line number="49" hits="0" branch="false" />
+                <line number="50" hits="0" branch="false" />
                 <line number="51" hits="0" branch="false" />
                 <line number="52" hits="0" branch="false" />
                 <line number="53" hits="0" branch="false" />
                 <line number="54" hits="0" branch="true" condition-coverage="0% (0/2)" />
                 <line number="55" hits="0" branch="false" />
-                <line number="57" hits="3" branch="false" />
-                <line number="58" hits="3" branch="false" />
-                <line number="59" hits="3" branch="false" />
-                <line number="60" hits="3" branch="true" condition-coverage="100% (2/2)" />
-                <line number="61" hits="3" branch="false" />
-                <line number="62" hits="3" branch="true" condition-coverage="50% (1/2)" />
+                <line number="57" hits="0" branch="false" />
+                <line number="58" hits="0" branch="false" />
+                <line number="59" hits="0" branch="false" />
+                <line number="60" hits="0" branch="true" condition-coverage="0% (0/2)" />
+                <line number="61" hits="0" branch="false" />
+                <line number="62" hits="0" branch="true" condition-coverage="0% (0/2)" />
                 <line number="63" hits="0" branch="false" />
                 <line number="64" hits="0" branch="true" condition-coverage="0% (0/2)" />
                 <line number="65" hits="0" branch="false" />
-                <line number="67" hits="3" branch="false" />
-                <line number="68" hits="3" branch="false" />
-                <line number="72" hits="3" branch="true" condition-coverage="50% (1/2)" />
-                <line number="73" hits="3" branch="false" />
-                <line number="74" hits="3" branch="false" />
-                <line number="75" hits="1" branch="false" />
+                <line number="67" hits="0" branch="false" />
+                <line number="68" hits="0" branch="false" />
+                <line number="72" hits="0" branch="true" condition-coverage="0% (0/2)" />
+                <line number="73" hits="0" branch="false" />
+                <line number="74" hits="0" branch="false" />
+                <line number="75" hits="0" branch="false" />
                 <line number="80" hits="0" branch="false" />
                 <line number="81" hits="0" branch="true" condition-coverage="0% (0/4)" />
                 <line number="82" hits="0" branch="false" />
@@ -5418,12 +5418,12 @@
                 <line number="95" hits="0" branch="false" />
                 <line number="96" hits="0" branch="true" condition-coverage="0% (0/2)" />
                 <line number="97" hits="0" branch="false" />
-                <line number="98" hits="3" branch="false" />
+                <line number="98" hits="0" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="22" hits="7" branch="false" />
+            <line number="22" hits="5" branch="false" />
             <line number="23" hits="11" branch="false" />
             <line number="29" hits="7" branch="false" />
             <line number="30" hits="7" branch="false" />
@@ -5432,34 +5432,34 @@
             <line number="33" hits="7" branch="true" condition-coverage="100% (2/2)" />
             <line number="34" hits="7" branch="false" />
             <line number="36" hits="1" branch="false" />
-            <line number="39" hits="3" branch="false" />
-            <line number="40" hits="3" branch="true" condition-coverage="50% (1/2)" />
-            <line number="41" hits="0" branch="false" />
-            <line number="43" hits="3" branch="false" />
-            <line number="44" hits="3" branch="false" />
-            <line number="45" hits="3" branch="false" />
-            <line number="49" hits="3" branch="false" />
-            <line number="50" hits="3" branch="false" />
+            <line number="39" hits="1" branch="false" />
+            <line number="40" hits="1" branch="true" condition-coverage="50% (1/2)" />
+            <line number="41" hits="1" branch="false" />
+            <line number="43" hits="0" branch="false" />
+            <line number="44" hits="0" branch="false" />
+            <line number="45" hits="0" branch="false" />
+            <line number="49" hits="0" branch="false" />
+            <line number="50" hits="0" branch="false" />
             <line number="51" hits="0" branch="false" />
             <line number="52" hits="0" branch="false" />
             <line number="53" hits="0" branch="false" />
             <line number="54" hits="0" branch="true" condition-coverage="0% (0/2)" />
             <line number="55" hits="0" branch="false" />
-            <line number="57" hits="3" branch="false" />
-            <line number="58" hits="3" branch="false" />
-            <line number="59" hits="3" branch="false" />
-            <line number="60" hits="3" branch="true" condition-coverage="100% (2/2)" />
-            <line number="61" hits="3" branch="false" />
-            <line number="62" hits="3" branch="true" condition-coverage="50% (1/2)" />
+            <line number="57" hits="0" branch="false" />
+            <line number="58" hits="0" branch="false" />
+            <line number="59" hits="0" branch="false" />
+            <line number="60" hits="0" branch="true" condition-coverage="0% (0/2)" />
+            <line number="61" hits="0" branch="false" />
+            <line number="62" hits="0" branch="true" condition-coverage="0% (0/2)" />
             <line number="63" hits="0" branch="false" />
             <line number="64" hits="0" branch="true" condition-coverage="0% (0/2)" />
             <line number="65" hits="0" branch="false" />
-            <line number="67" hits="3" branch="false" />
-            <line number="68" hits="3" branch="false" />
-            <line number="72" hits="3" branch="true" condition-coverage="50% (1/2)" />
-            <line number="73" hits="3" branch="false" />
-            <line number="74" hits="3" branch="false" />
-            <line number="75" hits="1" branch="false" />
+            <line number="67" hits="0" branch="false" />
+            <line number="68" hits="0" branch="false" />
+            <line number="72" hits="0" branch="true" condition-coverage="0% (0/2)" />
+            <line number="73" hits="0" branch="false" />
+            <line number="74" hits="0" branch="false" />
+            <line number="75" hits="0" branch="false" />
             <line number="80" hits="0" branch="false" />
             <line number="81" hits="0" branch="true" condition-coverage="0% (0/4)" />
             <line number="82" hits="0" branch="false" />
@@ -5476,7 +5476,7 @@
             <line number="95" hits="0" branch="false" />
             <line number="96" hits="0" branch="true" condition-coverage="0% (0/2)" />
             <line number="97" hits="0" branch="false" />
-            <line number="98" hits="3" branch="false" />
+            <line number="98" hits="0" branch="false" />
             <line number="114" hits="0" branch="false" />
             <line number="115" hits="0" branch="true" condition-coverage="0% (0/2)" />
             <line number="116" hits="0" branch="false" />
@@ -5512,23 +5512,23 @@
             <line number="155" hits="3" branch="false" />
             <line number="157" hits="3" branch="false" />
             <line number="159" hits="3" branch="false" />
-            <line number="160" hits="3" branch="false" />
+            <line number="160" hits="1" branch="false" />
             <line number="161" hits="3" branch="false" />
-            <line number="162" hits="3" branch="false" />
-            <line number="163" hits="13" branch="false" />
-            <line number="164" hits="3" branch="false" />
-            <line number="165" hits="3" branch="false" />
-            <line number="166" hits="2" branch="false" />
-            <line number="167" hits="1" branch="false" />
-            <line number="168" hits="3" branch="false" />
-            <line number="169" hits="0" branch="false" />
-            <line number="170" hits="0" branch="false" />
-            <line number="171" hits="0" branch="false" />
-            <line number="172" hits="0" branch="false" />
-            <line number="173" hits="0" branch="false" />
-            <line number="174" hits="6" branch="false" />
+            <line number="162" hits="1" branch="false" />
+            <line number="163" hits="3" branch="false" />
+            <line number="164" hits="0" branch="false" />
+            <line number="165" hits="0" branch="false" />
+            <line number="166" hits="0" branch="false" />
+            <line number="167" hits="0" branch="false" />
+            <line number="168" hits="0" branch="false" />
+            <line number="169" hits="1" branch="false" />
+            <line number="170" hits="1" branch="false" />
+            <line number="171" hits="1" branch="false" />
+            <line number="172" hits="1" branch="false" />
+            <line number="173" hits="1" branch="false" />
+            <line number="174" hits="3" branch="false" />
             <line number="176" hits="3" branch="false" />
-            <line number="177" hits="3" branch="false" />
+            <line number="177" hits="4" branch="false" />
             <line number="180" hits="1" branch="false" />
             <line number="181" hits="1" branch="true" condition-coverage="50% (1/2)" />
             <line number="182" hits="1" branch="false" />
@@ -5542,7 +5542,7 @@
             <line number="192" hits="7" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Storage.DuckDbConnector" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Storage\DuckDbConnector.cs" line-rate="0.9770114942528736" branch-rate="0.6538461538461539" complexity="28">
+        <class name="PitWall.Core.Storage.DuckDbConnector" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Storage/DuckDbConnector.cs" line-rate="0.9770114942528736" branch-rate="0.6538461538461539" complexity="28">
           <methods>
             <method name="get_DatabasePath" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -5742,7 +5742,7 @@
             <line number="137" hits="7" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Storage.DuckDbTelemetryWriter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Storage\DuckDbTelemetryWriter.cs" line-rate="0.06951871657754011" branch-rate="0.08695652173913043" complexity="47">
+        <class name="PitWall.Core.Storage.DuckDbTelemetryWriter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Storage/DuckDbTelemetryWriter.cs" line-rate="0.06951871657754011" branch-rate="0.08695652173913043" complexity="47">
           <methods>
             <method name="GetSamples" signature="(System.String)" line-rate="0" branch-rate="0" complexity="10">
               <lines>
@@ -6150,7 +6150,7 @@
             <line number="239" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Storage.InMemoryTelemetryWriter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Storage\InMemoryTelemetryWriter.cs" line-rate="1" branch-rate="1" complexity="6">
+        <class name="PitWall.Core.Storage.InMemoryTelemetryWriter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Storage/InMemoryTelemetryWriter.cs" line-rate="1" branch-rate="1" complexity="6">
           <methods>
             <method name="WriteSamples" signature="(System.String,System.Collections.Generic.List`1&lt;PitWall.Core.Models.TelemetrySample&gt;)" line-rate="1" branch-rate="1" complexity="2">
               <lines>
@@ -6204,7 +6204,7 @@
             <line number="34" hits="8" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Utilities.DataValidator" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\Utilities\DataValidator.cs" line-rate="0" branch-rate="0" complexity="19">
+        <class name="PitWall.Core.Utilities.DataValidator" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Utilities/DataValidator.cs" line-rate="0" branch-rate="0" complexity="19">
           <methods>
             <method name="IsValid" signature="(PitWall.Core.Models.TelemetrySample)" line-rate="0" branch-rate="0" complexity="18">
               <lines>
@@ -6244,7 +6244,7 @@
     </package>
     <package name="PitWall.Strategy" line-rate="0.875" branch-rate="0.8235294117647058" complexity="36">
       <classes>
-        <class name="PitWall.Strategy.StrategyEngine" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\StrategyEngine.cs" line-rate="0.873015873015873" branch-rate="0.8235294117647058" complexity="35">
+        <class name="PitWall.Strategy.StrategyEngine" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Strategy/StrategyEngine.cs" line-rate="0.873015873015873" branch-rate="0.8235294117647058" complexity="35">
           <methods>
             <method name="Evaluate" signature="(PitWall.Core.Models.TelemetrySample)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -6392,7 +6392,7 @@
             <line number="116" hits="7" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Strategy.StrategyEvaluation" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\StrategyEngine.cs" line-rate="1" branch-rate="1" complexity="1">
+        <class name="PitWall.Strategy.StrategyEvaluation" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Strategy/StrategyEngine.cs" line-rate="1" branch-rate="1" complexity="1">
           <methods>
             <method name="get_Recommendation" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -6406,9 +6406,9 @@
         </class>
       </classes>
     </package>
-    <package name="PitWall.UI" line-rate="0.15356573251310093" branch-rate="0.10057708161582853" complexity="1548">
+    <package name="PitWall.UI" line-rate="0.16248019914007694" branch-rate="0.10057708161582853" complexity="1548">
       <classes>
-        <class name="PitWall.UI.App" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\App.axaml" line-rate="0" branch-rate="0" complexity="4">
+        <class name="PitWall.UI.App" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/App.axaml" line-rate="0" branch-rate="0" complexity="4">
           <methods>
             <method name="!XamlIlPopulate" signature="(System.IServiceProvider,PitWall.UI.App)" line-rate="0" branch-rate="0" complexity="4">
               <lines>
@@ -6664,7 +6664,7 @@
             <line number="190" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.App" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\App.axaml.cs" line-rate="0" branch-rate="0" complexity="13">
+        <class name="PitWall.UI.App" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/App.axaml.cs" line-rate="0" branch-rate="0" complexity="13">
           <methods>
             <method name="Initialize" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -6816,7 +6816,7 @@
             <line number="107" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Controls.TrackMapControl" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Controls\TrackMapControl.axaml" line-rate="0" branch-rate="0" complexity="2">
+        <class name="PitWall.UI.Controls.TrackMapControl" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Controls/TrackMapControl.axaml" line-rate="0" branch-rate="0" complexity="2">
           <methods>
             <method name="!XamlIlPopulate" signature="(System.IServiceProvider,PitWall.UI.Controls.TrackMapControl)" line-rate="0" branch-rate="0" complexity="2">
               <lines>
@@ -6840,7 +6840,7 @@
             <line number="9" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Controls.TrackMapControl" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Controls\TrackMapControl.axaml.cs" line-rate="0" branch-rate="0" complexity="35">
+        <class name="PitWall.UI.Controls.TrackMapControl" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Controls/TrackMapControl.axaml.cs" line-rate="0" branch-rate="0" complexity="35">
           <methods>
             <method name="get_TrackPoints" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -7128,7 +7128,7 @@
             <line number="171" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Converters.BoolToAlignmentUserConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Converters\BoolToAlignmentUserConverter.cs" line-rate="0.625" branch-rate="0.6666666666666666" complexity="7">
+        <class name="PitWall.UI.Converters.BoolToAlignmentUserConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Converters/BoolToAlignmentUserConverter.cs" line-rate="0.625" branch-rate="0.6666666666666666" complexity="7">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0.8333333333333334" branch-rate="0.6666666666666666" complexity="6">
               <lines>
@@ -7158,7 +7158,7 @@
             <line number="27" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Converters.BoolToMessageBackgroundConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Converters\BoolToMessageBackgroundConverter.cs" line-rate="0.7" branch-rate="0.6666666666666666" complexity="8">
+        <class name="PitWall.UI.Converters.BoolToMessageBackgroundConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Converters/BoolToMessageBackgroundConverter.cs" line-rate="0.7" branch-rate="0.6666666666666666" complexity="8">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0.8333333333333334" branch-rate="0.6666666666666666" complexity="6">
               <lines>
@@ -7196,7 +7196,7 @@
             <line number="29" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Converters.BoolToMessageBorderConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Converters\BoolToMessageBorderConverter.cs" line-rate="0.7" branch-rate="0.6666666666666666" complexity="8">
+        <class name="PitWall.UI.Converters.BoolToMessageBorderConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Converters/BoolToMessageBorderConverter.cs" line-rate="0.7" branch-rate="0.6666666666666666" complexity="8">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0.8333333333333334" branch-rate="0.6666666666666666" complexity="6">
               <lines>
@@ -7234,7 +7234,7 @@
             <line number="29" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Converters.BoolToRoleColorConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Converters\BoolToRoleColorConverter.cs" line-rate="0.7" branch-rate="0.6666666666666666" complexity="8">
+        <class name="PitWall.UI.Converters.BoolToRoleColorConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Converters/BoolToRoleColorConverter.cs" line-rate="0.7" branch-rate="0.6666666666666666" complexity="8">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0.8333333333333334" branch-rate="0.6666666666666666" complexity="6">
               <lines>
@@ -7272,7 +7272,7 @@
             <line number="29" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Converters.BoolToTextConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Converters\BoolToTextConverter.cs" line-rate="0.7" branch-rate="0.75" complexity="9">
+        <class name="PitWall.UI.Converters.BoolToTextConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Converters/BoolToTextConverter.cs" line-rate="0.7" branch-rate="0.75" complexity="9">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0.875" branch-rate="0.75" complexity="8">
               <lines>
@@ -7306,7 +7306,7 @@
             <line number="28" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.AgentConfigDto" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\AgentConfigDto.cs" line-rate="1" branch-rate="1" complexity="17">
+        <class name="PitWall.UI.Models.AgentConfigDto" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/AgentConfigDto.cs" line-rate="1" branch-rate="1" complexity="17">
           <methods>
             <method name="get_EnableLLM" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -7414,7 +7414,7 @@
             <line number="25" hits="1" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.AgentConfigUpdateDto" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\AgentConfigUpdateDto.cs" line-rate="1" branch-rate="1" complexity="17">
+        <class name="PitWall.UI.Models.AgentConfigUpdateDto" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/AgentConfigUpdateDto.cs" line-rate="1" branch-rate="1" complexity="17">
           <methods>
             <method name="get_EnableLLM" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -7522,7 +7522,7 @@
             <line number="25" hits="1" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.AgentRequestDto" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\AgentRequestDto.cs" line-rate="1" branch-rate="1" complexity="2">
+        <class name="PitWall.UI.Models.AgentRequestDto" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/AgentRequestDto.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
             <method name="get_Query" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -7540,7 +7540,7 @@
             <line number="8" hits="2" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.AgentResponseDto" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\AgentResponseDto.cs" line-rate="1" branch-rate="1" complexity="5">
+        <class name="PitWall.UI.Models.AgentResponseDto" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/AgentResponseDto.cs" line-rate="1" branch-rate="1" complexity="5">
           <methods>
             <method name="get_Answer" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -7576,7 +7576,7 @@
             <line number="9" hits="2" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.AiMessage" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\AiMessage.cs" line-rate="0" branch-rate="1" complexity="4">
+        <class name="PitWall.UI.Models.AiMessage" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/AiMessage.cs" line-rate="0" branch-rate="1" complexity="4">
           <methods>
             <method name="get_Role" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -7606,7 +7606,7 @@
             <line number="10" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.BoolToAlignmentConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\ValueConverters.cs" line-rate="0" branch-rate="0" complexity="5">
+        <class name="PitWall.UI.Models.BoolToAlignmentConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/ValueConverters.cs" line-rate="0" branch-rate="0" complexity="5">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0" branch-rate="0" complexity="4">
               <lines>
@@ -7636,7 +7636,7 @@
             <line number="179" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.BoolToBackgroundConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\ValueConverters.cs" line-rate="0" branch-rate="0" complexity="5">
+        <class name="PitWall.UI.Models.BoolToBackgroundConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/ValueConverters.cs" line-rate="0" branch-rate="0" complexity="5">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0" branch-rate="0" complexity="4">
               <lines>
@@ -7666,7 +7666,7 @@
             <line number="158" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.CarSpec" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\CarSpec.cs" line-rate="0" branch-rate="1" complexity="12">
+        <class name="PitWall.UI.Models.CarSpec" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/CarSpec.cs" line-rate="0" branch-rate="1" complexity="12">
           <methods>
             <method name="get_Name" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -7744,7 +7744,7 @@
             <line number="19" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.FuelStatusConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\ValueConverters.cs" line-rate="0" branch-rate="0" complexity="9">
+        <class name="PitWall.UI.Models.FuelStatusConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/ValueConverters.cs" line-rate="0" branch-rate="0" complexity="9">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0" branch-rate="0" complexity="8">
               <lines>
@@ -7786,7 +7786,7 @@
             <line number="37" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.RecommendationDto" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\RecommendationDto.cs" line-rate="1" branch-rate="1" complexity="5">
+        <class name="PitWall.UI.Models.RecommendationDto" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/RecommendationDto.cs" line-rate="1" branch-rate="1" complexity="5">
           <methods>
             <method name="get_SessionId" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -7822,7 +7822,7 @@
             <line number="11" hits="3" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.SessionMetadataUpdateDto" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\SessionMetadataUpdateDto.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.UI.Models.SessionMetadataUpdateDto" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/SessionMetadataUpdateDto.cs" line-rate="0" branch-rate="1" complexity="3">
           <methods>
             <method name="get_Track" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -7846,7 +7846,7 @@
             <line number="7" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.SessionSummaryDto" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\SessionSummaryDto.cs" line-rate="0" branch-rate="0" complexity="8">
+        <class name="PitWall.UI.Models.SessionSummaryDto" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/SessionSummaryDto.cs" line-rate="0" branch-rate="0" complexity="8">
           <methods>
             <method name="get_SessionId" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -7904,7 +7904,7 @@
             <line number="22" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TelemetrySampleDto" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\TelemetrySampleDto.cs" line-rate="0.7272727272727273" branch-rate="1" complexity="11">
+        <class name="PitWall.UI.Models.TelemetrySampleDto" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/TelemetrySampleDto.cs" line-rate="0.7272727272727273" branch-rate="1" complexity="11">
           <methods>
             <method name="get_Timestamp" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -7976,7 +7976,7 @@
             <line number="27" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TireTempConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\ValueConverters.cs" line-rate="0" branch-rate="0" complexity="14">
+        <class name="PitWall.UI.Models.TireTempConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/ValueConverters.cs" line-rate="0" branch-rate="0" complexity="14">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0" branch-rate="0" complexity="12">
               <lines>
@@ -8070,7 +8070,7 @@
             <line number="137" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TireWearConverter" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\ValueConverters.cs" line-rate="0" branch-rate="0" complexity="9">
+        <class name="PitWall.UI.Models.TireWearConverter" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/ValueConverters.cs" line-rate="0" branch-rate="0" complexity="9">
           <methods>
             <method name="Convert" signature="(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)" line-rate="0" branch-rate="0" complexity="8">
               <lines>
@@ -8112,7 +8112,7 @@
             <line number="69" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TrackCorner" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\TrackMetadata.cs" line-rate="0" branch-rate="1" complexity="7">
+        <class name="PitWall.UI.Models.TrackCorner" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/TrackMetadata.cs" line-rate="0" branch-rate="1" complexity="7">
           <methods>
             <method name="get_Number" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -8164,7 +8164,7 @@
             <line number="51" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TrackMapFrame" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\TrackMapFrame.cs" line-rate="0" branch-rate="1" complexity="4">
+        <class name="PitWall.UI.Models.TrackMapFrame" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/TrackMapFrame.cs" line-rate="0" branch-rate="1" complexity="4">
           <methods>
             <method name="get_TrackPoints" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -8194,7 +8194,7 @@
             <line number="11" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TrackMetadata" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\TrackMetadata.cs" line-rate="0" branch-rate="1" complexity="8">
+        <class name="PitWall.UI.Models.TrackMetadata" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/TrackMetadata.cs" line-rate="0" branch-rate="1" complexity="8">
           <methods>
             <method name="get_Name" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -8256,7 +8256,7 @@
             <line number="24" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TrackOutlinePoint" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\TrackMetadata.cs" line-rate="0" branch-rate="1" complexity="2">
+        <class name="PitWall.UI.Models.TrackOutlinePoint" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/TrackMetadata.cs" line-rate="0" branch-rate="1" complexity="2">
           <methods>
             <method name="get_X" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -8274,7 +8274,7 @@
             <line number="57" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TrackRange" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\TrackMetadata.cs" line-rate="0" branch-rate="0" complexity="6">
+        <class name="PitWall.UI.Models.TrackRange" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/TrackMetadata.cs" line-rate="0" branch-rate="0" complexity="6">
           <methods>
             <method name="ContainsFraction" signature="(System.Double,System.Double,System.Double)" line-rate="0" branch-rate="0" complexity="6">
               <lines>
@@ -8296,7 +8296,7 @@
             <line number="70" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TrackSector" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\TrackMetadata.cs" line-rate="0" branch-rate="1" complexity="4">
+        <class name="PitWall.UI.Models.TrackSector" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/TrackMetadata.cs" line-rate="0" branch-rate="1" complexity="4">
           <methods>
             <method name="get_Name" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -8330,7 +8330,7 @@
             <line number="36" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Models.TrackSegmentStatus" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Models\TrackSegmentStatus.cs" line-rate="0" branch-rate="1" complexity="7">
+        <class name="PitWall.UI.Models.TrackSegmentStatus" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Models/TrackSegmentStatus.cs" line-rate="0" branch-rate="1" complexity="7">
           <methods>
             <method name="get_TrackName" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -8378,7 +8378,7 @@
             <line number="11" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Program" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Program.cs" line-rate="0" branch-rate="1" complexity="2">
+        <class name="PitWall.UI.Program" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Program.cs" line-rate="0" branch-rate="1" complexity="2">
           <methods>
             <method name="Main" signature="(System.String[])" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -8404,7 +8404,7 @@
             <line number="20" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.AgentConfigClient" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\AgentConfigClient.cs" line-rate="0.5714285714285714" branch-rate="0.4" complexity="12">
+        <class name="PitWall.UI.Services.AgentConfigClient" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/AgentConfigClient.cs" line-rate="0.5714285714285714" branch-rate="0.4" complexity="12">
           <methods>
             <method name=".ctor" signature="(System.Net.Http.HttpClient,Microsoft.Extensions.Logging.ILogger`1&lt;PitWall.UI.Services.AgentConfigClient&gt;)" line-rate="1" branch-rate="1" complexity="2">
               <lines>
@@ -8546,7 +8546,7 @@
             <line number="98" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.AgentQueryClient" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\AgentQueryClient.cs" line-rate="0.8620689655172413" branch-rate="0.75" complexity="5">
+        <class name="PitWall.UI.Services.AgentQueryClient" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/AgentQueryClient.cs" line-rate="0.8620689655172413" branch-rate="0.75" complexity="5">
           <methods>
             <method name=".ctor" signature="(System.Net.Http.HttpClient,Microsoft.Extensions.Logging.ILogger`1&lt;PitWall.UI.Services.AgentQueryClient&gt;)" line-rate="1" branch-rate="1" complexity="2">
               <lines>
@@ -8622,7 +8622,7 @@
             <line number="56" hits="1" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.CarSpecStore" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\CarSpecStore.cs" line-rate="0" branch-rate="0" complexity="114">
+        <class name="PitWall.UI.Services.CarSpecStore" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/CarSpecStore.cs" line-rate="0" branch-rate="0" complexity="114">
           <methods>
             <method name="GetByName" signature="(System.String)" line-rate="0" branch-rate="0" complexity="14">
               <lines>
@@ -9230,7 +9230,7 @@
             <line number="390" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.NullStackRestartService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\StackRestartService.cs" line-rate="0" branch-rate="1" complexity="1">
+        <class name="PitWall.UI.Services.NullStackRestartService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/StackRestartService.cs" line-rate="0" branch-rate="1" complexity="1">
           <methods>
             <method name="Restart" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -9246,7 +9246,7 @@
             <line number="100" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.RecommendationClient" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\RecommendationClient.cs" line-rate="0.7894736842105263" branch-rate="1" complexity="3">
+        <class name="PitWall.UI.Services.RecommendationClient" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/RecommendationClient.cs" line-rate="0.7894736842105263" branch-rate="1" complexity="3">
           <methods>
             <method name=".ctor" signature="(System.Net.Http.HttpClient,Microsoft.Extensions.Logging.ILogger`1&lt;PitWall.UI.Services.RecommendationClient&gt;)" line-rate="1" branch-rate="1" complexity="2">
               <lines>
@@ -9298,7 +9298,7 @@
             <line number="40" hits="1" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.RecommendationParser" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\RecommendationParser.cs" line-rate="1" branch-rate="0.75" complexity="5">
+        <class name="PitWall.UI.Services.RecommendationParser" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/RecommendationParser.cs" line-rate="1" branch-rate="0.75" complexity="5">
           <methods>
             <method name="Parse" signature="(System.String)" line-rate="1" branch-rate="0.75" complexity="4">
               <lines>
@@ -9338,7 +9338,7 @@
             <line number="24" hits="3" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.SessionClient" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\SessionClient.cs" line-rate="0" branch-rate="0" complexity="17">
+        <class name="PitWall.UI.Services.SessionClient" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/SessionClient.cs" line-rate="0" branch-rate="0" complexity="17">
           <methods>
             <method name=".ctor" signature="(System.Net.Http.HttpClient,Microsoft.Extensions.Logging.ILogger`1&lt;PitWall.UI.Services.SessionClient&gt;)" line-rate="0" branch-rate="0" complexity="2">
               <lines>
@@ -9518,7 +9518,7 @@
             <line number="113" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.StackRestartResult" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\StackRestartService.cs" line-rate="0" branch-rate="1" complexity="1">
+        <class name="PitWall.UI.Services.StackRestartResult" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/StackRestartService.cs" line-rate="0" branch-rate="1" complexity="1">
           <methods>
             <method name="get_Success" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -9530,7 +9530,7 @@
             <line number="12" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.StackRestartService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\StackRestartService.cs" line-rate="0" branch-rate="0" complexity="12">
+        <class name="PitWall.UI.Services.StackRestartService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/StackRestartService.cs" line-rate="0" branch-rate="0" complexity="12">
           <methods>
             <method name="Restart" signature="()" line-rate="0" branch-rate="0" complexity="4">
               <lines>
@@ -9656,7 +9656,7 @@
             <line number="92" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.TelemetryBuffer" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\TelemetryBuffer.cs" line-rate="0.31140350877192985" branch-rate="0.0875" complexity="85">
+        <class name="PitWall.UI.Services.TelemetryBuffer" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/TelemetryBuffer.cs" line-rate="0.31140350877192985" branch-rate="0.0875" complexity="85">
           <methods>
             <method name="get_Count" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -10182,7 +10182,7 @@
             <line number="330" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.TelemetryMessageParser" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\TelemetryMessageParser.cs" line-rate="0.8888888888888888" branch-rate="0.5" complexity="11">
+        <class name="PitWall.UI.Services.TelemetryMessageParser" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/TelemetryMessageParser.cs" line-rate="0.8888888888888888" branch-rate="0.5" complexity="11">
           <methods>
             <method name="Parse" signature="(System.String)" line-rate="0.8235294117647058" branch-rate="0.5" complexity="4">
               <lines>
@@ -10258,7 +10258,7 @@
             <line number="54" hits="2" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.TelemetryStreamClient" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\TelemetryStreamClient.cs" line-rate="0" branch-rate="0" complexity="16">
+        <class name="PitWall.UI.Services.TelemetryStreamClient" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/TelemetryStreamClient.cs" line-rate="0" branch-rate="0" complexity="16">
           <methods>
             <method name=".ctor" signature="(System.Uri,Microsoft.Extensions.Logging.ILogger`1&lt;PitWall.UI.Services.TelemetryStreamClient&gt;)" line-rate="0" branch-rate="0" complexity="2">
               <lines>
@@ -10366,7 +10366,7 @@
             <line number="84" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.TrackMapService" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\TrackMapService.cs" line-rate="0" branch-rate="0" complexity="286">
+        <class name="PitWall.UI.Services.TrackMapService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/TrackMapService.cs" line-rate="0" branch-rate="0" complexity="286">
           <methods>
             <method name="Reset" signature="(System.String)" line-rate="0" branch-rate="0" complexity="2">
               <lines>
@@ -11758,7 +11758,7 @@
             <line number="807" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Services.TrackMetadataStore" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Services\TrackMetadataStore.cs" line-rate="0" branch-rate="0" complexity="168">
+        <class name="PitWall.UI.Services.TrackMetadataStore" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Services/TrackMetadataStore.cs" line-rate="0" branch-rate="0" complexity="168">
           <methods>
             <method name="GetByName" signature="(System.String)" line-rate="0" branch-rate="0" complexity="16">
               <lines>
@@ -12704,7 +12704,7 @@
             <line number="569" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewLocator" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewLocator.cs" line-rate="0" branch-rate="0" complexity="5">
+        <class name="PitWall.UI.ViewLocator" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewLocator.cs" line-rate="0" branch-rate="0" complexity="5">
           <methods>
             <method name="Build" signature="(System.Object)" line-rate="0" branch-rate="0" complexity="4">
               <lines>
@@ -12744,7 +12744,7 @@
             <line number="36" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.AiAssistantViewModel" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\AiAssistantViewModel.cs" line-rate="0.7419354838709677" branch-rate="1" complexity="11">
+        <class name="PitWall.UI.ViewModels.AiAssistantViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/AiAssistantViewModel.cs" line-rate="0.7419354838709677" branch-rate="1" complexity="11">
           <methods>
             <method name="get_Messages" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -12906,7 +12906,7 @@
             <line number="115" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.AiMessageViewModel" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\AiAssistantViewModel.cs" line-rate="0.2222222222222222" branch-rate="0" complexity="10">
+        <class name="PitWall.UI.ViewModels.AiMessageViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/AiAssistantViewModel.cs" line-rate="0.2222222222222222" branch-rate="0" complexity="10">
           <methods>
             <method name="get_DisplayTimestamp" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -12962,49 +12962,49 @@
             <line number="153" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.CompetitorStrategy" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\StrategyViewModel.cs" line-rate="0" branch-rate="1" complexity="6">
+        <class name="PitWall.UI.ViewModels.CompetitorStrategy" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/StrategyViewModel.cs" line-rate="1" branch-rate="1" complexity="6">
           <methods>
-            <method name="get_Position" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Position" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="130" hits="0" branch="false" />
+                <line number="165" hits="14" branch="false" />
               </lines>
             </method>
-            <method name="get_CarNumber" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_CarNumber" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="131" hits="0" branch="false" />
+                <line number="166" hits="28" branch="false" />
               </lines>
             </method>
-            <method name="get_Driver" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Driver" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="132" hits="0" branch="false" />
+                <line number="167" hits="29" branch="false" />
               </lines>
             </method>
-            <method name="get_LastPitLap" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_LastPitLap" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="133" hits="0" branch="false" />
+                <line number="168" hits="14" branch="false" />
               </lines>
             </method>
-            <method name="get_EstimatedNextPit" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_EstimatedNextPit" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="134" hits="0" branch="false" />
+                <line number="169" hits="14" branch="false" />
               </lines>
             </method>
-            <method name="get_StrategyType" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_StrategyType" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="135" hits="0" branch="false" />
+                <line number="170" hits="28" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="130" hits="0" branch="false" />
-            <line number="131" hits="0" branch="false" />
-            <line number="132" hits="0" branch="false" />
-            <line number="133" hits="0" branch="false" />
-            <line number="134" hits="0" branch="false" />
-            <line number="135" hits="0" branch="false" />
+            <line number="165" hits="14" branch="false" />
+            <line number="166" hits="28" branch="false" />
+            <line number="167" hits="29" branch="false" />
+            <line number="168" hits="14" branch="false" />
+            <line number="169" hits="14" branch="false" />
+            <line number="170" hits="28" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.CursorDataRow" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\TelemetryAnalysisViewModel.cs" line-rate="1" branch-rate="1" complexity="1">
+        <class name="PitWall.UI.ViewModels.CursorDataRow" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/TelemetryAnalysisViewModel.cs" line-rate="1" branch-rate="1" complexity="1">
           <methods>
             <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -13024,7 +13024,7 @@
             <line number="487" hits="99" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.DashboardViewModel" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\DashboardViewModel.cs" line-rate="0.7307692307692307" branch-rate="0.08823529411764706" complexity="39">
+        <class name="PitWall.UI.ViewModels.DashboardViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/DashboardViewModel.cs" line-rate="0.7307692307692307" branch-rate="0.08823529411764706" complexity="39">
           <methods>
             <method name="get_Alerts" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -13218,7 +13218,7 @@
             <line number="214" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.MainWindowViewModel" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\MainWindowViewModel.cs" line-rate="0" branch-rate="0" complexity="235">
+        <class name="PitWall.UI.ViewModels.MainWindowViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/MainWindowViewModel.cs" line-rate="0" branch-rate="0" complexity="235">
           <methods>
             <method name="get_Dashboard" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -14706,7 +14706,7 @@
             <line number="896" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.NullAgentConfigClient" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\SettingsViewModel.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.UI.ViewModels.NullAgentConfigClient" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/SettingsViewModel.cs" line-rate="0" branch-rate="1" complexity="3">
           <methods>
             <method name="GetConfigAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -14742,7 +14742,7 @@
             <line number="312" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.NullAgentQueryClient" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\AiAssistantViewModel.cs" line-rate="0" branch-rate="1" complexity="1">
+        <class name="PitWall.UI.ViewModels.NullAgentQueryClient" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/AiAssistantViewModel.cs" line-rate="0" branch-rate="1" complexity="1">
           <methods>
             <method name="SendQueryAsync" signature="(System.String,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -14768,37 +14768,37 @@
             <line number="167" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.PitStopMarker" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\StrategyViewModel.cs" line-rate="0" branch-rate="1" complexity="4">
+        <class name="PitWall.UI.ViewModels.PitStopMarker" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/StrategyViewModel.cs" line-rate="1" branch-rate="1" complexity="4">
           <methods>
-            <method name="get_Lap" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Lap" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="122" hits="0" branch="false" />
+                <line number="157" hits="15" branch="false" />
               </lines>
             </method>
-            <method name="get_FuelToAdd" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_FuelToAdd" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="123" hits="0" branch="false" />
+                <line number="158" hits="14" branch="false" />
               </lines>
             </method>
-            <method name="get_ChangeTires" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_ChangeTires" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="124" hits="0" branch="false" />
+                <line number="159" hits="14" branch="false" />
               </lines>
             </method>
-            <method name="get_EstimatedDuration" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_EstimatedDuration" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="125" hits="0" branch="false" />
+                <line number="160" hits="14" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="122" hits="0" branch="false" />
-            <line number="123" hits="0" branch="false" />
-            <line number="124" hits="0" branch="false" />
-            <line number="125" hits="0" branch="false" />
+            <line number="157" hits="15" branch="false" />
+            <line number="158" hits="14" branch="false" />
+            <line number="159" hits="14" branch="false" />
+            <line number="160" hits="14" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.RelativePositionEntry" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\DashboardViewModel.cs" line-rate="0" branch-rate="1" complexity="6">
+        <class name="PitWall.UI.ViewModels.RelativePositionEntry" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/DashboardViewModel.cs" line-rate="0" branch-rate="1" complexity="6">
           <methods>
             <method name="get_Relation" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -14840,7 +14840,7 @@
             <line number="224" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.SettingsViewModel" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\SettingsViewModel.cs" line-rate="0.3592814371257485" branch-rate="0.32142857142857145" complexity="33">
+        <class name="PitWall.UI.ViewModels.SettingsViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/SettingsViewModel.cs" line-rate="0.3592814371257485" branch-rate="0.32142857142857145" complexity="33">
           <methods>
             <method name="get_DiscoveredEndpoints" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -15223,7 +15223,7 @@
             <line number="293" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.StandingsEntry" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\DashboardViewModel.cs" line-rate="0" branch-rate="1" complexity="6">
+        <class name="PitWall.UI.ViewModels.StandingsEntry" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/DashboardViewModel.cs" line-rate="0" branch-rate="1" complexity="6">
           <methods>
             <method name="get_Position" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -15265,101 +15265,101 @@
             <line number="234" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.StrategyAlternative" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\StrategyViewModel.cs" line-rate="0" branch-rate="1" complexity="4">
+        <class name="PitWall.UI.ViewModels.StrategyAlternative" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/StrategyViewModel.cs" line-rate="1" branch-rate="1" complexity="4">
           <methods>
-            <method name="get_Name" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Name" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="114" hits="0" branch="false" />
+                <line number="149" hits="59" branch="false" />
               </lines>
             </method>
-            <method name="get_Description" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Description" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="115" hits="0" branch="false" />
+                <line number="150" hits="56" branch="false" />
               </lines>
             </method>
-            <method name="get_Confidence" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Confidence" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="116" hits="0" branch="false" />
+                <line number="151" hits="28" branch="false" />
               </lines>
             </method>
-            <method name="get_EstimatedFinishPosition" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_EstimatedFinishPosition" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="117" hits="0" branch="false" />
+                <line number="152" hits="28" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="114" hits="0" branch="false" />
-            <line number="115" hits="0" branch="false" />
-            <line number="116" hits="0" branch="false" />
-            <line number="117" hits="0" branch="false" />
+            <line number="149" hits="59" branch="false" />
+            <line number="150" hits="56" branch="false" />
+            <line number="151" hits="28" branch="false" />
+            <line number="152" hits="28" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.StrategyViewModel" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\StrategyViewModel.cs" line-rate="0.9" branch-rate="0.5" complexity="11">
+        <class name="PitWall.UI.ViewModels.StrategyViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/StrategyViewModel.cs" line-rate="0.9428571428571428" branch-rate="0.5" complexity="11">
           <methods>
             <method name="get_AlternativeStrategies" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="51" hits="15" branch="false" />
+                <line number="51" hits="45" branch="false" />
               </lines>
             </method>
             <method name="get_PitStopMarkers" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="52" hits="15" branch="false" />
+                <line number="52" hits="30" branch="false" />
               </lines>
             </method>
             <method name="get_CompetitorStrategies" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="53" hits="15" branch="false" />
+                <line number="53" hits="30" branch="false" />
               </lines>
             </method>
             <method name="OverrideStrategy" signature="()" line-rate="0" branch-rate="1" complexity="1">
               <lines>
-                <line number="61" hits="0" branch="false" />
-                <line number="63" hits="0" branch="false" />
+                <line number="96" hits="0" branch="false" />
+                <line number="98" hits="0" branch="false" />
               </lines>
             </method>
             <method name="ToggleFuelSaveMode" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="67" hits="1" branch="false" />
-                <line number="68" hits="1" branch="false" />
-                <line number="70" hits="1" branch="false" />
+                <line number="102" hits="1" branch="false" />
+                <line number="103" hits="1" branch="false" />
+                <line number="105" hits="1" branch="false" />
               </lines>
             </method>
             <method name="SelectAlternativeStrategy" signature="(PitWall.UI.ViewModels.StrategyAlternative)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
-                <line number="74" hits="0" branch="false" />
-                <line number="76" hits="0" branch="false" />
+                <line number="109" hits="0" branch="false" />
+                <line number="111" hits="0" branch="false" />
               </lines>
             </method>
             <method name="UpdateFromRecommendation" signature="(PitWall.UI.Models.RecommendationDto)" line-rate="1" branch-rate="0.5" complexity="2">
               <lines>
-                <line number="79" hits="1" branch="false" />
-                <line number="80" hits="1" branch="true" condition-coverage="50% (1/2)" />
-                <line number="81" hits="1" branch="false" />
-                <line number="82" hits="1" branch="false" />
+                <line number="114" hits="1" branch="false" />
+                <line number="115" hits="1" branch="true" condition-coverage="50% (1/2)" />
+                <line number="116" hits="1" branch="false" />
+                <line number="117" hits="1" branch="false" />
               </lines>
             </method>
             <method name="UpdateStintStatus" signature="(System.Double,System.Double,System.Int32,System.Int32)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="88" hits="18" branch="false" />
-                <line number="89" hits="18" branch="false" />
-                <line number="90" hits="18" branch="false" />
-                <line number="91" hits="18" branch="false" />
-                <line number="92" hits="18" branch="false" />
-                <line number="93" hits="18" branch="false" />
-                <line number="94" hits="18" branch="false" />
+                <line number="123" hits="18" branch="false" />
+                <line number="124" hits="18" branch="false" />
+                <line number="125" hits="18" branch="false" />
+                <line number="126" hits="18" branch="false" />
+                <line number="127" hits="18" branch="false" />
+                <line number="128" hits="18" branch="false" />
+                <line number="129" hits="18" branch="false" />
               </lines>
             </method>
             <method name="CalculatePitWindow" signature="(System.Double,System.Double,System.Double)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="100" hits="6" branch="false" />
-                <line number="101" hits="6" branch="false" />
-                <line number="102" hits="6" branch="false" />
-                <line number="104" hits="6" branch="false" />
-                <line number="106" hits="6" branch="false" />
-                <line number="107" hits="6" branch="false" />
-                <line number="108" hits="6" branch="false" />
-                <line number="109" hits="6" branch="false" />
+                <line number="135" hits="6" branch="false" />
+                <line number="136" hits="6" branch="false" />
+                <line number="137" hits="6" branch="false" />
+                <line number="139" hits="6" branch="false" />
+                <line number="141" hits="6" branch="false" />
+                <line number="142" hits="6" branch="false" />
+                <line number="143" hits="6" branch="false" />
+                <line number="144" hits="6" branch="false" />
               </lines>
             </method>
             <method name=".ctor" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -15372,12 +15372,42 @@
                 <line number="40" hits="14" branch="false" />
                 <line number="46" hits="14" branch="false" />
                 <line number="49" hits="14" branch="false" />
-                <line number="51" hits="15" branch="false" />
-                <line number="52" hits="15" branch="false" />
-                <line number="53" hits="15" branch="false" />
+                <line number="51" hits="45" branch="false" />
+                <line number="52" hits="30" branch="false" />
+                <line number="53" hits="30" branch="false" />
                 <line number="55" hits="14" branch="false" />
                 <line number="56" hits="14" branch="false" />
-                <line number="57" hits="14" branch="false" />
+                <line number="58" hits="14" branch="false" />
+                <line number="59" hits="14" branch="false" />
+                <line number="60" hits="14" branch="false" />
+                <line number="61" hits="14" branch="false" />
+                <line number="62" hits="14" branch="false" />
+                <line number="63" hits="14" branch="false" />
+                <line number="64" hits="14" branch="false" />
+                <line number="65" hits="14" branch="false" />
+                <line number="66" hits="14" branch="false" />
+                <line number="67" hits="14" branch="false" />
+                <line number="68" hits="14" branch="false" />
+                <line number="69" hits="14" branch="false" />
+                <line number="70" hits="14" branch="false" />
+                <line number="71" hits="14" branch="false" />
+                <line number="74" hits="14" branch="false" />
+                <line number="75" hits="14" branch="false" />
+                <line number="76" hits="14" branch="false" />
+                <line number="77" hits="14" branch="false" />
+                <line number="78" hits="14" branch="false" />
+                <line number="79" hits="14" branch="false" />
+                <line number="80" hits="14" branch="false" />
+                <line number="83" hits="14" branch="false" />
+                <line number="84" hits="14" branch="false" />
+                <line number="85" hits="14" branch="false" />
+                <line number="86" hits="14" branch="false" />
+                <line number="87" hits="14" branch="false" />
+                <line number="88" hits="14" branch="false" />
+                <line number="89" hits="14" branch="false" />
+                <line number="90" hits="14" branch="false" />
+                <line number="91" hits="14" branch="false" />
+                <line number="92" hits="14" branch="false" />
               </lines>
             </method>
           </methods>
@@ -15390,41 +15420,71 @@
             <line number="40" hits="14" branch="false" />
             <line number="46" hits="14" branch="false" />
             <line number="49" hits="14" branch="false" />
-            <line number="51" hits="15" branch="false" />
-            <line number="52" hits="15" branch="false" />
-            <line number="53" hits="15" branch="false" />
+            <line number="51" hits="45" branch="false" />
+            <line number="52" hits="30" branch="false" />
+            <line number="53" hits="30" branch="false" />
             <line number="55" hits="14" branch="false" />
             <line number="56" hits="14" branch="false" />
-            <line number="57" hits="14" branch="false" />
-            <line number="61" hits="0" branch="false" />
-            <line number="63" hits="0" branch="false" />
-            <line number="67" hits="1" branch="false" />
-            <line number="68" hits="1" branch="false" />
-            <line number="70" hits="1" branch="false" />
-            <line number="74" hits="0" branch="false" />
-            <line number="76" hits="0" branch="false" />
-            <line number="79" hits="1" branch="false" />
-            <line number="80" hits="1" branch="true" condition-coverage="50% (1/2)" />
-            <line number="81" hits="1" branch="false" />
-            <line number="82" hits="1" branch="false" />
-            <line number="88" hits="18" branch="false" />
-            <line number="89" hits="18" branch="false" />
-            <line number="90" hits="18" branch="false" />
-            <line number="91" hits="18" branch="false" />
-            <line number="92" hits="18" branch="false" />
-            <line number="93" hits="18" branch="false" />
-            <line number="94" hits="18" branch="false" />
-            <line number="100" hits="6" branch="false" />
-            <line number="101" hits="6" branch="false" />
-            <line number="102" hits="6" branch="false" />
-            <line number="104" hits="6" branch="false" />
-            <line number="106" hits="6" branch="false" />
-            <line number="107" hits="6" branch="false" />
-            <line number="108" hits="6" branch="false" />
-            <line number="109" hits="6" branch="false" />
+            <line number="58" hits="14" branch="false" />
+            <line number="59" hits="14" branch="false" />
+            <line number="60" hits="14" branch="false" />
+            <line number="61" hits="14" branch="false" />
+            <line number="62" hits="14" branch="false" />
+            <line number="63" hits="14" branch="false" />
+            <line number="64" hits="14" branch="false" />
+            <line number="65" hits="14" branch="false" />
+            <line number="66" hits="14" branch="false" />
+            <line number="67" hits="14" branch="false" />
+            <line number="68" hits="14" branch="false" />
+            <line number="69" hits="14" branch="false" />
+            <line number="70" hits="14" branch="false" />
+            <line number="71" hits="14" branch="false" />
+            <line number="74" hits="14" branch="false" />
+            <line number="75" hits="14" branch="false" />
+            <line number="76" hits="14" branch="false" />
+            <line number="77" hits="14" branch="false" />
+            <line number="78" hits="14" branch="false" />
+            <line number="79" hits="14" branch="false" />
+            <line number="80" hits="14" branch="false" />
+            <line number="83" hits="14" branch="false" />
+            <line number="84" hits="14" branch="false" />
+            <line number="85" hits="14" branch="false" />
+            <line number="86" hits="14" branch="false" />
+            <line number="87" hits="14" branch="false" />
+            <line number="88" hits="14" branch="false" />
+            <line number="89" hits="14" branch="false" />
+            <line number="90" hits="14" branch="false" />
+            <line number="91" hits="14" branch="false" />
+            <line number="92" hits="14" branch="false" />
+            <line number="96" hits="0" branch="false" />
+            <line number="98" hits="0" branch="false" />
+            <line number="102" hits="1" branch="false" />
+            <line number="103" hits="1" branch="false" />
+            <line number="105" hits="1" branch="false" />
+            <line number="109" hits="0" branch="false" />
+            <line number="111" hits="0" branch="false" />
+            <line number="114" hits="1" branch="false" />
+            <line number="115" hits="1" branch="true" condition-coverage="50% (1/2)" />
+            <line number="116" hits="1" branch="false" />
+            <line number="117" hits="1" branch="false" />
+            <line number="123" hits="18" branch="false" />
+            <line number="124" hits="18" branch="false" />
+            <line number="125" hits="18" branch="false" />
+            <line number="126" hits="18" branch="false" />
+            <line number="127" hits="18" branch="false" />
+            <line number="128" hits="18" branch="false" />
+            <line number="129" hits="18" branch="false" />
+            <line number="135" hits="6" branch="false" />
+            <line number="136" hits="6" branch="false" />
+            <line number="137" hits="6" branch="false" />
+            <line number="139" hits="6" branch="false" />
+            <line number="141" hits="6" branch="false" />
+            <line number="142" hits="6" branch="false" />
+            <line number="143" hits="6" branch="false" />
+            <line number="144" hits="6" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.TelemetryAnalysisViewModel" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\TelemetryAnalysisViewModel.cs" line-rate="0.7289377289377289" branch-rate="0.6276595744680851" complexity="119">
+        <class name="PitWall.UI.ViewModels.TelemetryAnalysisViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/TelemetryAnalysisViewModel.cs" line-rate="0.7289377289377289" branch-rate="0.6276595744680851" complexity="119">
           <methods>
             <method name="get_AvailableLaps" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -16132,7 +16192,7 @@
             <line number="466" hits="10" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.TelemetryDataPoint" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\TelemetryAnalysisViewModel.cs" line-rate="1" branch-rate="1" complexity="2">
+        <class name="PitWall.UI.ViewModels.TelemetryDataPoint" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/TelemetryAnalysisViewModel.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
             <method name="get_Time" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -16150,7 +16210,7 @@
             <line number="493" hits="93" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.TrackMapViewModel" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\ViewModels\TrackMapViewModel.cs" line-rate="0" branch-rate="0" complexity="3">
+        <class name="PitWall.UI.ViewModels.TrackMapViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/TrackMapViewModel.cs" line-rate="0" branch-rate="0" complexity="3">
           <methods>
             <method name="UpdateFrame" signature="(PitWall.UI.Models.TrackMapFrame)" line-rate="0" branch-rate="0" complexity="2">
               <lines>
@@ -16198,7 +16258,7 @@
             <line number="44" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Views.MainWindow" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Views\MainWindow.axaml" line-rate="0" branch-rate="0" complexity="6">
+        <class name="PitWall.UI.Views.MainWindow" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Views/MainWindow.axaml" line-rate="0" branch-rate="0" complexity="6">
           <methods>
             <method name="!XamlIlPopulate" signature="(System.IServiceProvider,PitWall.UI.Views.MainWindow)" line-rate="0" branch-rate="0" complexity="2">
               <lines>
@@ -17362,7 +17422,7 @@
             <line number="895" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.Views.MainWindow" filename="C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\Views\MainWindow.axaml.cs" line-rate="0" branch-rate="0" complexity="47">
+        <class name="PitWall.UI.Views.MainWindow" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/Views/MainWindow.axaml.cs" line-rate="0" branch-rate="0" complexity="47">
           <methods>
             <method name="OnClosed" signature="(System.Object,System.EventArgs)" line-rate="0" branch-rate="0" complexity="8">
               <lines>
