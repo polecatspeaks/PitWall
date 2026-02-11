@@ -12,7 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\native\duckdb\duckdb.dll" Link="duckdb.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\native\duckdb\duckdb.dll" Link="duckdb.dll" CopyToOutputDirectory="PreserveNewest" Condition="'$(OS)' == 'Windows_NT'" />
+    <None Include="..\native\duckdb\libduckdb.so" Link="libduckdb.so" CopyToOutputDirectory="PreserveNewest" Condition="'$(OS)' != 'Windows_NT'" />
   </ItemGroup>
 
 </Project>

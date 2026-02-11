@@ -217,6 +217,7 @@ app.Map("/ws/state", async context =>
 
     try
     {
+        var sampleCount = 0;
         await foreach (var sample in reader.ReadSamplesAsync(sessionId, startRow, endRow, context.RequestAborted))
         {
             if (socket.State != WebSocketState.Open)
@@ -239,14 +240,31 @@ app.Map("/ws/state", async context =>
 
             var bytes = Encoding.UTF8.GetBytes(payload);
             await socket.SendAsync(bytes, WebSocketMessageType.Text, true, context.RequestAborted);
+            sampleCount++;
 
             if (intervalMs > 0)
                 await Task.Delay(intervalMs, context.RequestAborted);
+        }
+        
+        // Send completion message
+        if (socket.State == WebSocketState.Open)
+        {
+            var completionPayload = JsonSerializer.Serialize(new { type = "complete", sampleCount });
+            var completionBytes = Encoding.UTF8.GetBytes(completionPayload);
+            await socket.SendAsync(completionBytes, WebSocketMessageType.Text, true, context.RequestAborted);
+            logger.LogInformation("WebSocket replay completed. Session {SessionId}, sent {SampleCount} samples", sessionId, sampleCount);
+        }
+
+        // Close socket gracefully
+        if (socket.State == WebSocketState.Open)
+        {
+            await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Replay complete", CancellationToken.None);
         }
     }
     catch (OperationCanceledException)
     {
         // Client disconnected or request aborted.
+        logger.LogInformation("WebSocket cancelled. Session {SessionId}", sessionId);
     }
     catch (Exception ex)
     {

@@ -42,6 +42,13 @@ namespace PitWall.UI.Services
 
                 var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
                 
+                // Check for completion message
+                if (json.Contains("\"type\":\"complete\""))
+                {
+                    _logger.LogInformation("Received completion message from server.");
+                    break;
+                }
+                
                 // Log every 10th message to avoid spam
                 if (++messageCount % 10 == 0)
                 {
