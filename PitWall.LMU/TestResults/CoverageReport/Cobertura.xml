@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage line-rate="0.5361592438779894" branch-rate="0.48922539312754804" lines-covered="3744" lines-valid="6983" branches-covered="840" branches-valid="1717" complexity="2225" version="0" timestamp="1770835978">
+<coverage line-rate="0.5414578261492196" branch-rate="0.48922539312754804" lines-covered="3781" lines-valid="6983" branches-covered="840" branches-valid="1717" complexity="2225" version="0" timestamp="1770836275">
   <sources>
     <source>/home/runner/work/PitWall/PitWall/PitWall.LMU/</source>
   </sources>
@@ -2712,13 +2712,13 @@
         </class>
       </classes>
     </package>
-    <package name="PitWall.Api" line-rate="0.5955555555555555" branch-rate="0.7258064516129032" complexity="155">
+    <package name="PitWall.Api" line-rate="0.6177777777777778" branch-rate="0.7258064516129032" complexity="155">
       <classes>
         <class name="PitWall.Api.Models.SessionMetadata" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Models/SessionMetadata.cs" line-rate="1" branch-rate="1" complexity="3">
           <methods>
             <method name="get_Track" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="5" hits="55" branch="false" />
+                <line number="5" hits="57" branch="false" />
               </lines>
             </method>
             <method name="get_TrackId" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -2728,14 +2728,14 @@
             </method>
             <method name="get_Car" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="7" hits="55" branch="false" />
+                <line number="7" hits="57" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="5" hits="55" branch="false" />
+            <line number="5" hits="57" branch="false" />
             <line number="6" hits="34" branch="false" />
-            <line number="7" hits="55" branch="false" />
+            <line number="7" hits="57" branch="false" />
           </lines>
         </class>
         <class name="PitWall.Api.Models.SessionMetadataUpdate" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Models/SessionMetadataUpdate.cs" line-rate="0" branch-rate="1" complexity="3">
@@ -3306,66 +3306,66 @@
             <line number="112" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.NullSessionMetadataStore" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/NullSessionMetadataStore.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.Api.Services.NullSessionMetadataStore" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/NullSessionMetadataStore.cs" line-rate="1" branch-rate="1" complexity="3">
           <methods>
-            <method name="GetAllAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetAllAsync" signature="(System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="11" hits="0" branch="false" />
-                <line number="12" hits="0" branch="false" />
-                <line number="13" hits="0" branch="false" />
+                <line number="11" hits="1" branch="false" />
+                <line number="12" hits="1" branch="false" />
+                <line number="13" hits="1" branch="false" />
               </lines>
             </method>
-            <method name="GetAsync" signature="(System.Int32,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetAsync" signature="(System.Int32,System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="16" hits="0" branch="false" />
-                <line number="17" hits="0" branch="false" />
-                <line number="18" hits="0" branch="false" />
+                <line number="16" hits="4" branch="false" />
+                <line number="17" hits="4" branch="false" />
+                <line number="18" hits="4" branch="false" />
               </lines>
             </method>
-            <method name="SetAsync" signature="(System.Int32,PitWall.Api.Models.SessionMetadata,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="SetAsync" signature="(System.Int32,PitWall.Api.Models.SessionMetadata,System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="21" hits="0" branch="false" />
-                <line number="22" hits="0" branch="false" />
-                <line number="23" hits="0" branch="false" />
+                <line number="21" hits="1" branch="false" />
+                <line number="22" hits="1" branch="false" />
+                <line number="23" hits="1" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="11" hits="0" branch="false" />
-            <line number="12" hits="0" branch="false" />
-            <line number="13" hits="0" branch="false" />
-            <line number="16" hits="0" branch="false" />
-            <line number="17" hits="0" branch="false" />
-            <line number="18" hits="0" branch="false" />
-            <line number="21" hits="0" branch="false" />
-            <line number="22" hits="0" branch="false" />
-            <line number="23" hits="0" branch="false" />
+            <line number="11" hits="1" branch="false" />
+            <line number="12" hits="1" branch="false" />
+            <line number="13" hits="1" branch="false" />
+            <line number="16" hits="4" branch="false" />
+            <line number="17" hits="4" branch="false" />
+            <line number="18" hits="4" branch="false" />
+            <line number="21" hits="1" branch="false" />
+            <line number="22" hits="1" branch="false" />
+            <line number="23" hits="1" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.NullSessionSummaryService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/NullSessionSummaryService.cs" line-rate="0" branch-rate="1" complexity="2">
+        <class name="PitWall.Api.Services.NullSessionSummaryService" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/NullSessionSummaryService.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
-            <method name="GetSessionSummariesAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetSessionSummariesAsync" signature="(System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="11" hits="0" branch="false" />
-                <line number="12" hits="0" branch="false" />
-                <line number="13" hits="0" branch="false" />
+                <line number="11" hits="1" branch="false" />
+                <line number="12" hits="1" branch="false" />
+                <line number="13" hits="1" branch="false" />
               </lines>
             </method>
-            <method name="GetSessionSummaryAsync" signature="(System.Int32,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetSessionSummaryAsync" signature="(System.Int32,System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="16" hits="0" branch="false" />
-                <line number="17" hits="0" branch="false" />
-                <line number="18" hits="0" branch="false" />
+                <line number="16" hits="3" branch="false" />
+                <line number="17" hits="3" branch="false" />
+                <line number="18" hits="3" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="11" hits="0" branch="false" />
-            <line number="12" hits="0" branch="false" />
-            <line number="13" hits="0" branch="false" />
-            <line number="16" hits="0" branch="false" />
-            <line number="17" hits="0" branch="false" />
-            <line number="18" hits="0" branch="false" />
+            <line number="11" hits="1" branch="false" />
+            <line number="12" hits="1" branch="false" />
+            <line number="13" hits="1" branch="false" />
+            <line number="16" hits="3" branch="false" />
+            <line number="17" hits="3" branch="false" />
+            <line number="18" hits="3" branch="false" />
           </lines>
         </class>
         <class name="PitWall.Api.Services.RecommendationResponse" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Api/Services/RecommendationResponse.cs" line-rate="1" branch-rate="1" complexity="5">
@@ -4334,7 +4334,7 @@
         </class>
       </classes>
     </package>
-    <package name="PitWall.Core" line-rate="0.6524908869987849" branch-rate="0.44387755102040816" complexity="221">
+    <package name="PitWall.Core" line-rate="0.6646415552855407" branch-rate="0.44387755102040816" complexity="221">
       <classes>
         <class name="PitWall.Core.Models.ChannelInfo" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Models/ChannelInfo.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
@@ -5228,42 +5228,42 @@
             <line number="462" hits="28028" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.Core.Services.NullLmuTelemetryReader" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Services/NullLmuTelemetryReader.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.Core.Services.NullLmuTelemetryReader" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Services/NullLmuTelemetryReader.cs" line-rate="1" branch-rate="1" complexity="3">
           <methods>
-            <method name="GetSessionCountAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetSessionCountAsync" signature="(System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="12" hits="0" branch="false" />
-                <line number="13" hits="0" branch="false" />
-                <line number="14" hits="0" branch="false" />
+                <line number="12" hits="1" branch="false" />
+                <line number="13" hits="1" branch="false" />
+                <line number="14" hits="1" branch="false" />
               </lines>
             </method>
-            <method name="GetChannelsAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetChannelsAsync" signature="(System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="17" hits="0" branch="false" />
-                <line number="18" hits="0" branch="false" />
-                <line number="19" hits="0" branch="false" />
+                <line number="17" hits="1" branch="false" />
+                <line number="18" hits="1" branch="false" />
+                <line number="19" hits="1" branch="false" />
               </lines>
             </method>
-            <method name="ReadSamplesAsync" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="ReadSamplesAsync" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="26" hits="0" branch="false" />
-                <line number="27" hits="0" branch="false" />
-                <line number="28" hits="0" branch="false" />
-                <line number="29" hits="0" branch="false" />
+                <line number="26" hits="3" branch="false" />
+                <line number="27" hits="3" branch="false" />
+                <line number="28" hits="3" branch="false" />
+                <line number="29" hits="3" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="12" hits="0" branch="false" />
-            <line number="13" hits="0" branch="false" />
-            <line number="14" hits="0" branch="false" />
-            <line number="17" hits="0" branch="false" />
-            <line number="18" hits="0" branch="false" />
-            <line number="19" hits="0" branch="false" />
-            <line number="26" hits="0" branch="false" />
-            <line number="27" hits="0" branch="false" />
-            <line number="28" hits="0" branch="false" />
-            <line number="29" hits="0" branch="false" />
+            <line number="12" hits="1" branch="false" />
+            <line number="13" hits="1" branch="false" />
+            <line number="14" hits="1" branch="false" />
+            <line number="17" hits="1" branch="false" />
+            <line number="18" hits="1" branch="false" />
+            <line number="19" hits="1" branch="false" />
+            <line number="26" hits="3" branch="false" />
+            <line number="27" hits="3" branch="false" />
+            <line number="28" hits="3" branch="false" />
+            <line number="29" hits="3" branch="false" />
           </lines>
         </class>
         <class name="PitWall.Core.Services.SharedMemoryReader" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.Core/Services/SharedMemoryReader.cs" line-rate="0.3504273504273504" branch-rate="0.2894736842105263" complexity="41">
@@ -6406,7 +6406,7 @@
         </class>
       </classes>
     </package>
-    <package name="PitWall.UI" line-rate="0.4829146865806744" branch-rate="0.47320692497938993" complexity="1548">
+    <package name="PitWall.UI" line-rate="0.4856302330844082" branch-rate="0.47320692497938993" complexity="1548">
       <classes>
         <class name="PitWall.UI.App" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/App.axaml" line-rate="0" branch-rate="0" complexity="4">
           <methods>
@@ -14798,46 +14798,46 @@
             <line number="160" hits="84" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.RelativePositionEntry" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/DashboardViewModel.cs" line-rate="0" branch-rate="1" complexity="6">
+        <class name="PitWall.UI.ViewModels.RelativePositionEntry" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/DashboardViewModel.cs" line-rate="1" branch-rate="1" complexity="6">
           <methods>
-            <method name="get_Relation" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Relation" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="219" hits="0" branch="false" />
+                <line number="219" hits="9" branch="false" />
               </lines>
             </method>
-            <method name="get_Position" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Position" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="220" hits="0" branch="false" />
+                <line number="220" hits="6" branch="false" />
               </lines>
             </method>
-            <method name="get_CarNumber" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_CarNumber" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="221" hits="0" branch="false" />
+                <line number="221" hits="9" branch="false" />
               </lines>
             </method>
-            <method name="get_Driver" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Driver" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="222" hits="0" branch="false" />
+                <line number="222" hits="9" branch="false" />
               </lines>
             </method>
-            <method name="get_Gap" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Gap" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="223" hits="0" branch="false" />
+                <line number="223" hits="12" branch="false" />
               </lines>
             </method>
-            <method name="get_Class" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Class" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="224" hits="0" branch="false" />
+                <line number="224" hits="9" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="219" hits="0" branch="false" />
-            <line number="220" hits="0" branch="false" />
-            <line number="221" hits="0" branch="false" />
-            <line number="222" hits="0" branch="false" />
-            <line number="223" hits="0" branch="false" />
-            <line number="224" hits="0" branch="false" />
+            <line number="219" hits="9" branch="false" />
+            <line number="220" hits="6" branch="false" />
+            <line number="221" hits="9" branch="false" />
+            <line number="222" hits="9" branch="false" />
+            <line number="223" hits="12" branch="false" />
+            <line number="224" hits="9" branch="false" />
           </lines>
         </class>
         <class name="PitWall.UI.ViewModels.SettingsViewModel" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/SettingsViewModel.cs" line-rate="0.3592814371257485" branch-rate="0.35714285714285715" complexity="33">
@@ -15223,46 +15223,46 @@
             <line number="293" hits="0" branch="false" />
           </lines>
         </class>
-        <class name="PitWall.UI.ViewModels.StandingsEntry" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/DashboardViewModel.cs" line-rate="0" branch-rate="1" complexity="6">
+        <class name="PitWall.UI.ViewModels.StandingsEntry" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/DashboardViewModel.cs" line-rate="1" branch-rate="1" complexity="6">
           <methods>
-            <method name="get_Position" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Position" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="229" hits="0" branch="false" />
+                <line number="229" hits="6" branch="false" />
               </lines>
             </method>
-            <method name="get_Class" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Class" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="230" hits="0" branch="false" />
+                <line number="230" hits="9" branch="false" />
               </lines>
             </method>
-            <method name="get_CarNumber" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_CarNumber" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="231" hits="0" branch="false" />
+                <line number="231" hits="9" branch="false" />
               </lines>
             </method>
-            <method name="get_Driver" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Driver" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="232" hits="0" branch="false" />
+                <line number="232" hits="9" branch="false" />
               </lines>
             </method>
-            <method name="get_Gap" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Gap" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="233" hits="0" branch="false" />
+                <line number="233" hits="9" branch="false" />
               </lines>
             </method>
-            <method name="get_Laps" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Laps" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="234" hits="0" branch="false" />
+                <line number="234" hits="6" branch="false" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="229" hits="0" branch="false" />
-            <line number="230" hits="0" branch="false" />
-            <line number="231" hits="0" branch="false" />
-            <line number="232" hits="0" branch="false" />
-            <line number="233" hits="0" branch="false" />
-            <line number="234" hits="0" branch="false" />
+            <line number="229" hits="6" branch="false" />
+            <line number="230" hits="9" branch="false" />
+            <line number="231" hits="9" branch="false" />
+            <line number="232" hits="9" branch="false" />
+            <line number="233" hits="9" branch="false" />
+            <line number="234" hits="6" branch="false" />
           </lines>
         </class>
         <class name="PitWall.UI.ViewModels.StrategyAlternative" filename="/home/runner/work/PitWall/PitWall/PitWall.LMU/PitWall.UI/ViewModels/StrategyViewModel.cs" line-rate="1" branch-rate="1" complexity="4">

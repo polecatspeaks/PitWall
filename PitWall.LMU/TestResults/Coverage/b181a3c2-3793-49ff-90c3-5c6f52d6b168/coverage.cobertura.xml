@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.6279" branch-rate="0.4789" version="1.9" timestamp="1770835968" lines-covered="1610" lines-valid="2564" branches-covered="296" branches-valid="618">
+<coverage line-rate="0.6376" branch-rate="0.4789" version="1.9" timestamp="1770836267" lines-covered="1635" lines-valid="2564" branches-covered="296" branches-valid="618">
   <sources>
     <source>/home/runner/work/PitWall/PitWall/PitWall.LMU/</source>
   </sources>
@@ -3300,7 +3300,7 @@
         </class>
       </classes>
     </package>
-    <package name="PitWall.Api" line-rate="0.5954999999999999" branch-rate="0.5113" complexity="208">
+    <package name="PitWall.Api" line-rate="0.6177" branch-rate="0.5113" complexity="208">
       <classes>
         <class name="Program" filename="PitWall.Api/Program.cs" line-rate="0.3985" branch-rate="0.6428" complexity="14">
           <methods>
@@ -4610,66 +4610,66 @@
             <line number="19" hits="0" branch="False" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.NullSessionMetadataStore" filename="PitWall.Api/Services/NullSessionMetadataStore.cs" line-rate="0" branch-rate="1" complexity="3">
+        <class name="PitWall.Api.Services.NullSessionMetadataStore" filename="PitWall.Api/Services/NullSessionMetadataStore.cs" line-rate="1" branch-rate="1" complexity="3">
           <methods>
-            <method name="GetAllAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetAllAsync" signature="(System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="11" hits="0" branch="False" />
-                <line number="12" hits="0" branch="False" />
-                <line number="13" hits="0" branch="False" />
+                <line number="11" hits="1" branch="False" />
+                <line number="12" hits="1" branch="False" />
+                <line number="13" hits="1" branch="False" />
               </lines>
             </method>
-            <method name="GetAsync" signature="(System.Int32,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetAsync" signature="(System.Int32,System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="16" hits="0" branch="False" />
-                <line number="17" hits="0" branch="False" />
-                <line number="18" hits="0" branch="False" />
+                <line number="16" hits="4" branch="False" />
+                <line number="17" hits="4" branch="False" />
+                <line number="18" hits="4" branch="False" />
               </lines>
             </method>
-            <method name="SetAsync" signature="(System.Int32,PitWall.Api.Models.SessionMetadata,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="SetAsync" signature="(System.Int32,PitWall.Api.Models.SessionMetadata,System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="21" hits="0" branch="False" />
-                <line number="22" hits="0" branch="False" />
-                <line number="23" hits="0" branch="False" />
+                <line number="21" hits="1" branch="False" />
+                <line number="22" hits="1" branch="False" />
+                <line number="23" hits="1" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="11" hits="0" branch="False" />
-            <line number="12" hits="0" branch="False" />
-            <line number="13" hits="0" branch="False" />
-            <line number="16" hits="0" branch="False" />
-            <line number="17" hits="0" branch="False" />
-            <line number="18" hits="0" branch="False" />
-            <line number="21" hits="0" branch="False" />
-            <line number="22" hits="0" branch="False" />
-            <line number="23" hits="0" branch="False" />
+            <line number="11" hits="1" branch="False" />
+            <line number="12" hits="1" branch="False" />
+            <line number="13" hits="1" branch="False" />
+            <line number="16" hits="4" branch="False" />
+            <line number="17" hits="4" branch="False" />
+            <line number="18" hits="4" branch="False" />
+            <line number="21" hits="1" branch="False" />
+            <line number="22" hits="1" branch="False" />
+            <line number="23" hits="1" branch="False" />
           </lines>
         </class>
-        <class name="PitWall.Api.Services.NullSessionSummaryService" filename="PitWall.Api/Services/NullSessionSummaryService.cs" line-rate="0" branch-rate="1" complexity="2">
+        <class name="PitWall.Api.Services.NullSessionSummaryService" filename="PitWall.Api/Services/NullSessionSummaryService.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
-            <method name="GetSessionSummariesAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetSessionSummariesAsync" signature="(System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="11" hits="0" branch="False" />
-                <line number="12" hits="0" branch="False" />
-                <line number="13" hits="0" branch="False" />
+                <line number="11" hits="1" branch="False" />
+                <line number="12" hits="1" branch="False" />
+                <line number="13" hits="1" branch="False" />
               </lines>
             </method>
-            <method name="GetSessionSummaryAsync" signature="(System.Int32,System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetSessionSummaryAsync" signature="(System.Int32,System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="16" hits="0" branch="False" />
-                <line number="17" hits="0" branch="False" />
-                <line number="18" hits="0" branch="False" />
+                <line number="16" hits="3" branch="False" />
+                <line number="17" hits="3" branch="False" />
+                <line number="18" hits="3" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="11" hits="0" branch="False" />
-            <line number="12" hits="0" branch="False" />
-            <line number="13" hits="0" branch="False" />
-            <line number="16" hits="0" branch="False" />
-            <line number="17" hits="0" branch="False" />
-            <line number="18" hits="0" branch="False" />
+            <line number="11" hits="1" branch="False" />
+            <line number="12" hits="1" branch="False" />
+            <line number="13" hits="1" branch="False" />
+            <line number="16" hits="3" branch="False" />
+            <line number="17" hits="3" branch="False" />
+            <line number="18" hits="3" branch="False" />
           </lines>
         </class>
         <class name="PitWall.Api.Services.RecommendationResponse" filename="PitWall.Api/Services/RecommendationResponse.cs" line-rate="1" branch-rate="1" complexity="5">
@@ -5286,7 +5286,7 @@
           <methods>
             <method name="get_Track" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="5" hits="55" branch="False" />
+                <line number="5" hits="57" branch="False" />
               </lines>
             </method>
             <method name="get_TrackId" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -5296,14 +5296,14 @@
             </method>
             <method name="get_Car" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="7" hits="55" branch="False" />
+                <line number="7" hits="57" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="5" hits="55" branch="False" />
+            <line number="5" hits="57" branch="False" />
             <line number="6" hits="34" branch="False" />
-            <line number="7" hits="55" branch="False" />
+            <line number="7" hits="57" branch="False" />
           </lines>
         </class>
         <class name="PitWall.Api.Models.SessionMetadataUpdate" filename="PitWall.Api/Models/SessionMetadataUpdate.cs" line-rate="0" branch-rate="1" complexity="3">
@@ -5650,7 +5650,7 @@
         </class>
       </classes>
     </package>
-    <package name="PitWall.Core" line-rate="0.6524" branch-rate="0.43560000000000004" complexity="228">
+    <package name="PitWall.Core" line-rate="0.6646" branch-rate="0.43560000000000004" complexity="228">
       <classes>
         <class name="PitWall.Core.Utilities.DataValidator" filename="PitWall.Core/Utilities/DataValidator.cs" line-rate="0" branch-rate="0" complexity="19">
           <methods>
@@ -7686,48 +7686,48 @@
             <line number="210" hits="2" branch="False" />
           </lines>
         </class>
-        <class name="PitWall.Core.Services.NullLmuTelemetryReader" filename="PitWall.Core/Services/NullLmuTelemetryReader.cs" line-rate="0" branch-rate="1" complexity="2">
+        <class name="PitWall.Core.Services.NullLmuTelemetryReader" filename="PitWall.Core/Services/NullLmuTelemetryReader.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
-            <method name="GetSessionCountAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetSessionCountAsync" signature="(System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="12" hits="0" branch="False" />
-                <line number="13" hits="0" branch="False" />
-                <line number="14" hits="0" branch="False" />
+                <line number="12" hits="1" branch="False" />
+                <line number="13" hits="1" branch="False" />
+                <line number="14" hits="1" branch="False" />
               </lines>
             </method>
-            <method name="GetChannelsAsync" signature="(System.Threading.CancellationToken)" line-rate="0" branch-rate="1" complexity="1">
+            <method name="GetChannelsAsync" signature="(System.Threading.CancellationToken)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="17" hits="0" branch="False" />
-                <line number="18" hits="0" branch="False" />
-                <line number="19" hits="0" branch="False" />
+                <line number="17" hits="1" branch="False" />
+                <line number="18" hits="1" branch="False" />
+                <line number="19" hits="1" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="12" hits="0" branch="False" />
-            <line number="13" hits="0" branch="False" />
-            <line number="14" hits="0" branch="False" />
-            <line number="17" hits="0" branch="False" />
-            <line number="18" hits="0" branch="False" />
-            <line number="19" hits="0" branch="False" />
+            <line number="12" hits="1" branch="False" />
+            <line number="13" hits="1" branch="False" />
+            <line number="14" hits="1" branch="False" />
+            <line number="17" hits="1" branch="False" />
+            <line number="18" hits="1" branch="False" />
+            <line number="19" hits="1" branch="False" />
           </lines>
         </class>
-        <class name="PitWall.Core.Services.NullLmuTelemetryReader/&lt;ReadSamplesAsync&gt;d__2" filename="PitWall.Core/Services/NullLmuTelemetryReader.cs" line-rate="0" branch-rate="1" complexity="1">
+        <class name="PitWall.Core.Services.NullLmuTelemetryReader/&lt;ReadSamplesAsync&gt;d__2" filename="PitWall.Core/Services/NullLmuTelemetryReader.cs" line-rate="1" branch-rate="1" complexity="1">
           <methods>
-            <method name="MoveNext" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="26" hits="0" branch="False" />
-                <line number="27" hits="0" branch="False" />
-                <line number="28" hits="0" branch="False" />
-                <line number="29" hits="0" branch="False" />
+                <line number="26" hits="3" branch="False" />
+                <line number="27" hits="3" branch="False" />
+                <line number="28" hits="3" branch="False" />
+                <line number="29" hits="3" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="26" hits="0" branch="False" />
-            <line number="27" hits="0" branch="False" />
-            <line number="28" hits="0" branch="False" />
-            <line number="29" hits="0" branch="False" />
+            <line number="26" hits="3" branch="False" />
+            <line number="27" hits="3" branch="False" />
+            <line number="28" hits="3" branch="False" />
+            <line number="29" hits="3" branch="False" />
           </lines>
         </class>
         <class name="PitWall.Core.Services.SharedMemoryReader" filename="PitWall.Core/Services/SharedMemoryReader.cs" line-rate="0.5277000000000001" branch-rate="0.625" complexity="19">
