@@ -1,0 +1,14 @@
+{
+  "name": "Porsche 963",
+  "slug": "porsche-963",
+  "category": "LMDh",
+  "engine": "4.6-litre V8 Twin Turbo",
+  "transmission": "7-speed sequential",
+  "power": "670/bhp / 500 kW",
+  "powerBhp": 670,
+  "weightKg": 1030,
+  "lengthMm": 5100,
+  "widthMm": 2000,
+  "heightMm": 1060,
+  "sourceUrl": "https://lemansultimate.com/cars/porsche-963/"
+}

@@ -35,9 +35,15 @@ namespace PitWall.Api.Services
 
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-SELECT session_id, track_name, car_name
+SELECT sessions.session_id,
+             sessions.track_name,
+             sessions.car_name,
+             track_id.value AS track_id
 FROM sessions
-ORDER BY session_id;";
+LEFT JOIN session_metadata AS track_id
+    ON track_id.session_id = sessions.session_id
+ AND track_id.""key"" = 'TrackId'
+ORDER BY sessions.session_id;";
 
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
@@ -47,10 +53,12 @@ ORDER BY session_id;";
                     var sessionId = Convert.ToInt32(reader.GetValue(0));
                     var track = reader.IsDBNull(1) ? null : reader.GetString(1);
                     var car = reader.IsDBNull(2) ? null : reader.GetString(2);
+                    var trackId = reader.IsDBNull(3) ? null : reader.GetString(3);
 
                     result[sessionId] = new SessionMetadata
                     {
                         Track = string.IsNullOrWhiteSpace(track) ? "Unknown" : track,
+                        TrackId = string.IsNullOrWhiteSpace(trackId) ? null : trackId,
                         Car = string.IsNullOrWhiteSpace(car) ? "Unknown" : car
                     };
                 }
@@ -72,9 +80,14 @@ ORDER BY session_id;";
 
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-SELECT track_name, car_name
+SELECT sessions.track_name,
+             sessions.car_name,
+             track_id.value AS track_id
 FROM sessions
-WHERE session_id = ?;";
+LEFT JOIN session_metadata AS track_id
+    ON track_id.session_id = sessions.session_id
+ AND track_id.""key"" = 'TrackId'
+WHERE sessions.session_id = ?;";
 
                 var idParam = command.CreateParameter();
                 idParam.Value = sessionId;
@@ -85,10 +98,12 @@ WHERE session_id = ?;";
                 {
                     var track = reader.IsDBNull(0) ? null : reader.GetString(0);
                     var car = reader.IsDBNull(1) ? null : reader.GetString(1);
+                    var trackId = reader.IsDBNull(2) ? null : reader.GetString(2);
 
                     return Task.FromResult<SessionMetadata?>(new SessionMetadata
                     {
                         Track = string.IsNullOrWhiteSpace(track) ? "Unknown" : track,
+                        TrackId = string.IsNullOrWhiteSpace(trackId) ? null : trackId,
                         Car = string.IsNullOrWhiteSpace(car) ? "Unknown" : car
                     });
                 }
@@ -141,7 +156,7 @@ WHERE session_id = ?;";
                     deleteCommand.Transaction = transaction;
                     deleteCommand.CommandText = @"
 DELETE FROM session_metadata
-WHERE session_id = ? AND ""key"" IN ('TrackName', 'CarName');";
+WHERE session_id = ? AND ""key"" IN ('TrackName', 'TrackId', 'CarName');";
 
                     var idParam = deleteCommand.CreateParameter();
                     idParam.Value = sessionId;
@@ -169,6 +184,13 @@ INSERT INTO session_metadata (session_id, ""key"", ""value"") VALUES (?, ?, ?);"
                     keyParam.Value = "TrackName";
                     valueParam.Value = metadata.Track;
                     insertCommand.ExecuteNonQuery();
+
+                    if (!string.IsNullOrWhiteSpace(metadata.TrackId))
+                    {
+                        keyParam.Value = "TrackId";
+                        valueParam.Value = metadata.TrackId;
+                        insertCommand.ExecuteNonQuery();
+                    }
 
                     keyParam.Value = "CarName";
                     valueParam.Value = metadata.Car;

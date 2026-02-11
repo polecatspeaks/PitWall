@@ -13,8 +13,8 @@ public class TelemetryBuffer
 {
 	private const double DefaultLapDurationSeconds = 90.0;
 	private const int DefaultLapSampleCount = 8000;
-	private readonly TelemetrySampleDto[] _buffer;
-	private readonly int _capacity;
+	private TelemetrySampleDto[] _buffer;
+	private int _capacity;
 	private int _writeIndex;
 	private int _count;
 	private readonly object _lock = new();
@@ -49,6 +49,40 @@ public class TelemetryBuffer
 				_count++;
 			}
 		}
+	}
+
+	public void ReplaceAll(IReadOnlyList<TelemetrySampleDto> samples)
+	{
+		if (samples == null)
+		{
+			throw new ArgumentNullException(nameof(samples));
+		}
+
+		lock (_lock)
+		{
+			EnsureCapacity(samples.Count);
+			Array.Clear(_buffer, 0, _buffer.Length);
+			for (int i = 0; i < samples.Count; i++)
+			{
+				_buffer[i] = samples[i];
+			}
+			_count = samples.Count;
+			_writeIndex = samples.Count % _capacity;
+		}
+	}
+
+	private void EnsureCapacity(int required)
+	{
+		if (required <= _capacity)
+		{
+			return;
+		}
+
+		var newCapacity = Math.Max(required, _capacity * 2);
+		var newBuffer = new TelemetrySampleDto[newCapacity];
+		Array.Copy(_buffer, 0, newBuffer, 0, _count);
+		_buffer = newBuffer;
+		_capacity = newCapacity;
 	}
 
 	public TelemetrySampleDto[] GetAll()
@@ -93,7 +127,7 @@ public class TelemetryBuffer
 		{
 			return GetAll()
 				.Select(s => s.LapNumber)
-				.Where(lap => lap > 0)
+				.Where(lap => lap >= 0)
 				.Distinct()
 				.OrderBy(lap => lap)
 				.ToArray();
@@ -137,7 +171,8 @@ public class TelemetryBuffer
 				return Math.Clamp((double)progressIndex / (previousLapLength - 1), 0.0, 1.0);
 			}
 
-			if (sample.Timestamp.HasValue && allSamples[lapStartIndex].Timestamp.HasValue)
+			var lapStartTimestamp = allSamples[lapStartIndex].Timestamp;
+			if (sample.Timestamp.HasValue && lapStartTimestamp.HasValue)
 			{
 				var lapDurationSeconds = FindPreviousLapDurationSeconds(allSamples, lapStartIndex, lapNumber);
 				if (lapDurationSeconds <= 0)
@@ -145,7 +180,7 @@ public class TelemetryBuffer
 					lapDurationSeconds = DefaultLapDurationSeconds;
 				}
 
-				var elapsedSeconds = (sample.Timestamp.Value - allSamples[lapStartIndex].Timestamp.Value).TotalSeconds;
+				var elapsedSeconds = (sample.Timestamp.Value - lapStartTimestamp.Value).TotalSeconds;
 				if (elapsedSeconds < 0)
 				{
 					elapsedSeconds = 0;

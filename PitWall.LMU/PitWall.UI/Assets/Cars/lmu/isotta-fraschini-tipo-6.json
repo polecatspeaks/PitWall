@@ -1,0 +1,14 @@
+{
+  "name": "Isotta Fraschini Tipo 6",
+  "slug": "isotta-fraschini-tipo-6",
+  "category": "LMH",
+  "engine": "3.0-litre V6 Turbo",
+  "transmission": "7-speed sequential",
+  "power": "670 bhp / 520 kW",
+  "powerBhp": 670,
+  "weightKg": 1030,
+  "lengthMm": 5000,
+  "widthMm": 2000,
+  "heightMm": 1260,
+  "sourceUrl": "https://lemansultimate.com/cars/isotta-fraschini-tipo-6/"
+}

@@ -14,6 +14,36 @@
 				"$msCompile"
 			],
 			"group": "test"
+		},
+		{
+			"label": "coverage (PitWall.LMU)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}\\PitWall.LMU\\Tools\\RunCoverage.ps1"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "test"
+		},
+		{
+			"label": "open coverage report (PitWall.LMU)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"Start-Process \"${workspaceFolder}\\PitWall.LMU\\TestResults\\CoverageReport\\index.html\""
+			],
+			"isBackground": false
 		}
 	]
 }

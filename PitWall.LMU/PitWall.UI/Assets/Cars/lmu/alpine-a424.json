@@ -1,0 +1,14 @@
+{
+  "name": "Alpine A424",
+  "slug": "alpine-a424",
+  "category": "LMDh",
+  "engine": "3.4-litre V6 Turbo",
+  "transmission": "7-speed sequential",
+  "power": "675 bhp / 520 kW",
+  "powerBhp": 675,
+  "weightKg": 1030,
+  "lengthMm": 5088,
+  "widthMm": 1992,
+  "heightMm": 1055,
+  "sourceUrl": "https://lemansultimate.com/cars/alpine-a424/"
+}

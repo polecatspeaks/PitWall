@@ -1,0 +1,14 @@
+{
+  "name": "Cadillac V-Series.R",
+  "slug": "cadillac-v-series-r",
+  "category": "LMDh",
+  "engine": "5.5-litre V8",
+  "transmission": "7-speed sequential",
+  "power": "670 bhp / 520 kW",
+  "powerBhp": 670,
+  "weightKg": 1046,
+  "lengthMm": 5100,
+  "widthMm": 2000,
+  "heightMm": 1168,
+  "sourceUrl": "https://lemansultimate.com/cars/cadillac-v-series-r/"
+}

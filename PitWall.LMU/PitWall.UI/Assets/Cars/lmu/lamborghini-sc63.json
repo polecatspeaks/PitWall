@@ -1,0 +1,14 @@
+{
+  "name": "Lamborghini SC63",
+  "slug": "lamborghini-sc63",
+  "category": "LMDh",
+  "engine": "3.8-litre, twin-turbo V8",
+  "transmission": "7-speed sequential",
+  "power": "670 bhp / 520 kW",
+  "powerBhp": 670,
+  "weightKg": 1030,
+  "lengthMm": 5100,
+  "widthMm": 2000,
+  "heightMm": 1170,
+  "sourceUrl": "https://lemansultimate.com/cars/lamborghini-sc63/"
+}

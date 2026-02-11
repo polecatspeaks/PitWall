@@ -18,7 +18,7 @@ namespace PitWall.UI.Controls
         public static readonly StyledProperty<Point?> CurrentPointProperty =
             AvaloniaProperty.Register<TrackMapControl, Point?>(nameof(CurrentPoint));
 
-        public static readonly StyledProperty<double> PaddingProperty =
+        public static new readonly StyledProperty<double> PaddingProperty =
             AvaloniaProperty.Register<TrackMapControl, double>(nameof(Padding), 8.0);
 
         public static readonly StyledProperty<string?> MapImageUriProperty =
@@ -54,7 +54,7 @@ namespace PitWall.UI.Controls
             set => SetValue(CurrentPointProperty, value);
         }
 
-        public double Padding
+        public new double Padding
         {
             get => GetValue(PaddingProperty);
             set => SetValue(PaddingProperty, value);

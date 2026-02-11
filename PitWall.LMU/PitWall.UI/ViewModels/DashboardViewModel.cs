@@ -120,6 +120,21 @@ public partial class DashboardViewModel : ViewModelBase
 	[ObservableProperty]
 	private string currentSegment = "--";
 
+	[ObservableProperty]
+	private string carName = "CAR";
+
+	[ObservableProperty]
+	private string carClass = "--";
+
+	[ObservableProperty]
+	private string carPower = "--";
+
+	[ObservableProperty]
+	private string carWeight = "--";
+
+	[ObservableProperty]
+	private string carDimensions = "--";
+
 	public ObservableCollection<string> Alerts { get; } = new();
 	public ObservableCollection<RelativePositionEntry> RelativePositions { get; } = new();
 	public ObservableCollection<StandingsEntry> Standings { get; } = new();
@@ -177,6 +192,25 @@ public partial class DashboardViewModel : ViewModelBase
 		CurrentSector = status.SectorName;
 		CurrentCorner = status.CornerLabel;
 		CurrentSegment = status.SegmentType;
+	}
+
+	public void UpdateCarSpec(CarSpec? spec, string? fallbackName)
+	{
+		CarName = !string.IsNullOrWhiteSpace(spec?.Name)
+			? spec!.Name
+			: (string.IsNullOrWhiteSpace(fallbackName) ? "CAR" : fallbackName!);
+		CarClass = !string.IsNullOrWhiteSpace(spec?.Category) ? spec!.Category : "--";
+		CarPower = !string.IsNullOrWhiteSpace(spec?.Power) ? spec!.Power : "--";
+		CarWeight = spec?.WeightKg.HasValue == true ? $"{spec.WeightKg}kg" : "--";
+
+		if (spec?.LengthMm.HasValue == true && spec?.WidthMm.HasValue == true && spec?.HeightMm.HasValue == true)
+		{
+			CarDimensions = $"L {spec.LengthMm}mm W {spec.WidthMm}mm H {spec.HeightMm}mm";
+		}
+		else
+		{
+			CarDimensions = "--";
+		}
 	}
 }
 

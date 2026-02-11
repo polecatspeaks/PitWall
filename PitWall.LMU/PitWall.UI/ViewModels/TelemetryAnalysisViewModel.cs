@@ -107,14 +107,14 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	[RelayCommand]
 	private void SelectReferenceLap(int lapNumber)
 	{
-		if (lapNumber <= 0) return;
+		if (lapNumber < 0) return;
 		
 		SelectedReferenceLap = lapNumber;
 	}
 
 	partial void OnSelectedReferenceLapChanged(int? value)
 	{
-		if (!value.HasValue || value.Value <= 0)
+		if (!value.HasValue || value.Value < 0)
 		{
 			ClearReferenceLapData();
 			return;
@@ -164,7 +164,7 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	{
 		try
 		{
-			if (CurrentLap <= 0)
+			if (CurrentLap < 0)
 			{
 				StatusMessage = "No lap selected for export";
 				return;
@@ -211,7 +211,7 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	/// </summary>
 	public void LoadCurrentLapData(int lapNumber)
 	{
-		if (lapNumber <= 0) return;
+		if (lapNumber < 0) return;
 
 		CurrentLap = lapNumber;
 		var lapData = _telemetryBuffer.GetLapData(lapNumber);
@@ -230,7 +230,7 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 
 	private void LoadReferenceLapData()
 	{
-		if (!SelectedReferenceLap.HasValue || SelectedReferenceLap.Value <= 0) return;
+		if (!SelectedReferenceLap.HasValue || SelectedReferenceLap.Value < 0) return;
 
 		var lapData = _telemetryBuffer.GetLapData(SelectedReferenceLap.Value);
 
@@ -290,18 +290,7 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	public void RefreshAvailableLaps()
 	{
 		var laps = _telemetryBuffer.GetAvailableLaps();
-
-		// If user has explicitly selected a reference lap, preserve it and skip updates
-		// This prevents ComboBox binding disruption while a selection is active
-		if (SelectedReferenceLap.HasValue && laps.Contains(SelectedReferenceLap.Value))
-		{
-			// Lap still exists and user selected it explicitly, don't update collection
-			if (laps.Length > 0)
-			{
-				StatusMessage = $"{laps.Length} laps available (reference lap {SelectedReferenceLap} selected)";
-			}
-			return;
-		}
+		var selectedLap = SelectedReferenceLap;
 
 		// Check if list has actually changed by comparing both length and content
 		bool needsUpdate = AvailableLaps.Count != laps.Length;
@@ -345,7 +334,11 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		// Verify selection is still valid
 		if (laps.Length > 0)
 		{
-			if (!SelectedReferenceLap.HasValue || !laps.Contains(SelectedReferenceLap.Value))
+			if (selectedLap.HasValue && laps.Contains(selectedLap.Value))
+			{
+				SelectedReferenceLap = selectedLap;
+			}
+			else if (!SelectedReferenceLap.HasValue || !laps.Contains(SelectedReferenceLap.Value))
 			{
 				SelectedReferenceLap = laps[0];
 			}
@@ -383,6 +376,24 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		UpdateCursorDataRow(6, "tTyreCentre_RL", currentValues.TireTemp, referenceValues.TireTemp, "°C");
 		UpdateCursorDataRow(7, "tTyreCentre_RR", currentValues.TireTemp, referenceValues.TireTemp, "°C");
 		UpdateCursorDataRow(8, "fFuel", currentValues.Fuel, referenceValues.Fuel, "L");
+	}
+
+	public TelemetrySampleDto? GetSampleAtTime(double timeSeconds)
+	{
+		if (CurrentLap < 0)
+		{
+			return null;
+		}
+
+		var lapData = _telemetryBuffer.GetLapData(CurrentLap);
+		if (lapData.Length == 0)
+		{
+			return null;
+		}
+
+		var index = (int)Math.Round(timeSeconds / 0.01);
+		index = Math.Clamp(index, 0, lapData.Length - 1);
+		return lapData[index];
 	}
 
 	private (double Speed, double Throttle, double Brake, double Steering, double TireTemp, double Fuel) ExtractValuesAtIndex(

@@ -1,0 +1,14 @@
+{
+  "name": "ORECA 07 Gibson 2023",
+  "slug": "oreca-07-gibson-2023",
+  "category": "LMP2",
+  "engine": "4.2-litre V8",
+  "transmission": "Six-speed sequential",
+  "power": "603 bhp",
+  "powerBhp": 603,
+  "weightKg": 930,
+  "lengthMm": 4745,
+  "widthMm": 1895,
+  "heightMm": 1045,
+  "sourceUrl": "https://lemansultimate.com/cars/oreca-07-gibson/"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "BMW M4 LMGT3",
+  "slug": "bmw-m4-lmgt3",
+  "category": "LMGT3",
+  "engine": "3.0l straight six turbo",
+  "transmission": "6spd sequential",
+  "power": "Approx. 590bhp",
+  "powerBhp": 590,
+  "weightKg": 1339,
+  "lengthMm": 5020,
+  "widthMm": 2040,
+  "heightMm": 1308,
+  "sourceUrl": "https://lemansultimate.com/cars/bmw-m4-lmgt3/"
+}

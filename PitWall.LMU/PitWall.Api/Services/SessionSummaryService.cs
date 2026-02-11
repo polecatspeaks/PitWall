@@ -69,6 +69,7 @@ namespace PitWall.Api.Services
                         StartTimeUtc = startTime,
                         EndTimeUtc = endTime,
                         Track = meta?.Track ?? "Unknown",
+                        TrackId = meta?.TrackId,
                         Car = meta?.Car ?? "Unknown"
                     });
                 }

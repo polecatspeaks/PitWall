@@ -1,0 +1,14 @@
+{
+  "name": "Mercedes-AMG LMGT3",
+  "slug": "mercedes-amg-lmgt3",
+  "category": "LMGT3",
+  "engine": "6.3-litre V8 naturally aspirated",
+  "transmission": "6pd sequential",
+  "power": "Approx. 560bhp",
+  "powerBhp": 560,
+  "weightKg": 1360,
+  "lengthMm": 4746,
+  "widthMm": 2049,
+  "heightMm": 1238,
+  "sourceUrl": "https://lemansultimate.com/cars/mercedes-amg-lmgt3/"
+}

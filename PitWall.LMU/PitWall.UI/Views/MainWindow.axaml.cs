@@ -1,10 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Input;
 using Avalonia.Threading;
 using PitWall.UI.ViewModels;
 using ScottPlot;
 using ScottPlot.Avalonia;
+using ScottPlot.Plottables;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -19,6 +22,8 @@ public partial class MainWindow : Window
     private AvaPlot? _brakePlot;
     private AvaPlot? _steeringPlot;
     private AvaPlot? _tireTempPlot;
+    private readonly Dictionary<AvaPlot, VerticalLine> _cursorLines = new();
+    private double? _cursorTimeSeconds;
 
     public MainWindow()
     {
@@ -64,6 +69,12 @@ public partial class MainWindow : Window
         _brakePlot = this.FindControl<AvaPlot>("BrakePlot");
         _steeringPlot = this.FindControl<AvaPlot>("SteeringPlot");
         _tireTempPlot = this.FindControl<AvaPlot>("TireTempPlot");
+
+        AttachPlotInteractions(_speedPlot);
+        AttachPlotInteractions(_throttlePlot);
+        AttachPlotInteractions(_brakePlot);
+        AttachPlotInteractions(_steeringPlot);
+        AttachPlotInteractions(_tireTempPlot);
     }
 
     private void OnDataContextChanged(object? sender, EventArgs e)
@@ -111,7 +122,7 @@ public partial class MainWindow : Window
         UpdatePlot(_tireTempPlot, _telemetryViewModel.TireTempData, _telemetryViewModel.ReferenceTireTempData, Colors.OrangeRed, Colors.DeepSkyBlue);
     }
 
-    private static void UpdatePlot(
+    private void UpdatePlot(
         AvaPlot? plotControl,
         System.Collections.Generic.IReadOnlyCollection<TelemetryDataPoint> currentData,
         System.Collections.Generic.IReadOnlyCollection<TelemetryDataPoint> referenceData,
@@ -140,7 +151,81 @@ public partial class MainWindow : Window
             plot.Add.SignalXY(xs, ys, color: referenceColor);
         }
 
+        var cursorLine = plot.Add.VerticalLine(0, color: Colors.DimGray);
+        cursorLine.LineWidth = 1;
+        if (_cursorTimeSeconds.HasValue)
+        {
+            cursorLine.X = _cursorTimeSeconds.Value;
+            cursorLine.IsVisible = true;
+        }
+        else
+        {
+            cursorLine.IsVisible = false;
+        }
+
+        _cursorLines[plotControl] = cursorLine;
+
         plot.Axes.AutoScale();
         plotControl.InvalidateVisual();
+    }
+
+    private void AttachPlotInteractions(AvaPlot? plotControl)
+    {
+        if (plotControl == null)
+        {
+            return;
+        }
+
+        plotControl.PointerMoved += OnPlotPointerMoved;
+        plotControl.PointerExited += OnPlotPointerExited;
+    }
+
+    private void OnPlotPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (_telemetryViewModel == null || sender is not AvaPlot plotControl)
+        {
+            return;
+        }
+
+        var position = e.GetPosition(plotControl);
+        var coordinates = plotControl.Plot.GetCoordinates(new Pixel(position.X, position.Y));
+        var time = coordinates.X;
+        if (double.IsNaN(time) || double.IsInfinity(time))
+        {
+            return;
+        }
+
+        _cursorTimeSeconds = time;
+        UpdateCursorLines();
+        _telemetryViewModel.UpdateCursorData(time);
+        var sample = _telemetryViewModel.GetSampleAtTime(time);
+        if (DataContext is MainWindowViewModel vm)
+        {
+            vm.UpdateHoverSample(sample);
+        }
+    }
+
+    private void OnPlotPointerExited(object? sender, PointerEventArgs e)
+    {
+        _cursorTimeSeconds = null;
+        UpdateCursorLines();
+    }
+
+    private void UpdateCursorLines()
+    {
+        foreach (var plotControl in _cursorLines.Keys.ToList())
+        {
+            if (_cursorTimeSeconds.HasValue)
+            {
+                _cursorLines[plotControl].X = _cursorTimeSeconds.Value;
+                _cursorLines[plotControl].IsVisible = true;
+            }
+            else
+            {
+                _cursorLines[plotControl].IsVisible = false;
+            }
+
+            plotControl.Refresh();
+        }
     }
 }

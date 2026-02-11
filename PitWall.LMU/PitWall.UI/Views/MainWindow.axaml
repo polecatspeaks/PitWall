@@ -10,7 +10,9 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="PitWall LMU - Professional Race Engineering System"
-        Width="1920" Height="1080">
+        WindowState="Maximized"
+        MinWidth="1280"
+        MinHeight="720">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -168,6 +170,26 @@
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <TextBlock Classes="label" Text="Grip:" />
                                             <TextBlock Text="{Binding Dashboard.GripPercentage, StringFormat={}{0:0}%}" FontSize="14" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="Car:" />
+                                            <TextBlock Text="{Binding Dashboard.CarName}" FontSize="14" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="Class:" />
+                                            <TextBlock Text="{Binding Dashboard.CarClass}" FontSize="14" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="Power:" />
+                                            <TextBlock Text="{Binding Dashboard.CarPower}" FontSize="14" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="Weight:" />
+                                            <TextBlock Text="{Binding Dashboard.CarWeight}" FontSize="14" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Classes="label" Text="Dims:" />
+                                            <TextBlock Text="{Binding Dashboard.CarDimensions}" FontSize="14" />
                                         </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
@@ -417,11 +439,12 @@
                         </Grid>
 
                         <!-- Replay Controls -->
-                        <StackPanel Grid.Column="1" Spacing="12">
+                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="12">
                             <Border Classes="atlas-panel">
                                 <StackPanel Spacing="10">
                                     <TextBlock Classes="data-label" Text="TRACK MAP" FontSize="14" FontWeight="Bold" />
-                                    <controls:TrackMapControl Height="220" TrackPoints="{Binding TrackMap.TrackPoints}" CurrentPoint="{Binding TrackMap.CurrentPoint}" />
+                                    <controls:TrackMapControl MinHeight="180" TrackPoints="{Binding TrackMap.TrackPoints}" CurrentPoint="{Binding TrackMap.CurrentPoint}" />
                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                                         <StackPanel Grid.Column="0" Spacing="4">
                                             <TextBlock Classes="data-label" Text="SECTOR" />
@@ -470,6 +493,10 @@
                                         <TextBlock Text="Car:" VerticalAlignment="Center" Width="40" />
                                         <TextBox Width="100" Text="{Binding SessionMetadataCar, Mode=TwoWay}" />
                                     </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Track ID:" VerticalAlignment="Center" Width="70" />
+                                        <TextBox Width="220" Text="{Binding SessionMetadataTrackId, Mode=TwoWay}" Watermark="SimHub trackId" />
+                                    </StackPanel>
                                     <Button Content="Save Metadata" Command="{Binding SaveSessionMetadataCommand}" />
 
                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsEnabled="{Binding ReplayEnabled}">
@@ -484,19 +511,47 @@
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
-                                        <Button Content="Play/Pause" Command="{Binding ToggleReplayCommand}" />
+                                        <Button Content="Play" Command="{Binding PlayReplayCommand}" />
+                                        <Button Content="Pause" Command="{Binding PauseReplayCommand}" />
+                                        <Button Content="Stop" Command="{Binding StopReplayCommand}" />
                                         <Button Content="Restart" Command="{Binding RestartReplayCommand}" />
                                         <Button Content="Apply" Command="{Binding ApplyReplaySettingsCommand}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
+                                        <Button Content="Rewind" Command="{Binding RewindCommand}" />
+                                        <Button Content="Fast Forward" Command="{Binding FastForwardCommand}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
+                                        <Button Content="0.5x" Command="{Binding HalfSpeedForwardCommand}" />
+                                        <Button Content="0.25x" Command="{Binding QuarterSpeedForwardCommand}" />
+                                        <Button Content="-0.5x" Command="{Binding HalfSpeedReverseCommand}" />
+                                        <Button Content="-0.25x" Command="{Binding QuarterSpeedReverseCommand}" />
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Classes="data-label" Text="PRELOAD" FontSize="12" />
+                                        <ProgressBar Classes="atlas-progress" Height="6" IsIndeterminate="{Binding IsPreloading}" />
+                                        <TextBlock Text="{Binding PreloadStatusMessage}" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Classes="data-label" Text="REPLAY PROGRESS" FontSize="12" />
+                                        <ProgressBar Classes="atlas-progress" Height="8" Value="{Binding ReplayProgressPercent}" Maximum="100" />
+                                        <TextBlock Text="{Binding ReplayProgressPercent, StringFormat='Progress: {0:0}%'}" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
+                                        <TextBlock Text="{Binding ReplaySpeed, StringFormat='Speed: {0:0.##}x'}" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
                                     </StackPanel>
 
                                     <TextBlock Text="{Binding ReplayStatusMessage}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" />
                                 </StackPanel>
                             </Border>
-                        </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
                     </Grid>
 
                     <!-- Note about ScottPlot -->
-                    <Border Grid.Row="2" Background="{DynamicResource BrushInfo}" CornerRadius="4" Padding="12">
+                    <Border Grid.Row="2" Background="{DynamicResource BrushInfo}" CornerRadius="4" Padding="12" IsVisible="False">
                         <StackPanel Spacing="4">
                             <TextBlock Text="📊 Telemetry Waveforms" FontWeight="Bold" FontSize="12" />
                             <TextBlock TextWrapping="Wrap" FontSize="11">
@@ -833,6 +888,15 @@
                                 
                                 <TextBlock Text="{Binding Settings.StatusMessage}" Foreground="{DynamicResource BrushInfo}" 
                                           IsVisible="{Binding Settings.StatusMessage}" Margin="0,8,0,0" />
+
+                                <Border Classes="atlas-panel" Margin="0,12,0,0">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Classes="data-label" Text="ATTRIBUTION" FontSize="12" FontWeight="Bold" />
+                                        <TextBlock TextWrapping="Wrap" FontSize="11">
+                                            Track data: Lovely Track Data (© 2025 Lovely Sim Racing, CC BY-NC-SA 4.0) - https://github.com/Lovely-Sim-Racing/lovely-track-data
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
                             </StackPanel>
                         </Grid>
                     </Grid>

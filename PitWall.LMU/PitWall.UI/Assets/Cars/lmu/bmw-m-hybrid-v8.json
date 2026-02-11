@@ -1,0 +1,14 @@
+{
+  "name": "BMW M Hybrid V8",
+  "slug": "bmw-m-hybrid-v8",
+  "category": "LMDh",
+  "engine": "4.0-litre twin-turbo V8",
+  "transmission": "7-speed sequential",
+  "power": "650 bhp / 485 KW",
+  "powerBhp": 650,
+  "weightKg": 1030,
+  "lengthMm": 4991,
+  "widthMm": 1994,
+  "heightMm": 1200,
+  "sourceUrl": "https://lemansultimate.com/cars/bmw-m-hybrid-v8/"
+}

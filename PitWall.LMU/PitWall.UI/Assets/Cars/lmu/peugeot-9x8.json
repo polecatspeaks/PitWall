@@ -1,0 +1,14 @@
+{
+  "name": "Peugeot 9X8",
+  "slug": "peugeot-9x8",
+  "category": "LMH",
+  "engine": "2.6-litre V6 Twin-Turbo",
+  "transmission": "7-speed sequential",
+  "power": "670 bhp / 520 kW",
+  "powerBhp": 670,
+  "weightKg": 1030,
+  "lengthMm": 4995,
+  "widthMm": 2000,
+  "heightMm": 1145,
+  "sourceUrl": "https://lemansultimate.com/cars/peugeot-9x8/"
+}

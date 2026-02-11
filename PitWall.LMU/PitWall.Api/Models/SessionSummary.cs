@@ -8,6 +8,7 @@ namespace PitWall.Api.Models
         public DateTimeOffset? StartTimeUtc { get; init; }
         public DateTimeOffset? EndTimeUtc { get; init; }
         public string Track { get; init; } = "Unknown";
+        public string? TrackId { get; init; }
         public string Car { get; init; } = "Unknown";
     }
 }

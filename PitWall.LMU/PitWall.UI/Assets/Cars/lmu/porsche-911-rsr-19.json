@@ -1,0 +1,14 @@
+{
+  "name": "Porsche 911 RSR-19",
+  "slug": "porsche-911-rsr-19",
+  "category": "GTE",
+  "engine": "4.0-litre flat-six",
+  "transmission": "Six-speed sequential",
+  "power": "510 bhp",
+  "powerBhp": 510,
+  "weightKg": 1243,
+  "lengthMm": 4557,
+  "widthMm": 2042,
+  "heightMm": 1250,
+  "sourceUrl": "https://lemansultimate.com/cars/porsche-911-rsr-19/"
+}

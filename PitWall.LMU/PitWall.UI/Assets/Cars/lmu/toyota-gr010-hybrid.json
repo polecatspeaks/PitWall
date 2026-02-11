@@ -1,0 +1,14 @@
+{
+  "name": "Toyota GR010-Hybrid",
+  "slug": "toyota-gr010-hybrid",
+  "category": "LMH",
+  "engine": "3.5-litre V6 Twin Turbo",
+  "transmission": "7-speed sequential",
+  "power": "670 bhp / 500 kW",
+  "powerBhp": 670,
+  "weightKg": 1062,
+  "lengthMm": 4900,
+  "widthMm": 2000,
+  "heightMm": 1150,
+  "sourceUrl": "https://lemansultimate.com/cars/toyota-gr010-hybrid/"
+}

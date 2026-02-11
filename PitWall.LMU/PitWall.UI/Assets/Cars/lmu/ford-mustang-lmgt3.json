@@ -1,0 +1,14 @@
+{
+  "name": "Ford Mustang LMGT3",
+  "slug": "ford-mustang-lmgt3",
+  "category": "LMGT3",
+  "engine": "5.4 V8 N/A",
+  "transmission": "6spd sequential",
+  "power": "Approx. 550bhp",
+  "powerBhp": 550,
+  "weightKg": 1329,
+  "lengthMm": null,
+  "widthMm": null,
+  "heightMm": null,
+  "sourceUrl": "https://lemansultimate.com/cars/ford-mustang-lmgt3/"
+}

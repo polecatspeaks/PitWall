@@ -1,0 +1,14 @@
+{
+  "name": "Ferrari 488 GTE Evo",
+  "slug": "ferrari-488-gte-evo",
+  "category": "GTE",
+  "engine": "4.0-litre Turbocharged V8",
+  "transmission": "Six-speed sequential",
+  "power": "500 bhp",
+  "powerBhp": 500,
+  "weightKg": 1245,
+  "lengthMm": 4614,
+  "widthMm": 2050,
+  "heightMm": 1090,
+  "sourceUrl": "https://lemansultimate.com/cars/ferrari-488-gte-evo/"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Chevrolet Corvette C8.R",
+  "slug": "chevrolet-corvette-c8-r",
+  "category": "GTE",
+  "engine": "5.5-litre V8",
+  "transmission": "Six-speed sequential",
+  "power": "500 bhp",
+  "powerBhp": 500,
+  "weightKg": 1240,
+  "lengthMm": 4630,
+  "widthMm": 2053,
+  "heightMm": 1148,
+  "sourceUrl": "https://lemansultimate.com/cars/chevrolet-corvette-c8-r/"
+}

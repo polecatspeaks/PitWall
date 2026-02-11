@@ -10,5 +10,6 @@ namespace PitWall.UI.Services
         Task<int> GetSessionCountAsync(CancellationToken cancellationToken);
         Task<IReadOnlyList<SessionSummaryDto>> GetSessionSummariesAsync(CancellationToken cancellationToken);
         Task<SessionSummaryDto?> UpdateSessionMetadataAsync(int sessionId, SessionMetadataUpdateDto update, CancellationToken cancellationToken);
+        Task<IReadOnlyList<TelemetrySampleDto>> GetSessionSamplesAsync(int sessionId, int startRow, int endRow, CancellationToken cancellationToken);
     }
 }

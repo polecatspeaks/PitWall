@@ -90,7 +90,26 @@ namespace PitWall.UI.Services
             }
         }
 
+        public async Task<IReadOnlyList<TelemetrySampleDto>> GetSessionSamplesAsync(int sessionId, int startRow, int endRow, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/sessions/{sessionId}/samples?startRow={startRow}&endRow={endRow}", cancellationToken);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync(cancellationToken);
+                var result = JsonSerializer.Deserialize<SessionSamplesResponse>(json, Options);
+                return result?.Samples ?? new List<TelemetrySampleDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to fetch samples for session {SessionId}.", sessionId);
+                throw;
+            }
+        }
+
         private record SessionCountResponse(int SessionCount);
         private record SessionSummaryResponse(List<SessionSummaryDto> Sessions);
+        private record SessionSamplesResponse(int SessionId, int SampleCount, List<TelemetrySampleDto> Samples);
     }
 }

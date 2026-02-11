@@ -112,6 +112,7 @@ app.MapPut("/api/sessions/{sessionId}/metadata", async (int sessionId, SessionMe
     var updated = new SessionMetadata
     {
         Track = string.IsNullOrWhiteSpace(update.Track) ? existing.Track : update.Track.Trim(),
+        TrackId = string.IsNullOrWhiteSpace(update.TrackId) ? existing.TrackId : update.TrackId.Trim(),
         Car = string.IsNullOrWhiteSpace(update.Car) ? existing.Car : update.Car.Trim()
     };
 
@@ -121,7 +122,7 @@ app.MapPut("/api/sessions/{sessionId}/metadata", async (int sessionId, SessionMe
     logger.LogDebug("Session metadata updated for {SessionId}.", sessionId);
 
     if (summary == null)
-        return Results.Ok(new { sessionId, track = updated.Track, car = updated.Car });
+        return Results.Ok(new { sessionId, track = updated.Track, trackId = updated.TrackId, car = updated.Car });
 
     return Results.Ok(summary);
 })
@@ -177,7 +178,7 @@ app.MapGet("/api/sessions/{sessionId}/samples", async (int sessionId, int startR
         return Results.BadRequest(new { error = ex.Message });
     }
 
-    return Results.Ok(new { sessionId, sampleCount = samples.Count, samples });
+    return Results.Ok(new { sessionId, timebase = "gps_time", sampleCount = samples.Count, samples });
 })
 .WithName("GetSessionSamples")
 .WithDescription("Get telemetry samples for a session");
@@ -217,6 +218,17 @@ app.Map("/ws/state", async context =>
 
     try
     {
+        var metadataPayload = JsonSerializer.Serialize(new
+        {
+            type = "meta",
+            timebase = "gps_time",
+            sessionId,
+            startRow,
+            endRow
+        });
+        var metadataBytes = Encoding.UTF8.GetBytes(metadataPayload);
+        await socket.SendAsync(metadataBytes, WebSocketMessageType.Text, true, context.RequestAborted);
+
         var sampleCount = 0;
         await foreach (var sample in reader.ReadSamplesAsync(sessionId, startRow, endRow, context.RequestAborted))
         {

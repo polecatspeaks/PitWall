@@ -7,6 +7,7 @@ namespace PitWall.UI.Models
     public sealed class TrackMetadata
     {
         public string Name { get; set; } = "Default";
+        public string? TrackId { get; set; }
         public List<TrackSector> Sectors { get; set; } = new();
         public List<TrackCorner> Corners { get; set; } = new();
         public List<TrackOutlinePoint> Outline { get; set; } = new();

@@ -213,37 +213,37 @@ ORDER BY table_name, ordinal_position;";
         {
             var gpsLatCte = hasGpsLat
                 ? "SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS lat FROM \"GPS Latitude\" WHERE session_id = ?"
-                : "SELECT rn, NULL AS lat FROM throttle";
+                : "SELECT rn, NULL AS lat FROM gps_clock";
 
             var gpsLonCte = hasGpsLon
                 ? "SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS lon FROM \"GPS Longitude\" WHERE session_id = ?"
-                : "SELECT rn, NULL AS lon FROM throttle";
+                : "SELECT rn, NULL AS lon FROM gps_clock";
 
             var latGCte = hasLatG
                 ? "SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS lat_g FROM \"G Force Lat\" WHERE session_id = ?"
-                : "SELECT rn, NULL AS lat_g FROM throttle";
+                : "SELECT rn, NULL AS lat_g FROM gps_clock";
 
             var gpsLatCountCte = hasGpsLat
                 ? "SELECT COUNT(*) AS cnt FROM gps_lat"
-                : "SELECT COUNT(*) AS cnt FROM throttle";
+                : "SELECT COUNT(*) AS cnt FROM gps_clock";
 
             var gpsLonCountCte = hasGpsLon
                 ? "SELECT COUNT(*) AS cnt FROM gps_lon"
-                : "SELECT COUNT(*) AS cnt FROM throttle";
+                : "SELECT COUNT(*) AS cnt FROM gps_clock";
 
             var latGCountCte = hasLatG
                 ? "SELECT COUNT(*) AS cnt FROM lat_g"
-                : "SELECT COUNT(*) AS cnt FROM throttle";
+                : "SELECT COUNT(*) AS cnt FROM gps_clock";
 
             return @"
-WITH speed AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS speed
-    FROM ""GPS Speed""
-    WHERE session_id = ?
-),
-clock AS (
+WITH gps_clock AS (
     SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS gps_time
     FROM ""GPS Time""
+    WHERE session_id = ?
+),
+speed AS (
+    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS speed
+    FROM ""GPS Speed""
     WHERE session_id = ?
 ),
 throttle AS (
@@ -285,8 +285,8 @@ gps_lon AS (
 lat_g AS (
     " + latGCte + @"
 ),
+clock_count AS (SELECT COUNT(*) AS cnt FROM gps_clock),
 speed_count AS (SELECT COUNT(*) AS cnt FROM speed),
-clock_count AS (SELECT COUNT(*) AS cnt FROM clock),
 throttle_count AS (SELECT COUNT(*) AS cnt FROM throttle),
 brake_count AS (SELECT COUNT(*) AS cnt FROM brake),
 steer_count AS (SELECT COUNT(*) AS cnt FROM steer),
@@ -303,101 +303,100 @@ lat_g_count AS (
     " + latGCountCte + @"
 ),
 speed_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            s.speed
-    FROM throttle t
+    FROM gps_clock c
     CROSS JOIN speed_count sc
-    CROSS JOIN throttle_count tc
-    LEFT JOIN speed s
-        ON s.rn = CAST(FLOOR((t.rn - 1) * sc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
-),
-clock_map AS (
-    SELECT t.rn,
-           c.gps_time
-    FROM throttle t
     CROSS JOIN clock_count cc
+    LEFT JOIN speed s
+        ON s.rn = CAST(FLOOR((c.rn - 1) * sc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
+),
+throttle_map AS (
+    SELECT c.rn,
+           t.throttle
+    FROM gps_clock c
     CROSS JOIN throttle_count tc
-    LEFT JOIN clock c
-        ON c.rn = CAST(FLOOR((t.rn - 1) * cc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
+    CROSS JOIN clock_count cc
+    LEFT JOIN throttle t
+        ON t.rn = CAST(FLOOR((c.rn - 1) * tc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
 ),
 brake_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            b.brake
-    FROM throttle t
+    FROM gps_clock c
     CROSS JOIN brake_count bc
-    CROSS JOIN throttle_count tc
+    CROSS JOIN clock_count cc
     LEFT JOIN brake b
-        ON b.rn = CAST(FLOOR((t.rn - 1) * bc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
+        ON b.rn = CAST(FLOOR((c.rn - 1) * bc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
 ),
 steer_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            s.steering
-    FROM throttle t
+    FROM gps_clock c
     CROSS JOIN steer_count sc
-    CROSS JOIN throttle_count tc
+    CROSS JOIN clock_count cc
     LEFT JOIN steer s
-        ON s.rn = CAST(FLOOR((t.rn - 1) * sc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
+        ON s.rn = CAST(FLOOR((c.rn - 1) * sc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
 ),
 fuel_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            f.fuel
-    FROM throttle t
+    FROM gps_clock c
     CROSS JOIN fuel_count fc
-    CROSS JOIN throttle_count tc
+    CROSS JOIN clock_count cc
     LEFT JOIN fuel f
-        ON f.rn = CAST(FLOOR((t.rn - 1) * fc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
+        ON f.rn = CAST(FLOOR((c.rn - 1) * fc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
 ),
 temps_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            tm.value1,
            tm.value2,
            tm.value3,
            tm.value4
-    FROM throttle t
+    FROM gps_clock c
     CROSS JOIN temps_count tc
-    CROSS JOIN throttle_count ttc
+    CROSS JOIN clock_count cc
     LEFT JOIN temps tm
-        ON tm.rn = CAST(FLOOR((t.rn - 1) * tc.cnt::DOUBLE / ttc.cnt) + 1 AS BIGINT)
+        ON tm.rn = CAST(FLOOR((c.rn - 1) * tc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
 ),
 lap_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            COALESCE(MAX(l.lap), 0) AS lap
-    FROM throttle t
-    LEFT JOIN clock_map c ON c.rn = t.rn
+    FROM gps_clock c
     LEFT JOIN lap l ON l.ts <= c.gps_time
-    GROUP BY t.rn
+    GROUP BY c.rn
 ),
 gps_lat_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            gl.lat
-    FROM throttle t
+    FROM gps_clock c
     CROSS JOIN gps_lat_count glc
-    CROSS JOIN throttle_count tc
+    CROSS JOIN clock_count cc
     LEFT JOIN gps_lat gl
-        ON gl.rn = CAST(FLOOR((t.rn - 1) * glc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
+        ON gl.rn = CAST(FLOOR((c.rn - 1) * glc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
 ),
 gps_lon_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            gl.lon
-    FROM throttle t
+    FROM gps_clock c
     CROSS JOIN gps_lon_count glc
-    CROSS JOIN throttle_count tc
+    CROSS JOIN clock_count cc
     LEFT JOIN gps_lon gl
-        ON gl.rn = CAST(FLOOR((t.rn - 1) * glc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
+        ON gl.rn = CAST(FLOOR((c.rn - 1) * glc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
 ),
 lat_g_map AS (
-    SELECT t.rn,
+    SELECT c.rn,
            lg.lat_g
-    FROM throttle t
+    FROM gps_clock c
     CROSS JOIN lat_g_count lgc
-    CROSS JOIN throttle_count tc
+    CROSS JOIN clock_count cc
     LEFT JOIN lat_g lg
-        ON lg.rn = CAST(FLOOR((t.rn - 1) * lgc.cnt::DOUBLE / tc.cnt) + 1 AS BIGINT)
+        ON lg.rn = CAST(FLOOR((c.rn - 1) * lgc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
 )
-SELECT throttle.rn,
-       COALESCE(clock_map.gps_time, 0) AS gps_time,
+SELECT gps_clock.rn,
+       COALESCE(gps_clock.gps_time, 0) AS gps_time,
        speed_map.speed,
-       COALESCE(throttle.throttle, 0) AS throttle,
+       COALESCE(throttle_map.throttle, 0) AS throttle,
        COALESCE(brake_map.brake, 0) AS brake,
        COALESCE(steer_map.steering, 0) AS steering,
        COALESCE(fuel_map.fuel, 0) AS fuel,
@@ -409,19 +408,19 @@ SELECT throttle.rn,
        COALESCE(gps_lat_map.lat, 0) AS lat,
        COALESCE(gps_lon_map.lon, 0) AS lon,
        COALESCE(lat_g_map.lat_g, 0) AS lat_g
-FROM throttle
-LEFT JOIN speed_map ON speed_map.rn = throttle.rn
-LEFT JOIN clock_map ON clock_map.rn = throttle.rn
-LEFT JOIN brake_map ON brake_map.rn = throttle.rn
-LEFT JOIN steer_map ON steer_map.rn = throttle.rn
-LEFT JOIN fuel_map ON fuel_map.rn = throttle.rn
-LEFT JOIN temps_map ON temps_map.rn = throttle.rn
-LEFT JOIN lap_map ON lap_map.rn = throttle.rn
-LEFT JOIN gps_lat_map ON gps_lat_map.rn = throttle.rn
-LEFT JOIN gps_lon_map ON gps_lon_map.rn = throttle.rn
-LEFT JOIN lat_g_map ON lat_g_map.rn = throttle.rn
-WHERE throttle.rn BETWEEN ? AND ?
-ORDER BY throttle.rn;";
+FROM gps_clock
+LEFT JOIN speed_map ON speed_map.rn = gps_clock.rn
+LEFT JOIN throttle_map ON throttle_map.rn = gps_clock.rn
+LEFT JOIN brake_map ON brake_map.rn = gps_clock.rn
+LEFT JOIN steer_map ON steer_map.rn = gps_clock.rn
+LEFT JOIN fuel_map ON fuel_map.rn = gps_clock.rn
+LEFT JOIN temps_map ON temps_map.rn = gps_clock.rn
+LEFT JOIN lap_map ON lap_map.rn = gps_clock.rn
+LEFT JOIN gps_lat_map ON gps_lat_map.rn = gps_clock.rn
+LEFT JOIN gps_lon_map ON gps_lon_map.rn = gps_clock.rn
+LEFT JOIN lat_g_map ON lat_g_map.rn = gps_clock.rn
+WHERE gps_clock.rn BETWEEN ? AND ?
+ORDER BY gps_clock.rn;";
         }
 
         private static Task<HashSet<string>> GetTableNamesAsync(

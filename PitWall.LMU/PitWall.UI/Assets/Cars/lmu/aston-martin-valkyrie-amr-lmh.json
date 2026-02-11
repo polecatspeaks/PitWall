@@ -1,0 +1,14 @@
+{
+  "name": "Aston Martin Valkyrie AMR-LMH",
+  "slug": "aston-martin-valkyrie-amr-lmh",
+  "category": "LMH",
+  "engine": "6.5l Naturally aspirated V12",
+  "transmission": "7spd sequential",
+  "power": "500kw / approx. 670 bhp",
+  "powerBhp": 500,
+  "weightKg": 1030,
+  "lengthMm": null,
+  "widthMm": 1965,
+  "heightMm": 1070,
+  "sourceUrl": "https://lemansultimate.com/cars/aston-martin-valkyrie/"
+}

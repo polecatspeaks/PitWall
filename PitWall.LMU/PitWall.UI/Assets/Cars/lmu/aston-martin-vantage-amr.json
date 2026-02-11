@@ -1,0 +1,14 @@
+{
+  "name": "Aston Martin Vantage AMR",
+  "slug": "aston-martin-vantage-amr",
+  "category": "GTE",
+  "engine": "4.0-litre Turbocharged V8",
+  "transmission": "Six-speed sequential",
+  "power": "500 bhp",
+  "powerBhp": 500,
+  "weightKg": 1245,
+  "lengthMm": 4665,
+  "widthMm": 2153,
+  "heightMm": 1274,
+  "sourceUrl": "https://lemansultimate.com/cars/aston-martin-vantage-amr/"
+}
