@@ -1,0 +1,252 @@
+[
+  {
+    "name": "Default",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": []
+  },
+  {
+    "name": "Algarve International Circuit",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "Turn 1", "direction": "", "severity": "" },
+      { "number": 2, "name": "Turn 2", "direction": "", "severity": "" },
+      { "number": 3, "name": "Turn 3", "direction": "", "severity": "" },
+      { "number": 4, "name": "Turn 4", "direction": "", "severity": "" },
+      { "number": 5, "name": "Turn 5", "direction": "", "severity": "" },
+      { "number": 6, "name": "Turn 6", "direction": "", "severity": "" },
+      { "number": 7, "name": "Turn 7", "direction": "", "severity": "" },
+      { "number": 8, "name": "Turn 8", "direction": "", "severity": "" },
+      { "number": 9, "name": "Turn 9", "direction": "", "severity": "" },
+      { "number": 10, "name": "Turn 10", "direction": "", "severity": "" },
+      { "number": 11, "name": "Turn 11", "direction": "", "severity": "" },
+      { "number": 12, "name": "Turn 12", "direction": "", "severity": "" },
+      { "number": 13, "name": "Turn 13", "direction": "", "severity": "" },
+      { "number": 14, "name": "Turn 14", "direction": "", "severity": "" },
+      { "number": 15, "name": "Turn 15", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Autodromo Nazionale Monza",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "Variante del Rettifilo", "direction": "", "severity": "" },
+      { "number": 2, "name": "Curva Grande", "direction": "", "severity": "" },
+      { "number": 3, "name": "Variante della Roggia", "direction": "", "severity": "" },
+      { "number": 4, "name": "Lesmo 1", "direction": "", "severity": "" },
+      { "number": 5, "name": "Lesmo 2", "direction": "", "severity": "" },
+      { "number": 6, "name": "Variante Ascari", "direction": "", "severity": "" },
+      { "number": 7, "name": "Curva Alboreto", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Autodromo Jose Carlos Pace",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "Senna S (Descida)", "direction": "", "severity": "" },
+      { "number": 2, "name": "Senna S (Subida)", "direction": "", "severity": "" },
+      { "number": 3, "name": "Curva do Sol", "direction": "", "severity": "" },
+      { "number": 4, "name": "Descida do Lago", "direction": "", "severity": "" },
+      { "number": 5, "name": "Descida do Lago (Saída)", "direction": "", "severity": "" },
+      { "number": 6, "name": "Ferradura", "direction": "", "severity": "" },
+      { "number": 7, "name": "Ferradura (Saída)", "direction": "", "severity": "" },
+      { "number": 8, "name": "Laranjinha", "direction": "", "severity": "" },
+      { "number": 9, "name": "Pinheirinho", "direction": "", "severity": "" },
+      { "number": 10, "name": "Bico de Pato", "direction": "", "severity": "" },
+      { "number": 11, "name": "Mergulho", "direction": "", "severity": "" },
+      { "number": 12, "name": "Junção", "direction": "", "severity": "" },
+      { "number": 13, "name": "Café", "direction": "", "severity": "" },
+      { "number": 14, "name": "Subida dos Boxes", "direction": "", "severity": "" },
+      { "number": 15, "name": "Arquibancadas", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Bahrain International Circuit",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "Turn 1 (Michael Schumacher)", "direction": "", "severity": "" },
+      { "number": 2, "name": "Turn 2", "direction": "", "severity": "" },
+      { "number": 3, "name": "Turn 3", "direction": "", "severity": "" },
+      { "number": 4, "name": "Turn 4", "direction": "", "severity": "" },
+      { "number": 5, "name": "Turn 5", "direction": "", "severity": "" },
+      { "number": 6, "name": "Turn 6", "direction": "", "severity": "" },
+      { "number": 7, "name": "Turn 7", "direction": "", "severity": "" },
+      { "number": 8, "name": "Turn 8", "direction": "", "severity": "" },
+      { "number": 9, "name": "Turn 9", "direction": "", "severity": "" },
+      { "number": 10, "name": "Turn 10", "direction": "", "severity": "" },
+      { "number": 11, "name": "Turn 11", "direction": "", "severity": "" },
+      { "number": 12, "name": "Turn 12", "direction": "", "severity": "" },
+      { "number": 13, "name": "Turn 13", "direction": "", "severity": "" },
+      { "number": 14, "name": "Turn 14", "direction": "", "severity": "" },
+      { "number": 15, "name": "Turn 15", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Circuit de Spa-Francorchamps",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "La Source", "direction": "", "severity": "" },
+      { "number": 2, "name": "Eau Rouge", "direction": "", "severity": "" },
+      { "number": 3, "name": "Raidillon", "direction": "", "severity": "" },
+      { "number": 4, "name": "Kemmel Straight", "direction": "", "severity": "" },
+      { "number": 5, "name": "Les Combes", "direction": "", "severity": "" },
+      { "number": 6, "name": "Malmedy", "direction": "", "severity": "" },
+      { "number": 7, "name": "Rivage", "direction": "", "severity": "" },
+      { "number": 8, "name": "Pouhon", "direction": "", "severity": "" },
+      { "number": 9, "name": "Les Fagnes", "direction": "", "severity": "" },
+      { "number": 10, "name": "Campus", "direction": "", "severity": "" },
+      { "number": 11, "name": "Jacky Ickx (Speakers Corner)", "direction": "", "severity": "" },
+      { "number": 12, "name": "Stavelot", "direction": "", "severity": "" },
+      { "number": 13, "name": "Blanchimont", "direction": "", "severity": "" },
+      { "number": 14, "name": "Bus Stop Chicane", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Circuit de la Sarthe",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "Dunlop Bridge", "direction": "", "severity": "" },
+      { "number": 2, "name": "Esses", "direction": "", "severity": "" },
+      { "number": 3, "name": "Tertre Rouge", "direction": "", "severity": "" },
+      { "number": 4, "name": "Mulsanne Straight", "direction": "", "severity": "" },
+      { "number": 5, "name": "Mulsanne Corner", "direction": "", "severity": "" },
+      { "number": 6, "name": "Indianapolis", "direction": "", "severity": "" },
+      { "number": 7, "name": "Arnage", "direction": "", "severity": "" },
+      { "number": 8, "name": "Porsche Curves", "direction": "", "severity": "" },
+      { "number": 9, "name": "Ford Chicane", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Circuit of the Americas",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "Big Red", "direction": "", "severity": "" },
+      { "number": 2, "name": "Turn 2", "direction": "", "severity": "" },
+      { "number": 3, "name": "Turn 3", "direction": "", "severity": "" },
+      { "number": 4, "name": "Turn 4", "direction": "", "severity": "" },
+      { "number": 5, "name": "Turn 5", "direction": "", "severity": "" },
+      { "number": 6, "name": "Turn 6", "direction": "", "severity": "" },
+      { "number": 7, "name": "Turn 7", "direction": "", "severity": "" },
+      { "number": 8, "name": "Turn 8", "direction": "", "severity": "" },
+      { "number": 9, "name": "Turn 9", "direction": "", "severity": "" },
+      { "number": 10, "name": "Turn 10", "direction": "", "severity": "" },
+      { "number": 11, "name": "Turn 11", "direction": "", "severity": "" },
+      { "number": 12, "name": "Turn 12", "direction": "", "severity": "" },
+      { "number": 13, "name": "Turn 13", "direction": "", "severity": "" },
+      { "number": 14, "name": "Turn 14", "direction": "", "severity": "" },
+      { "number": 15, "name": "Turn 15", "direction": "", "severity": "" },
+      { "number": 16, "name": "Turn 16", "direction": "", "severity": "" },
+      { "number": 17, "name": "Turn 17", "direction": "", "severity": "" },
+      { "number": 18, "name": "Turn 18", "direction": "", "severity": "" },
+      { "number": 19, "name": "Turn 19", "direction": "", "severity": "" },
+      { "number": 20, "name": "Turn 20", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Fuji Speedway",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "TGR Corner (27R)", "direction": "", "severity": "" },
+      { "number": 2, "name": "75R", "direction": "", "severity": "" },
+      { "number": 3, "name": "Coca-Cola Corner (80R)", "direction": "", "severity": "" },
+      { "number": 4, "name": "Toyopet (100R)", "direction": "", "severity": "" },
+      { "number": 5, "name": "Advan Corner (30R)", "direction": "", "severity": "" },
+      { "number": 6, "name": "120R", "direction": "", "severity": "" },
+      { "number": 7, "name": "300R", "direction": "", "severity": "" },
+      { "number": 8, "name": "Dunlop Corner (15R)", "direction": "", "severity": "" },
+      { "number": 9, "name": "30R", "direction": "", "severity": "" },
+      { "number": 10, "name": "45R", "direction": "", "severity": "" },
+      { "number": 11, "name": "GR Supra Corner (25R)", "direction": "", "severity": "" },
+      { "number": 12, "name": "Panasonic Corner (12R)", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Sebring International Raceway",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "Turn 1", "direction": "", "severity": "" },
+      { "number": 2, "name": "Turn 2", "direction": "", "severity": "" },
+      { "number": 3, "name": "Turn 3", "direction": "", "severity": "" },
+      { "number": 4, "name": "Turn 4", "direction": "", "severity": "" },
+      { "number": 5, "name": "Turn 5", "direction": "", "severity": "" },
+      { "number": 6, "name": "Turn 6", "direction": "", "severity": "" },
+      { "number": 7, "name": "Turn 7", "direction": "", "severity": "" },
+      { "number": 8, "name": "Turn 8", "direction": "", "severity": "" },
+      { "number": 9, "name": "Turn 9", "direction": "", "severity": "" },
+      { "number": 10, "name": "Turn 10", "direction": "", "severity": "" },
+      { "number": 11, "name": "Turn 11", "direction": "", "severity": "" },
+      { "number": 12, "name": "Turn 12", "direction": "", "severity": "" },
+      { "number": 13, "name": "Turn 13", "direction": "", "severity": "" },
+      { "number": 14, "name": "Turn 14", "direction": "", "severity": "" },
+      { "number": 15, "name": "Turn 15", "direction": "", "severity": "" },
+      { "number": 16, "name": "Turn 16", "direction": "", "severity": "" },
+      { "number": 17, "name": "Turn 17", "direction": "", "severity": "" }
+    ]
+  },
+  {
+    "name": "Silverstone Circuit",
+    "sectors": [
+      { "name": "Sector 1", "start": 0.0, "end": 0.333 },
+      { "name": "Sector 2", "start": 0.333, "end": 0.666 },
+      { "name": "Sector 3", "start": 0.666, "end": 1.0 }
+    ],
+    "corners": [
+      { "number": 1, "name": "Abbey", "direction": "", "severity": "" },
+      { "number": 2, "name": "Village", "direction": "", "severity": "" },
+      { "number": 3, "name": "The Loop", "direction": "", "severity": "" },
+      { "number": 4, "name": "Aintree", "direction": "", "severity": "" },
+      { "number": 5, "name": "Wellington Straight", "direction": "", "severity": "" },
+      { "number": 6, "name": "Brooklands", "direction": "", "severity": "" },
+      { "number": 7, "name": "Luffield", "direction": "", "severity": "" },
+      { "number": 8, "name": "Woodcote", "direction": "", "severity": "" },
+      { "number": 9, "name": "Copse", "direction": "", "severity": "" },
+      { "number": 10, "name": "Maggotts", "direction": "", "severity": "" },
+      { "number": 11, "name": "Becketts", "direction": "", "severity": "" },
+      { "number": 12, "name": "Becketts 2", "direction": "", "severity": "" },
+      { "number": 13, "name": "Becketts 3", "direction": "", "severity": "" },
+      { "number": 14, "name": "Chapel", "direction": "", "severity": "" },
+      { "number": 15, "name": "Hangar Straight", "direction": "", "severity": "" },
+      { "number": 16, "name": "Stowe", "direction": "", "severity": "" },
+      { "number": 17, "name": "Club", "direction": "", "severity": "" }
+    ]
+  }
+]

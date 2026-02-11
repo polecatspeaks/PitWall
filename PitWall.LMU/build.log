@@ -1,0 +1,15 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  PitWall.Core -> C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Core\bin\Debug\net9.0\PitWall.Core.dll
+  PitWall.UI -> C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI\bin\Debug\net9.0\PitWall.UI.dll
+  PitWall.Strategy -> C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Strategy\bin\Debug\net9.0\PitWall.Strategy.dll
+  PitWall.UI.Tests -> C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.UI.Tests\bin\Debug\net9.0\PitWall.UI.Tests.dll
+  PitWall.Agent -> C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Agent\bin\Debug\net9.0\PitWall.Agent.dll
+  PitWall.Api -> C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api\bin\Debug\net9.0\PitWall.Api.dll
+  PitWall.Tests -> C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Tests\bin\Debug\net9.0\PitWall.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.13

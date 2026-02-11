@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
@@ -25,6 +26,24 @@ public partial class DashboardViewModel : ViewModelBase
 
 	[ObservableProperty]
 	private string speedDisplay = "-- KPH";
+
+	[ObservableProperty]
+	private string throttleDisplay = "--%";
+
+	[ObservableProperty]
+	private string brakeDisplay = "--%";
+
+	[ObservableProperty]
+	private string steeringDisplay = "--";
+
+	[ObservableProperty]
+	private double throttlePercent;
+
+	[ObservableProperty]
+	private double brakePercent;
+
+	[ObservableProperty]
+	private double steeringPercent;
 
 	[ObservableProperty]
 	private double tireFLWear;
@@ -89,12 +108,44 @@ public partial class DashboardViewModel : ViewModelBase
 	[ObservableProperty]
 	private string gapToLeader = "--";
 
+	[ObservableProperty]
+	private string trackName = "TRACK";
+
+	[ObservableProperty]
+	private string currentSector = "--";
+
+	[ObservableProperty]
+	private string currentCorner = "--";
+
+	[ObservableProperty]
+	private string currentSegment = "--";
+
 	public ObservableCollection<string> Alerts { get; } = new();
+	public ObservableCollection<RelativePositionEntry> RelativePositions { get; } = new();
+	public ObservableCollection<StandingsEntry> Standings { get; } = new();
 
 	public void UpdateTelemetry(TelemetrySampleDto telemetry)
 	{
 		FuelLiters = $"{telemetry.FuelLiters:0.0} L";
 		SpeedDisplay = $"{telemetry.SpeedKph:0.0} KPH";
+
+		// Debug logging
+		Console.WriteLine($"[Dashboard] Raw values - Throttle: {telemetry.ThrottlePosition}, Brake: {telemetry.BrakePosition}, Steering: {telemetry.SteeringAngle}");
+
+		var throttle = Math.Clamp(telemetry.ThrottlePosition, 0, 1);
+		var brake = Math.Clamp(telemetry.BrakePosition, 0, 1);
+		var steering = Math.Clamp(telemetry.SteeringAngle, -1, 1);
+
+		ThrottlePercent = throttle * 100;
+		BrakePercent = brake * 100;
+		SteeringPercent = (steering + 1) * 50;
+
+		ThrottleDisplay = $"{ThrottlePercent:0}%";
+		BrakeDisplay = $"{BrakePercent:0}%";
+		SteeringDisplay = $"{steering:0.00}";
+
+		Console.WriteLine($"[Dashboard] Calculated - ThrottlePercent: {ThrottlePercent}, BrakePercent: {BrakePercent}, SteeringPercent: {SteeringPercent}");
+		Console.WriteLine($"[Dashboard] Displays - Throttle: {ThrottleDisplay}, Brake: {BrakeDisplay}, Steering: {SteeringDisplay}");
 
 		if (telemetry.TyreTempsC.Length >= 4)
 		{
@@ -119,4 +170,32 @@ public partial class DashboardViewModel : ViewModelBase
 		// Parse next pit lap from recommendation message (simplified)
 		// TODO: Get this from a structured response
 	}
+
+	public void UpdateTrackContext(TrackSegmentStatus status)
+	{
+		TrackName = status.TrackName;
+		CurrentSector = status.SectorName;
+		CurrentCorner = status.CornerLabel;
+		CurrentSegment = status.SegmentType;
+	}
+}
+
+public class RelativePositionEntry
+{
+	public string Relation { get; set; } = string.Empty;
+	public int Position { get; set; }
+	public string CarNumber { get; set; } = string.Empty;
+	public string Driver { get; set; } = string.Empty;
+	public string Gap { get; set; } = string.Empty;
+	public string Class { get; set; } = string.Empty;
+}
+
+public class StandingsEntry
+{
+	public int Position { get; set; }
+	public string Class { get; set; } = string.Empty;
+	public string CarNumber { get; set; } = string.Empty;
+	public string Driver { get; set; } = string.Empty;
+	public string Gap { get; set; } = string.Empty;
+	public int Laps { get; set; }
 }

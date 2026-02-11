@@ -4,6 +4,8 @@ using System.IO.MemoryMappedFiles;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PitWall.Core.Models;
 
 namespace PitWall.Core.Services
@@ -13,6 +15,7 @@ namespace PitWall.Core.Services
     {
         private readonly string _memoryMapName;
         private readonly int _memorySize;
+        private readonly ILogger<SharedMemoryReader> _logger;
         private CancellationTokenSource? _cts;
         private TelemetrySample? _latest;
 
@@ -23,10 +26,11 @@ namespace PitWall.Core.Services
         public event EventHandler<bool>? OnConnectionStateChanged;
         public event EventHandler<Exception>? OnError;
 
-        public SharedMemoryReader(string memoryMapName = "Local\\LMU_Telemetry", int memorySize = 8192)
+        public SharedMemoryReader(string memoryMapName = "Local\\LMU_Telemetry", int memorySize = 8192, ILogger<SharedMemoryReader>? logger = null)
         {
             _memoryMapName = memoryMapName ?? throw new ArgumentNullException(nameof(memoryMapName));
             _memorySize = memorySize;
+            _logger = logger ?? NullLogger<SharedMemoryReader>.Instance;
         }
 
         public TelemetrySample? GetLatestTelemetry() => _latest;
@@ -46,6 +50,7 @@ namespace PitWall.Core.Services
                 mmf = MemoryMappedFile.OpenExisting(_memoryMapName);
                 IsConnected = true;
                 shouldContinue = true;
+                _logger.LogInformation("Connected to shared memory map {MapName}.", _memoryMapName);
                 OnConnectionStateChanged?.Invoke(this, true);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -53,6 +58,7 @@ namespace PitWall.Core.Services
             {
                 IsConnected = false;
                 OnConnectionStateChanged?.Invoke(this, false);
+                _logger.LogWarning(ex, "Failed to open shared memory map {MapName}.", _memoryMapName);
                 if (ex is not FileNotFoundException)
                 {
                     OnError?.Invoke(this, ex);
@@ -115,8 +121,8 @@ namespace PitWall.Core.Services
                 {
                     var speed = accessor.ReadDouble(0);
                     var fuel = accessor.ReadDouble(8);
-                    var brake = accessor.ReadDouble(16);
-                    var throttle = accessor.ReadDouble(24);
+                    var brake = accessor.ReadDouble(16) / 100.0;    // Scale from 0-100 to 0-1
+                    var throttle = accessor.ReadDouble(24) / 100.0; // Scale from 0-100 to 0-1
                     var steering = accessor.ReadDouble(32);
 
                     var tyreTemps = new double[4];
@@ -148,6 +154,8 @@ namespace PitWall.Core.Services
             _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
             PollingFrequency = frequencyHz;
 
+            _logger.LogInformation("Starting shared memory reader at {FrequencyHz} Hz.", frequencyHz);
+
             Task.Run(async () =>
             {
                 try
@@ -161,6 +169,7 @@ namespace PitWall.Core.Services
                 catch (Exception ex)
                 {
                     OnError?.Invoke(this, ex);
+                    _logger.LogError(ex, "Shared memory stream failed.");
                 }
             }, _cts.Token);
 
@@ -171,6 +180,7 @@ namespace PitWall.Core.Services
         {
             _cts?.Cancel();
             IsConnected = false;
+            _logger.LogInformation("Shared memory reader stopped.");
             OnConnectionStateChanged?.Invoke(this, false);
             return Task.CompletedTask;
         }

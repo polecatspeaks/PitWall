@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using DuckDB.NET.Data;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PitWall.Core.Models;
 
 namespace PitWall.Core.Storage
@@ -14,6 +16,7 @@ namespace PitWall.Core.Storage
     public class DuckDbConnector : IDuckDbConnector
     {
         private readonly string _databasePath;
+        private readonly ILogger<DuckDbConnector> _logger;
         private const string TableGpsSpeed = "GPS Speed";
         private const string TableGpsTime = "GPS Time";
         private const string TableThrottle = "Throttle Pos";
@@ -22,13 +25,17 @@ namespace PitWall.Core.Storage
         private const string TableFuel = "Fuel Level";
         private const string TableTyreTemps = "TyresTempCentre";
 
-        public DuckDbConnector(string databasePath)
+        public DuckDbConnector(string databasePath, ILogger<DuckDbConnector>? logger = null)
         {
             _databasePath = databasePath ?? throw new ArgumentNullException(nameof(databasePath));
+            _logger = logger ?? NullLogger<DuckDbConnector>.Instance;
         }
+
+        public string DatabasePath => _databasePath;
 
         public void EnsureSchema()
         {
+            _logger.LogDebug("Ensuring DuckDB schema at {DatabasePath}.", _databasePath);
             using (var connection = new DuckDBConnection($"Data Source={_databasePath}"))
             {
                 connection.Open();
@@ -56,6 +63,8 @@ CREATE TABLE IF NOT EXISTS ""TyresTempCentre"" (value1 FLOAT, value2 FLOAT, valu
             var sampleList = samples?.ToList() ?? new List<TelemetrySample>();
             if (sampleList.Count == 0)
                 return;
+
+            _logger.LogDebug("Inserting {SampleCount} samples for session {SessionId}.", sampleList.Count, sessionId);
 
             using (var connection = new DuckDBConnection($"Data Source={_databasePath}"))
             {
@@ -100,6 +109,8 @@ CREATE TABLE IF NOT EXISTS ""TyresTempCentre"" (value1 FLOAT, value2 FLOAT, valu
                     transaction.Commit();
                 }
             }
+
+            _logger.LogDebug("Insert completed for session {SessionId}.", sessionId);
         }
 
         private static DuckDBCommand CreateInsertCommand(

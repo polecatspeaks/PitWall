@@ -34,10 +34,14 @@ namespace PitWall.Agent.Services.LLM
             var port = _options.LLMDiscoveryPort;
             var endpoints = new List<Uri>();
 
+            _logger.LogDebug("Enumerating LLM discovery endpoints on {Prefix}.x:{Port}", prefix, port);
+
             for (var host = 1; host <= 254; host++)
             {
                 endpoints.Add(new Uri($"http://{prefix}.{host}:{port}"));
             }
+
+            _logger.LogDebug("Generated {EndpointCount} discovery endpoints.", endpoints.Count);
 
             return endpoints;
         }

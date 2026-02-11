@@ -1,0 +1,292 @@
+Using launch settings from PitWall.Api\Properties\launchSettings.json...
+[19:37:34 INF] PitWall API starting. Telemetry DB path: C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db
+[19:37:34 INF] Now listening on: http://localhost:5236
+[19:37:34 INF] Application started. Press Ctrl+C to shut down.
+[19:37:34 INF] Hosting environment: Development
+[19:37:34 INF] Content root path: C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\PitWall.Api
+[19:37:35 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:35 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:35 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:35 DBG] Recommendation requested for session 276
+[19:37:35 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:35 DBG] Loaded 230 session ranges from telemetry.
+[19:37:35 DBG] No session range found for session 276.
+[19:37:35 DBG] No samples available for session 276.
+[19:37:35 INF] Setting HTTP status code 200.
+[19:37:35 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:35 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:35 INF] HTTP GET /api/recommend responded 200 in 114.6893 ms
+[19:37:35 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 166.8909ms
+[19:37:36 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:36 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:36 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:36 DBG] Recommendation requested for session 276
+[19:37:36 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:36 DBG] Loaded 230 session ranges from telemetry.
+[19:37:36 DBG] No session range found for session 276.
+[19:37:36 DBG] No samples available for session 276.
+[19:37:36 INF] Setting HTTP status code 200.
+[19:37:36 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:36 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:36 INF] HTTP GET /api/recommend responded 200 in 72.1286 ms
+[19:37:36 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 72.9921ms
+[19:37:38 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:38 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:38 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:38 DBG] Recommendation requested for session 276
+[19:37:38 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:38 DBG] Loaded 230 session ranges from telemetry.
+[19:37:38 DBG] No session range found for session 276.
+[19:37:38 DBG] No samples available for session 276.
+[19:37:38 INF] Setting HTTP status code 200.
+[19:37:38 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:38 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:38 INF] HTTP GET /api/recommend responded 200 in 80.1967 ms
+[19:37:38 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 80.5423ms
+[19:37:40 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:40 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:40 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:40 DBG] Recommendation requested for session 276
+[19:37:40 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:40 DBG] Loaded 230 session ranges from telemetry.
+[19:37:40 DBG] No session range found for session 276.
+[19:37:40 DBG] No samples available for session 276.
+[19:37:40 INF] Setting HTTP status code 200.
+[19:37:40 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:40 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:40 INF] HTTP GET /api/recommend responded 200 in 74.7201 ms
+[19:37:40 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 75.0163ms
+[19:37:42 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:42 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:42 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:42 DBG] Recommendation requested for session 276
+[19:37:42 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:42 DBG] Loaded 230 session ranges from telemetry.
+[19:37:42 DBG] No session range found for session 276.
+[19:37:42 DBG] No samples available for session 276.
+[19:37:42 INF] Setting HTTP status code 200.
+[19:37:42 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:42 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:42 INF] HTTP GET /api/recommend responded 200 in 73.7276 ms
+[19:37:42 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 73.9727ms
+[19:37:44 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:44 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:44 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:44 DBG] Recommendation requested for session 276
+[19:37:44 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:44 DBG] Loaded 230 session ranges from telemetry.
+[19:37:44 DBG] No session range found for session 276.
+[19:37:44 DBG] No samples available for session 276.
+[19:37:44 INF] Setting HTTP status code 200.
+[19:37:44 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:44 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:44 INF] HTTP GET /api/recommend responded 200 in 73.8257 ms
+[19:37:44 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 74.0779ms
+[19:37:46 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:46 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:46 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:46 DBG] Recommendation requested for session 276
+[19:37:46 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:46 DBG] Loaded 230 session ranges from telemetry.
+[19:37:46 DBG] No session range found for session 276.
+[19:37:46 DBG] No samples available for session 276.
+[19:37:46 INF] Setting HTTP status code 200.
+[19:37:46 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:46 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:46 INF] HTTP GET /api/recommend responded 200 in 71.0014 ms
+[19:37:46 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 71.2574ms
+[19:37:48 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:48 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:48 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:48 DBG] Recommendation requested for session 276
+[19:37:48 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:48 DBG] Loaded 230 session ranges from telemetry.
+[19:37:48 DBG] No session range found for session 276.
+[19:37:48 DBG] No samples available for session 276.
+[19:37:48 INF] Setting HTTP status code 200.
+[19:37:48 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:48 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:48 INF] HTTP GET /api/recommend responded 200 in 75.2256 ms
+[19:37:48 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 75.4441ms
+[19:37:50 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:50 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:50 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:50 DBG] Recommendation requested for session 276
+[19:37:50 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:50 DBG] Loaded 230 session ranges from telemetry.
+[19:37:50 DBG] No session range found for session 276.
+[19:37:50 DBG] No samples available for session 276.
+[19:37:50 INF] Setting HTTP status code 200.
+[19:37:50 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:50 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:50 INF] HTTP GET /api/recommend responded 200 in 72.9066 ms
+[19:37:50 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 73.1322ms
+[19:37:52 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:52 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:52 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:52 DBG] Recommendation requested for session 276
+[19:37:52 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:52 DBG] Loaded 230 session ranges from telemetry.
+[19:37:52 DBG] No session range found for session 276.
+[19:37:52 DBG] No samples available for session 276.
+[19:37:52 INF] Setting HTTP status code 200.
+[19:37:52 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:52 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:52 INF] HTTP GET /api/recommend responded 200 in 72.4285 ms
+[19:37:52 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 72.6637ms
+[19:37:54 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:54 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:54 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:54 DBG] Recommendation requested for session 276
+[19:37:54 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:54 DBG] Loaded 230 session ranges from telemetry.
+[19:37:54 DBG] No session range found for session 276.
+[19:37:54 DBG] No samples available for session 276.
+[19:37:54 INF] Setting HTTP status code 200.
+[19:37:54 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:54 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:54 INF] HTTP GET /api/recommend responded 200 in 58.1562 ms
+[19:37:54 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 58.3597ms
+[19:37:56 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:56 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:56 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:56 DBG] Recommendation requested for session 276
+[19:37:56 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:56 DBG] Loaded 230 session ranges from telemetry.
+[19:37:56 DBG] No session range found for session 276.
+[19:37:56 DBG] No samples available for session 276.
+[19:37:56 INF] Setting HTTP status code 200.
+[19:37:56 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:56 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:56 INF] HTTP GET /api/recommend responded 200 in 57.4530 ms
+[19:37:56 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 57.6592ms
+[19:37:58 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:37:58 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:37:58 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:37:58 DBG] Recommendation requested for session 276
+[19:37:58 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:37:58 DBG] Loaded 230 session ranges from telemetry.
+[19:37:58 DBG] No session range found for session 276.
+[19:37:58 DBG] No samples available for session 276.
+[19:37:58 INF] Setting HTTP status code 200.
+[19:37:58 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:37:58 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:37:58 INF] HTTP GET /api/recommend responded 200 in 62.9786 ms
+[19:37:58 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 63.1935ms
+[19:38:00 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:00 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:00 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:00 DBG] Recommendation requested for session 276
+[19:38:00 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:00 DBG] Loaded 230 session ranges from telemetry.
+[19:38:00 DBG] No session range found for session 276.
+[19:38:00 DBG] No samples available for session 276.
+[19:38:00 INF] Setting HTTP status code 200.
+[19:38:00 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:00 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:00 INF] HTTP GET /api/recommend responded 200 in 56.3496 ms
+[19:38:00 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 56.6201ms
+[19:38:02 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:02 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:02 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:02 DBG] Recommendation requested for session 276
+[19:38:02 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:02 DBG] Loaded 230 session ranges from telemetry.
+[19:38:02 DBG] No session range found for session 276.
+[19:38:02 DBG] No samples available for session 276.
+[19:38:02 INF] Setting HTTP status code 200.
+[19:38:02 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:02 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:02 INF] HTTP GET /api/recommend responded 200 in 57.1198 ms
+[19:38:02 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 57.2958ms
+[19:38:04 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:04 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:04 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:04 DBG] Recommendation requested for session 276
+[19:38:04 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:04 DBG] Loaded 230 session ranges from telemetry.
+[19:38:04 DBG] No session range found for session 276.
+[19:38:04 DBG] No samples available for session 276.
+[19:38:04 INF] Setting HTTP status code 200.
+[19:38:04 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:04 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:04 INF] HTTP GET /api/recommend responded 200 in 63.6042 ms
+[19:38:04 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 63.7783ms
+[19:38:06 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:06 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:06 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:06 DBG] Recommendation requested for session 276
+[19:38:06 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:06 DBG] Loaded 230 session ranges from telemetry.
+[19:38:06 DBG] No session range found for session 276.
+[19:38:06 DBG] No samples available for session 276.
+[19:38:06 INF] Setting HTTP status code 200.
+[19:38:06 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:06 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:06 INF] HTTP GET /api/recommend responded 200 in 44.3844 ms
+[19:38:06 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 44.6218ms
+[19:38:08 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:08 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:08 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:08 DBG] Recommendation requested for session 276
+[19:38:08 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:08 DBG] Loaded 230 session ranges from telemetry.
+[19:38:08 DBG] No session range found for session 276.
+[19:38:08 DBG] No samples available for session 276.
+[19:38:08 INF] Setting HTTP status code 200.
+[19:38:08 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:08 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:08 INF] HTTP GET /api/recommend responded 200 in 55.1882 ms
+[19:38:08 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 55.3636ms
+[19:38:10 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:10 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:10 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:10 DBG] Recommendation requested for session 276
+[19:38:10 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:10 DBG] Loaded 230 session ranges from telemetry.
+[19:38:10 DBG] No session range found for session 276.
+[19:38:10 DBG] No samples available for session 276.
+[19:38:10 INF] Setting HTTP status code 200.
+[19:38:10 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:10 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:10 INF] HTTP GET /api/recommend responded 200 in 58.8337 ms
+[19:38:10 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 59.0239ms
+[19:38:12 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:12 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:12 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:12 DBG] Recommendation requested for session 276
+[19:38:12 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:12 DBG] Loaded 230 session ranges from telemetry.
+[19:38:12 DBG] No session range found for session 276.
+[19:38:12 DBG] No samples available for session 276.
+[19:38:12 INF] Setting HTTP status code 200.
+[19:38:12 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:12 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:12 INF] HTTP GET /api/recommend responded 200 in 61.2039 ms
+[19:38:12 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 61.3749ms
+[19:38:14 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:14 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:14 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:14 DBG] Recommendation requested for session 276
+[19:38:14 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:14 DBG] Loaded 230 session ranges from telemetry.
+[19:38:14 DBG] No session range found for session 276.
+[19:38:14 DBG] No samples available for session 276.
+[19:38:14 INF] Setting HTTP status code 200.
+[19:38:14 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:14 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:14 INF] HTTP GET /api/recommend responded 200 in 56.8208 ms
+[19:38:14 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 57.0284ms
+[19:38:16 INF] Request starting HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - null null
+[19:38:16 INF] Executing endpoint 'HTTP: GET /api/recommend'
+[19:38:16 DBG] Ensuring DuckDB schema at C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db.
+[19:38:16 DBG] Recommendation requested for session 276
+[19:38:16 DBG] Loading telemetry samples from C:\Users\ohzee\.claude-worktrees\PitWall\vibrant-meninsky\PitWall.LMU\lmu_telemetry.db for session 276.
+[19:38:16 DBG] Loaded 230 session ranges from telemetry.
+[19:38:16 DBG] No session range found for session 276.
+[19:38:16 DBG] No samples available for session 276.
+[19:38:16 INF] Setting HTTP status code 200.
+[19:38:16 INF] Writing value of type 'RecommendationResponse' as Json.
+[19:38:16 INF] Executed endpoint 'HTTP: GET /api/recommend'
+[19:38:16 INF] HTTP GET /api/recommend responded 200 in 50.2338 ms
+[19:38:16 INF] Request finished HTTP/1.1 GET http://localhost:5236/api/recommend?sessionId=276 - 200 null application/json; charset=utf-8 50.3845ms

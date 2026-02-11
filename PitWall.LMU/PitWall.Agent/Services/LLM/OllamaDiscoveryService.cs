@@ -32,14 +32,18 @@ namespace PitWall.Agent.Services.LLM
         {
             if (!_options.EnableLLMDiscovery)
             {
+                _logger.LogInformation("LLM discovery disabled. Skipping.");
                 return Array.Empty<string>();
             }
 
             var endpoints = _endpointEnumerator.GetCandidateEndpoints().ToList();
             if (endpoints.Count == 0)
             {
+                _logger.LogWarning("No discovery endpoints generated.");
                 return Array.Empty<string>();
             }
+
+            _logger.LogDebug("Starting LLM discovery with {EndpointCount} endpoints.", endpoints.Count);
 
             var results = new List<string>();
             var gate = new SemaphoreSlim(_options.LLMDiscoveryMaxConcurrency);
@@ -63,6 +67,7 @@ namespace PitWall.Agent.Services.LLM
             });
 
             await Task.WhenAll(tasks);
+            _logger.LogInformation("LLM discovery completed. Found {ResultCount} endpoints.", results.Count);
             return results;
         }
 

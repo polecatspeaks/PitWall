@@ -1,0 +1,173 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+
+namespace PitWall.UI.Controls
+{
+    public partial class TrackMapControl : UserControl
+    {
+        public static readonly StyledProperty<IReadOnlyList<Point>> TrackPointsProperty =
+            AvaloniaProperty.Register<TrackMapControl, IReadOnlyList<Point>>(nameof(TrackPoints), Array.Empty<Point>());
+
+        public static readonly StyledProperty<Point?> CurrentPointProperty =
+            AvaloniaProperty.Register<TrackMapControl, Point?>(nameof(CurrentPoint));
+
+        public static readonly StyledProperty<double> PaddingProperty =
+            AvaloniaProperty.Register<TrackMapControl, double>(nameof(Padding), 8.0);
+
+        public static readonly StyledProperty<string?> MapImageUriProperty =
+            AvaloniaProperty.Register<TrackMapControl, string?>(nameof(MapImageUri));
+
+        public TrackMapControl()
+        {
+            InitializeComponent();
+            MapCanvas.SizeChanged += (_, _) => UpdateVisuals();
+            PropertyChanged += (_, args) =>
+            {
+                if (args.Property == TrackPointsProperty || args.Property == CurrentPointProperty)
+                {
+                    UpdateVisuals();
+                }
+
+                if (args.Property == MapImageUriProperty)
+                {
+                    UpdateMapImage();
+                }
+            };
+        }
+
+        public IReadOnlyList<Point> TrackPoints
+        {
+            get => GetValue(TrackPointsProperty);
+            set => SetValue(TrackPointsProperty, value);
+        }
+
+        public Point? CurrentPoint
+        {
+            get => GetValue(CurrentPointProperty);
+            set => SetValue(CurrentPointProperty, value);
+        }
+
+        public double Padding
+        {
+            get => GetValue(PaddingProperty);
+            set => SetValue(PaddingProperty, value);
+        }
+
+        public string? MapImageUri
+        {
+            get => GetValue(MapImageUriProperty);
+            set => SetValue(MapImageUriProperty, value);
+        }
+
+        private void UpdateVisuals()
+        {
+            UpdateTrackPath();
+            UpdateCarMarker();
+        }
+
+        private void UpdateMapImage()
+        {
+            MapImage.Source = null;
+            if (string.IsNullOrWhiteSpace(MapImageUri))
+            {
+                return;
+            }
+
+            try
+            {
+                if (MapImageUri.StartsWith("avares://", StringComparison.OrdinalIgnoreCase))
+                {
+                    var uri = new Uri(MapImageUri);
+                    using var stream = AssetLoader.Open(uri);
+                    MapImage.Source = new Bitmap(stream);
+                    return;
+                }
+
+                if (File.Exists(MapImageUri))
+                {
+                    MapImage.Source = new Bitmap(MapImageUri);
+                }
+            }
+            catch
+            {
+                MapImage.Source = null;
+            }
+
+            UpdateVisuals();
+        }
+
+        private void UpdateTrackPath()
+        {
+            if (TrackPoints == null || TrackPoints.Count < 2)
+            {
+                TrackPath.Data = null;
+                return;
+            }
+
+            var bounds = MapCanvas.Bounds;
+            if (bounds.Width <= 0 || bounds.Height <= 0)
+            {
+                return;
+            }
+
+            var geometry = new StreamGeometry();
+            using (var context = geometry.Open())
+            {
+                var first = ScalePoint(TrackPoints[0]);
+                context.BeginFigure(first, false);
+                for (var i = 1; i < TrackPoints.Count; i++)
+                {
+                    context.LineTo(ScalePoint(TrackPoints[i]));
+                }
+            }
+
+            TrackPath.Data = geometry;
+        }
+
+        private void UpdateCarMarker()
+        {
+            if (CurrentPoint is null)
+            {
+                CarMarker.IsVisible = false;
+                return;
+            }
+
+            var point = ScalePoint(CurrentPoint.Value);
+            Canvas.SetLeft(CarMarker, point.X - CarMarker.Width / 2);
+            Canvas.SetTop(CarMarker, point.Y - CarMarker.Height / 2);
+            CarMarker.IsVisible = true;
+        }
+
+        private Point ScalePoint(Point point)
+        {
+            var bounds = MapCanvas.Bounds;
+            var availableWidth = Math.Max(0, bounds.Width - (Padding * 2));
+            var availableHeight = Math.Max(0, bounds.Height - (Padding * 2));
+
+            var offsetX = Padding;
+            var offsetY = Padding;
+            var width = availableWidth;
+            var height = availableHeight;
+
+            if (MapImage.Source is Bitmap bitmap && bitmap.PixelSize.Width > 0 && bitmap.PixelSize.Height > 0)
+            {
+                var scale = Math.Min(availableWidth / bitmap.PixelSize.Width, availableHeight / bitmap.PixelSize.Height);
+                width = bitmap.PixelSize.Width * scale;
+                height = bitmap.PixelSize.Height * scale;
+                offsetX = Padding + (availableWidth - width) / 2;
+                offsetY = Padding + (availableHeight - height) / 2;
+            }
+
+            var x = offsetX + (point.X * width);
+            var y = offsetY + ((1 - point.Y) * height);
+            return new Point(x, y);
+        }
+    }
+}

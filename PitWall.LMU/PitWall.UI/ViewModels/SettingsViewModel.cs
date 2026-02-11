@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PitWall.UI.Models;
 using PitWall.UI.Services;
 
@@ -18,15 +20,27 @@ namespace PitWall.UI.ViewModels;
 public partial class SettingsViewModel : ViewModelBase
 {
 	private readonly IAgentConfigClient _agentConfigClient;
+	private readonly IStackRestartService _stackRestartService;
+	private readonly ILogger<SettingsViewModel> _logger;
 
 	public SettingsViewModel()
-		: this(new NullAgentConfigClient())
+		: this(new NullAgentConfigClient(), new NullStackRestartService())
 	{
 	}
 
-	public SettingsViewModel(IAgentConfigClient agentConfigClient)
+	public SettingsViewModel(
+		IAgentConfigClient agentConfigClient,
+		IStackRestartService stackRestartService,
+		ILogger<SettingsViewModel>? logger = null)
 	{
 		_agentConfigClient = agentConfigClient;
+		_stackRestartService = stackRestartService;
+		_logger = logger ?? NullLogger<SettingsViewModel>.Instance;
+	}
+
+	public SettingsViewModel(IAgentConfigClient agentConfigClient, ILogger<SettingsViewModel>? logger = null)
+		: this(agentConfigClient, new NullStackRestartService(), logger)
+	{
 	}
 
 	[ObservableProperty]
@@ -98,6 +112,9 @@ public partial class SettingsViewModel : ViewModelBase
 	[ObservableProperty]
 	private bool isDiscovering;
 
+	[ObservableProperty]
+	private bool isRestarting;
+
 	public ObservableCollection<string> DiscoveredEndpoints { get; } = new();
 
 	public IReadOnlyList<string> LlmProviders { get; } = new[] { "Ollama", "OpenAI", "Anthropic" };
@@ -107,6 +124,7 @@ public partial class SettingsViewModel : ViewModelBase
 	{
 		IsLoading = true;
 		StatusMessage = null;
+		_logger.LogDebug("Loading agent settings.");
 
 		try
 		{
@@ -131,10 +149,12 @@ public partial class SettingsViewModel : ViewModelBase
 			AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
 
 			StatusMessage = "Settings loaded successfully";
+			_logger.LogDebug("Agent settings loaded.");
 		}
 		catch (Exception ex)
 		{
 			StatusMessage = $"Error loading settings: {ex.Message}";
+			_logger.LogError(ex, "Failed to load agent settings.");
 		}
 		finally
 		{
@@ -147,6 +167,7 @@ public partial class SettingsViewModel : ViewModelBase
 	{
 		IsSaving = true;
 		StatusMessage = null;
+		_logger.LogDebug("Saving agent settings.");
 
 		try
 		{
@@ -179,10 +200,12 @@ public partial class SettingsViewModel : ViewModelBase
 			AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
 
 			StatusMessage = "Settings saved successfully";
+			_logger.LogDebug("Agent settings saved.");
 		}
 		catch (Exception ex)
 		{
 			StatusMessage = $"Error saving settings: {ex.Message}";
+			_logger.LogError(ex, "Failed to save agent settings.");
 		}
 		finally
 		{
@@ -196,6 +219,7 @@ public partial class SettingsViewModel : ViewModelBase
 		IsDiscovering = true;
 		StatusMessage = "Discovering LLM endpoints on your network...";
 		DiscoveredEndpoints.Clear();
+		_logger.LogDebug("Starting LLM endpoint discovery.");
 
 		try
 		{
@@ -204,6 +228,7 @@ public partial class SettingsViewModel : ViewModelBase
 			if (endpoints.Count == 0)
 			{
 				StatusMessage = "⚠️ No LLM endpoints found on the network. Check your subnet prefix, port, and ensure discovery is enabled.";
+				_logger.LogWarning("No LLM endpoints discovered.");
 			}
 			else
 			{
@@ -212,11 +237,13 @@ public partial class SettingsViewModel : ViewModelBase
 					DiscoveredEndpoints.Add(endpoint);
 				}
 				StatusMessage = $"✓ Discovery complete! Found {endpoints.Count} endpoint(s). Click 'Use' to select one.";
+				_logger.LogDebug("Discovered {EndpointCount} LLM endpoints.", endpoints.Count);
 			}
 		}
 		catch (Exception ex)
 		{
 			StatusMessage = $"❌ Discovery failed: {ex.Message}";
+			_logger.LogError(ex, "LLM endpoint discovery failed.");
 		}
 		finally
 		{
@@ -229,6 +256,40 @@ public partial class SettingsViewModel : ViewModelBase
 	{
 		LlmEndpoint = endpoint;
 		StatusMessage = $"✓ Selected endpoint: {endpoint}";
+		_logger.LogDebug("Selected LLM endpoint {Endpoint}.", endpoint);
+	}
+
+	[RelayCommand]
+	private async Task RestartStackAsync()
+	{
+		if (IsRestarting)
+		{
+			return;
+		}
+
+		IsRestarting = true;
+		StatusMessage = "Restarting PitWall stack...";
+		_logger.LogInformation("Restarting PitWall stack from settings.");
+
+		try
+		{
+			var result = _stackRestartService.Restart();
+			StatusMessage = result.Message;
+			if (result.Success)
+			{
+				await Task.Delay(300);
+				Environment.Exit(0);
+			}
+		}
+		catch (Exception ex)
+		{
+			StatusMessage = $"Restart failed: {ex.Message}";
+			_logger.LogError(ex, "PitWall stack restart failed.");
+		}
+		finally
+		{
+			IsRestarting = false;
+		}
 	}
 }
 

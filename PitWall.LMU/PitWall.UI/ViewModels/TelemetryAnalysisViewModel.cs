@@ -20,8 +20,10 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 {
 	private readonly TelemetryBuffer _telemetryBuffer;
 
+	public event EventHandler? DataSeriesUpdated;
+
 	[ObservableProperty]
-	private int selectedReferenceLap = 1;
+	private int? selectedReferenceLap;
 
 	[ObservableProperty]
 	private int currentLap = 1;
@@ -34,6 +36,18 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 
 	[ObservableProperty]
 	private string statusMessage = "No telemetry data available";
+
+	[ObservableProperty]
+	private string trackName = "TRACK";
+
+	[ObservableProperty]
+	private string sectorLabel = "--";
+
+	[ObservableProperty]
+	private string cornerLabel = "--";
+
+	[ObservableProperty]
+	private string segmentType = "--";
 
 	public ObservableCollection<int> AvailableLaps { get; } = new();
 	public ObservableCollection<CursorDataRow> CursorData { get; } = new();
@@ -69,6 +83,14 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	{
 	}
 
+	public void UpdateTrackContext(TrackSegmentStatus status)
+	{
+		TrackName = status.TrackName;
+		SectorLabel = status.SectorName;
+		CornerLabel = status.CornerLabel;
+		SegmentType = status.SegmentType;
+	}
+
 	private void InitializeCursorDataTable()
 	{
 		CursorData.Add(new CursorDataRow { Parameter = "vSpeed", Unit = "km/h", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
@@ -88,6 +110,16 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		if (lapNumber <= 0) return;
 		
 		SelectedReferenceLap = lapNumber;
+	}
+
+	partial void OnSelectedReferenceLapChanged(int? value)
+	{
+		if (!value.HasValue || value.Value <= 0)
+		{
+			ClearReferenceLapData();
+			return;
+		}
+
 		LoadReferenceLapData();
 	}
 
@@ -193,13 +225,14 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 
 		PopulateDataSeries(lapData, SpeedData, ThrottleData, BrakeData, SteeringData, TireTempData);
 		StatusMessage = $"Loaded {lapData.Length} samples for lap {lapNumber}";
+		RaiseDataSeriesUpdated();
 	}
 
 	private void LoadReferenceLapData()
 	{
-		if (SelectedReferenceLap <= 0) return;
+		if (!SelectedReferenceLap.HasValue || SelectedReferenceLap.Value <= 0) return;
 
-		var lapData = _telemetryBuffer.GetLapData(SelectedReferenceLap);
+		var lapData = _telemetryBuffer.GetLapData(SelectedReferenceLap.Value);
 
 		if (lapData.Length == 0)
 		{
@@ -210,6 +243,7 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 
 		PopulateDataSeries(lapData, ReferenceSpeedData, ReferenceThrottleData, ReferenceBrakeData, ReferenceSteeringData, ReferenceTireTempData);
 		StatusMessage = $"Loaded reference lap {SelectedReferenceLap} with {lapData.Length} samples";
+		RaiseDataSeriesUpdated();
 	}
 
 	/// <summary>
@@ -218,7 +252,6 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	public void LoadReferenceLapData(int lapNumber)
 	{
 		SelectedReferenceLap = lapNumber;
-		LoadReferenceLapData();
 	}
 
 	private void PopulateDataSeries(
@@ -252,24 +285,75 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	}
 
 	/// <summary>
-	/// Updates the available laps list from telemetry buffer
+	/// Updates the available laps list from telemetry buffer without disrupting ComboBox selection
 	/// </summary>
 	public void RefreshAvailableLaps()
 	{
 		var laps = _telemetryBuffer.GetAvailableLaps();
-		AvailableLaps.Clear();
-		
-		foreach (var lap in laps)
+
+		// If user has explicitly selected a reference lap, preserve it and skip updates
+		// This prevents ComboBox binding disruption while a selection is active
+		if (SelectedReferenceLap.HasValue && laps.Contains(SelectedReferenceLap.Value))
+		{
+			// Lap still exists and user selected it explicitly, don't update collection
+			if (laps.Length > 0)
+			{
+				StatusMessage = $"{laps.Length} laps available (reference lap {SelectedReferenceLap} selected)";
+			}
+			return;
+		}
+
+		// Check if list has actually changed by comparing both length and content
+		bool needsUpdate = AvailableLaps.Count != laps.Length;
+		if (!needsUpdate && laps.Length > 0)
+		{
+			// Verify all items match
+			for (int i = 0; i < laps.Length; i++)
+			{
+				if (AvailableLaps[i] != laps[i])
+				{
+					needsUpdate = true;
+					break;
+				}
+			}
+		}
+
+		// If list hasn't changed, just update message and exit without touching collections
+		if (!needsUpdate)
+		{
+			if (laps.Length > 0)
+			{
+				StatusMessage = $"{laps.Length} laps available for analysis";
+			}
+			return;
+		}
+
+		// Only update if list actually changed - add/remove items instead of clearing
+		// to avoid disrupting ComboBox binding
+		var toRemove = AvailableLaps.Where(l => !laps.Contains(l)).ToList();
+		foreach (var lap in toRemove)
+		{
+			AvailableLaps.Remove(lap);
+		}
+
+		var toAdd = laps.Where(l => !AvailableLaps.Contains(l)).ToList();
+		foreach (var lap in toAdd)
 		{
 			AvailableLaps.Add(lap);
 		}
 
+		// Verify selection is still valid
 		if (laps.Length > 0)
 		{
+			if (!SelectedReferenceLap.HasValue || !laps.Contains(SelectedReferenceLap.Value))
+			{
+				SelectedReferenceLap = laps[0];
+			}
 			StatusMessage = $"{laps.Length} laps available for analysis";
 		}
 		else
 		{
+			SelectedReferenceLap = null;
 			StatusMessage = "No telemetry data available yet";
 		}
 	}
@@ -352,6 +436,7 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		BrakeData.Clear();
 		SteeringData.Clear();
 		TireTempData.Clear();
+		RaiseDataSeriesUpdated();
 	}
 
 	private void ClearReferenceLapData()
@@ -361,6 +446,12 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		ReferenceBrakeData.Clear();
 		ReferenceSteeringData.Clear();
 		ReferenceTireTempData.Clear();
+		RaiseDataSeriesUpdated();
+	}
+
+	private void RaiseDataSeriesUpdated()
+	{
+		DataSeriesUpdated?.Invoke(this, EventArgs.Empty);
 	}
 }
 

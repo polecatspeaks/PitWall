@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using PitWall.Core.Models;
 using PitWall.Core.Storage;
 using PitWall.Strategy;
@@ -17,10 +18,12 @@ namespace PitWall.Api.Services
     public class RecommendationService : IRecommendationService
     {
         private readonly StrategyEngine _engine;
+        private readonly ILogger<RecommendationService> _logger;
 
-        public RecommendationService()
+        public RecommendationService(ILogger<RecommendationService> logger, ILogger<StrategyEngine> strategyLogger)
         {
-            _engine = new StrategyEngine();
+            _logger = logger;
+            _engine = new StrategyEngine(strategyLogger);
         }
 
         public RecommendationResponse GetRecommendation(string sessionId, ITelemetryWriter writer)
@@ -35,15 +38,19 @@ namespace PitWall.Api.Services
             var samples = writer.GetSamples(sessionId);
 
             if (samples == null || samples.Count == 0)
+            {
+                _logger.LogDebug("No samples available for session {SessionId}.", sessionId);
                 return new RecommendationResponse
                 {
                     Recommendation = "No telemetry data available",
                     Confidence = 0.0,
                     SessionId = sessionId
                 };
+            }
 
             // Use the most recent sample
             var latestSample = samples[samples.Count - 1];
+            _logger.LogDebug("Evaluating recommendation for session {SessionId}.", sessionId);
 
             // Evaluate using StrategyEngine
             var evaluation = _engine.EvaluateWithConfidence(latestSample);

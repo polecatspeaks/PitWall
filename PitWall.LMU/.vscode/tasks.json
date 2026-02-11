@@ -17,6 +17,19 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"label": "dotnet test (PitWall.LMU)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "test"
 		}
 	]
 }

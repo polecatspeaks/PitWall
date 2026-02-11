@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -163,6 +164,7 @@ namespace PitWall.Tests
             return new WebApplicationFactory<PitWall.Agent.Program>()
                 .WithWebHostBuilder(builder =>
                 {
+                    builder.UseEnvironment("Test");
                     builder.ConfigureAppConfiguration((_, config) =>
                     {
                         var settings = new Dictionary<string, string?>

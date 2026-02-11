@@ -1,4 +1,6 @@
 using System;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PitWall.Core.Models;
 
 namespace PitWall.Strategy
@@ -20,6 +22,13 @@ namespace PitWall.Strategy
         private const double ConfidenceLow = 0.55;
         private const double ConfidenceNone = 0.4;
 
+        private readonly ILogger<StrategyEngine> _logger;
+
+        public StrategyEngine(ILogger<StrategyEngine>? logger = null)
+        {
+            _logger = logger ?? NullLogger<StrategyEngine>.Instance;
+        }
+
         public string Evaluate(TelemetrySample sample)
         {
             return EvaluateWithConfidence(sample).Recommendation;
@@ -28,7 +37,10 @@ namespace PitWall.Strategy
         public StrategyEvaluation EvaluateWithConfidence(TelemetrySample sample)
         {
             if (sample == null)
+            {
+                _logger.LogWarning("Strategy evaluation received null sample.");
                 return new StrategyEvaluation("Invalid sample", 0.0);
+            }
 
             // Check tyre temperatures
             if (sample.TyreTempsC != null)
@@ -37,6 +49,7 @@ namespace PitWall.Strategy
                 {
                     if (t >= TyreOverheatThreshold)
                     {
+                        _logger.LogDebug("Tyre overheat detected: {Temp}", t);
                         return new StrategyEvaluation("Tyre overheat: reduce pace / pit soon", ConfidenceHigh);
                     }
                 }
@@ -46,6 +59,7 @@ namespace PitWall.Strategy
             int lapsRemaining = ProjectLapsRemaining(sample, AvgLapFuelConsumption);
             if (sample.FuelLiters <= CriticalFuelLevel)
             {
+                _logger.LogDebug("Critical fuel level detected: {FuelLiters}", sample.FuelLiters);
                 return new StrategyEvaluation(
                     $"Critical fuel: pit now (~{lapsRemaining} laps remaining)",
                     ConfidenceHigh);
@@ -56,23 +70,27 @@ namespace PitWall.Strategy
                 && sample.SpeedKph >= WheelLockSpeedKph
                 && sample.Throttle <= WheelLockThrottleMax)
             {
+                _logger.LogDebug("Wheel lock risk detected.");
                 return new StrategyEvaluation("Wheel lock risk: ease brake pressure", ConfidenceMedium);
             }
 
             // Brake/throttle overlap coaching
             if (sample.Brake >= BrakeOverlapThreshold && sample.Throttle >= ThrottleOverlapThreshold)
             {
+                _logger.LogDebug("Brake/throttle overlap detected.");
                 return new StrategyEvaluation("Brake/throttle overlap: smooth inputs", ConfidenceLow);
             }
 
             // Heavy brake while steering can destabilize the car
             if (sample.Brake >= BrakeOverlapThreshold && Math.Abs(sample.Steering) >= HeavyBrakeSteerThreshold)
             {
+                _logger.LogDebug("Heavy brake while steering detected.");
                 return new StrategyEvaluation("Heavy brake while steering: trail brake smoothly", ConfidenceLow);
             }
 
             if (lapsRemaining <= 3)
             {
+                _logger.LogDebug("Low fuel projection: {LapsRemaining} laps.", lapsRemaining);
                 return new StrategyEvaluation(
                     $"Plan pit stop: fuel for ~{lapsRemaining} laps remaining",
                     ConfidenceMedium);
@@ -80,11 +98,13 @@ namespace PitWall.Strategy
 
             if (lapsRemaining <= PitWindowLaps)
             {
+                _logger.LogDebug("Pit window open: {LapsRemaining} laps.", lapsRemaining);
                 return new StrategyEvaluation(
                     $"Pit window open: plan stop within ~{lapsRemaining - 1} laps",
                     ConfidenceLow);
             }
 
+            _logger.LogDebug("No immediate action required.");
             return new StrategyEvaluation("No immediate action", ConfidenceNone);
         }
 

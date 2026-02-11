@@ -12,6 +12,7 @@ namespace PitWall.Tests
         {
             public bool SchemaEnsured { get; private set; }
             public List<TelemetrySample> Inserted { get; } = new List<TelemetrySample>();
+            public string DatabasePath => string.Empty;
 
             public void EnsureSchema()
             {

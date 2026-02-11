@@ -9,11 +9,16 @@ using PitWall.UI.Views;
 using PitWall.UI.Services;
 using System;
 using System.Net.Http;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 
 namespace PitWall.UI;
 
 public partial class App : Application
 {
+    private ILoggerFactory? _loggerFactory;
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -27,6 +32,22 @@ public partial class App : Application
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
 
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("System", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File(
+                    System.IO.Path.Combine(AppContext.BaseDirectory, "logs", "pitwall-ui-.log"),
+                    rollingInterval: RollingInterval.Day,
+                    retainedFileCountLimit: 7,
+                    shared: true)
+                .CreateLogger();
+
+            _loggerFactory = LoggerFactory.Create(builder => builder.AddSerilog());
+            var appLogger = _loggerFactory.CreateLogger<App>();
+
             var apiBase = Environment.GetEnvironmentVariable("PITWALL_API_BASE") ?? "http://localhost:5236";
             var agentBase = Environment.GetEnvironmentVariable("PITWALL_AGENT_BASE") ?? "http://localhost:5139";
 
@@ -34,15 +55,24 @@ public partial class App : Application
             var agentClientHttp = new HttpClient { BaseAddress = new Uri(agentBase) };
 
             var wsBase = BuildWebSocketBase(apiBase);
-            var telemetryClient = new TelemetryStreamClient(wsBase);
-            var recommendationClient = new RecommendationClient(apiClient);
-            var sessionClient = new SessionClient(apiClient);
-            var agentClient = new AgentQueryClient(agentClientHttp);
-            var agentConfigClient = new AgentConfigClient(agentClientHttp);
+            var telemetryClient = new TelemetryStreamClient(wsBase, _loggerFactory.CreateLogger<TelemetryStreamClient>());
+            var recommendationClient = new RecommendationClient(apiClient, _loggerFactory.CreateLogger<RecommendationClient>());
+            var sessionClient = new SessionClient(apiClient, _loggerFactory.CreateLogger<SessionClient>());
+            var agentClient = new AgentQueryClient(agentClientHttp, _loggerFactory.CreateLogger<AgentQueryClient>());
+            var agentConfigClient = new AgentConfigClient(agentClientHttp, _loggerFactory.CreateLogger<AgentConfigClient>());
+
+            appLogger.LogInformation("UI configured. API={ApiBase} Agent={AgentBase}", apiBase, agentBase);
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(recommendationClient, telemetryClient, agentClient, agentConfigClient, sessionClient),
+                DataContext = new MainWindowViewModel(
+                    recommendationClient,
+                    telemetryClient,
+                    agentClient,
+                    agentConfigClient,
+                    sessionClient,
+                    _loggerFactory.CreateLogger<MainWindowViewModel>(),
+                    _loggerFactory),
             };
         }
 

@@ -58,10 +58,19 @@ dkms.conf
 **/bin/
 **/obj/
 
+# Logs
+logs/
+
 # Ignore LMU Telemetry Database
 PitWall.LMU/lmu_telemetry.db
 PitWall.LMU/lmu_telemetry.db-shm
 PitWall.LMU/lmu_telemetry.db-wal
+
+# Local agent settings
+PitWall.LMU/PitWall.Agent/appsettings.Agent.user.json
+
+# Local session metadata
+PitWall.LMU/session-metadata.json
 
 # BFG jar
 PitWall.LMU/bfg-1.14.0.jar

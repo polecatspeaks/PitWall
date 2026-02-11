@@ -9,5 +9,11 @@ namespace PitWall.Core.Models
         double FuelLiters,
         double Brake,
         double Throttle,
-        double Steering);
+        double Steering)
+    {
+        public int LapNumber { get; init; }
+        public double Latitude { get; init; }
+        public double Longitude { get; init; }
+        public double LateralG { get; init; }
+    }
 }

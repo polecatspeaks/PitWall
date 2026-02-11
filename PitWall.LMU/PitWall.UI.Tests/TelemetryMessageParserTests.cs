@@ -14,9 +14,9 @@ namespace PitWall.UI.Tests
             var result = TelemetryMessageParser.Parse(json);
 
             Assert.Equal(241.2, result.SpeedKph);
-            Assert.Equal(0.8, result.Throttle);
-            Assert.Equal(0.1, result.Brake);
-            Assert.Equal(-0.05, result.Steering);
+            Assert.Equal(0.8, result.ThrottlePosition);
+            Assert.Equal(0.1, result.BrakePosition);
+            Assert.Equal(-0.05, result.SteeringAngle);
             Assert.Equal(4, result.TyreTempsC.Length);
             Assert.Equal(45.2, result.FuelLiters);
         }

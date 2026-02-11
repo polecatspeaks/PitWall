@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging.Abstractions;
 using PitWall.Api.Services;
 using PitWall.Core.Models;
 using PitWall.Core.Storage;
+using PitWall.Strategy;
 using Xunit;
 
 namespace PitWall.Tests
@@ -13,7 +15,9 @@ namespace PitWall.Tests
         public void GetRecommendation_WithOverheatedTyres_ReturnsWarning()
         {
             // Arrange
-            var service = new RecommendationService();
+            var service = new RecommendationService(
+                NullLogger<RecommendationService>.Instance,
+                NullLogger<StrategyEngine>.Instance);
             var writer = new InMemoryTelemetryWriter();
             var sessionId = "test-session-1";
             var samples = new List<TelemetrySample>
@@ -36,7 +40,9 @@ namespace PitWall.Tests
         public void GetRecommendation_WithLowFuel_ReturnsPitRecommendation()
         {
             // Arrange
-            var service = new RecommendationService();
+            var service = new RecommendationService(
+                NullLogger<RecommendationService>.Instance,
+                NullLogger<StrategyEngine>.Instance);
             var writer = new InMemoryTelemetryWriter();
             var sessionId = "test-session-fuel";
             var samples = new List<TelemetrySample>
@@ -59,7 +65,9 @@ namespace PitWall.Tests
         public void GetRecommendation_WithNoData_ReturnsEmptyMessage()
         {
             // Arrange
-            var service = new RecommendationService();
+            var service = new RecommendationService(
+                NullLogger<RecommendationService>.Instance,
+                NullLogger<StrategyEngine>.Instance);
             var writer = new InMemoryTelemetryWriter();
             var sessionId = "nonexistent-session";
 
@@ -77,7 +85,9 @@ namespace PitWall.Tests
         public void GetRecommendation_WithNullSessionId_ThrowsArgumentException()
         {
             // Arrange
-            var service = new RecommendationService();
+            var service = new RecommendationService(
+                NullLogger<RecommendationService>.Instance,
+                NullLogger<StrategyEngine>.Instance);
             var writer = new InMemoryTelemetryWriter();
             string? sessionId = null;
 
@@ -89,7 +99,9 @@ namespace PitWall.Tests
         public void GetRecommendation_WithNullWriter_ThrowsArgumentNullException()
         {
             // Arrange
-            var service = new RecommendationService();
+            var service = new RecommendationService(
+                NullLogger<RecommendationService>.Instance,
+                NullLogger<StrategyEngine>.Instance);
             ITelemetryWriter? writer = null;
 
             // Act & Assert

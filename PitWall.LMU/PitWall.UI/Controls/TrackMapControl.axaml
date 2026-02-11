@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PitWall.UI.Controls.TrackMapControl">
+    <Border Background="#0D0D0D" CornerRadius="6" BorderBrush="#2A2A2A" BorderThickness="1">
+        <Grid>
+            <Image x:Name="MapImage" Stretch="Uniform" Opacity="0.8" IsHitTestVisible="False" />
+            <Canvas x:Name="MapCanvas">
+                <Path x:Name="TrackPath" Stroke="#00D9FF" StrokeThickness="2" />
+                <Ellipse x:Name="CarMarker" Width="8" Height="8" Fill="#FFB800" />
+            </Canvas>
+        </Grid>
+    </Border>
+</UserControl>

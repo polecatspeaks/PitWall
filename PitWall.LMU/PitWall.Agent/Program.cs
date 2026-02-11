@@ -1,3 +1,5 @@
+using System.IO;
+using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using PitWall.Agent.Models;
 using PitWall.Agent.Services;
@@ -5,6 +7,8 @@ using PitWall.Agent.Services.LLM;
 using PitWall.Agent.Services.RulesEngine;
 using PitWall.Core.Storage;
 using PitWall.Strategy;
+using Serilog;
+using Serilog.Events;
 
 namespace PitWall.Agent
 {
@@ -12,13 +16,31 @@ namespace PitWall.Agent
 	{
 		public static void Main(string[] args)
 		{
+			Log.Logger = new LoggerConfiguration()
+				.MinimumLevel.Debug()
+				.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+				.MinimumLevel.Override("System", LogEventLevel.Information)
+				.Enrich.FromLogContext()
+				.WriteTo.Console()
+				.WriteTo.File(
+					Path.Combine(AppContext.BaseDirectory, "logs", "pitwall-agent-.log"),
+					rollingInterval: RollingInterval.Day,
+					retainedFileCountLimit: 7,
+					shared: true)
+				.CreateLogger();
+
 			var builder = WebApplication.CreateBuilder(args);
+			builder.Host.UseSerilog();
+			if (!builder.Environment.IsEnvironment("Test"))
+				builder.Configuration.AddJsonFile("appsettings.Agent.user.json", optional: true, reloadOnChange: true);
 
 			var agentOptions = builder.Configuration
 				.GetSection(AgentOptions.SectionName)
 				.Get<AgentOptions>() ?? new AgentOptions();
 
 			builder.Services.AddSingleton(agentOptions);
+			var userConfigPath = Path.Combine(builder.Environment.ContentRootPath, "appsettings.Agent.user.json");
+			builder.Services.AddSingleton<IAgentOptionsStore>(new JsonAgentOptionsStore(userConfigPath));
 			builder.Services.AddSingleton<IRulesEngine, RulesEngine>();
 			builder.Services.AddSingleton<StrategyEngine>();
 			builder.Services.AddSingleton<ITelemetryWriter, InMemoryTelemetryWriter>();
@@ -43,13 +65,8 @@ namespace PitWall.Agent
 			}
 
 			builder.Services.AddScoped<IAgentService, AgentService>();
-			builder.Services.AddLogging(logging =>
-			{
-				logging.AddConsole();
-				logging.SetMinimumLevel(LogLevel.Information);
-			});
-
 			var app = builder.Build();
+			app.UseSerilogRequestLogging();
 
 			app.MapGet("/", () => "PitWall Agent Service Running");
 
@@ -93,8 +110,9 @@ namespace PitWall.Agent
 				return Results.Ok(new { endpoints });
 			});
 
-			app.MapGet("/agent/config", ([FromServices] AgentOptions options) =>
+			app.MapGet("/agent/config", ([FromServices] AgentOptions options, ILogger<Program> logger) =>
 			{
+				logger.LogDebug("Agent config requested.");
 				return Results.Ok(new AgentConfigResponse
 				{
 					EnableLLM = options.EnableLLM,
@@ -121,7 +139,7 @@ namespace PitWall.Agent
 				});
 			});
 
-			app.MapPut("/agent/config", ([FromServices] AgentOptions options, [FromBody] AgentConfigUpdate update) =>
+			app.MapPut("/agent/config", async ([FromServices] AgentOptions options, [FromServices] IAgentOptionsStore optionsStore, [FromBody] AgentConfigUpdate update, CancellationToken cancellationToken, ILogger<Program> logger) =>
 			{
 				static string? ReadExtra(AgentConfigUpdate payload, params string[] names)
 				{
@@ -183,6 +201,9 @@ namespace PitWall.Agent
 				if (update.LLMDiscoverySubnetPrefix != null)
 					options.LLMDiscoverySubnetPrefix = update.LLMDiscoverySubnetPrefix;
 
+				await optionsStore.SaveAsync(options, cancellationToken);
+				logger.LogDebug("Agent config persisted to user settings.");
+
 				return Results.Ok(new AgentConfigResponse
 				{
 					EnableLLM = options.EnableLLM,
@@ -208,6 +229,7 @@ namespace PitWall.Agent
 				});
 			});
 
+			app.Logger.LogInformation("PitWall Agent started with LLM enabled: {EnableLlm}", agentOptions.EnableLLM);
 			app.Run();
 		}
 	}
