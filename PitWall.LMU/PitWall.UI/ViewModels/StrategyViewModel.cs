@@ -54,6 +54,41 @@ public partial class StrategyViewModel : ViewModelBase
 
 	public StrategyViewModel()
 	{
+		// Initialize with sample alternative strategies
+		AlternativeStrategies.Add(new StrategyAlternative
+		{
+			Name = "2-Stop Aggressive",
+			Description = "Two-stop strategy optimized for track position",
+			Confidence = 78.5,
+			EstimatedFinishPosition = 3
+		});
+		AlternativeStrategies.Add(new StrategyAlternative
+		{
+			Name = "1-Stop Conservative",
+			Description = "Single-stop strategy with fuel saving",
+			Confidence = 82.0,
+			EstimatedFinishPosition = 5
+		});
+
+		// Initialize with sample pit stop markers
+		PitStopMarkers.Add(new PitStopMarker
+		{
+			Lap = 18,
+			FuelToAdd = 45.0,
+			ChangeTires = true,
+			EstimatedDuration = 25.5
+		});
+
+		// Initialize with sample competitor strategies
+		CompetitorStrategies.Add(new CompetitorStrategy
+		{
+			Position = 2,
+			CarNumber = "44",
+			Driver = "Competitor A",
+			LastPitLap = 12,
+			EstimatedNextPit = 24,
+			StrategyType = "2-Stop"
+		});
 	}
 
 	[RelayCommand]
