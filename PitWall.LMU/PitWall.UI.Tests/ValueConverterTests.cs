@@ -566,7 +566,7 @@ public class ValueConverterTests
 	}
 
 	[Fact]
-	public void TireTempConverter_WithGettingHotTemp_ReturnsInterpolatedBrush()
+	public void TireTempConverter_WithTransitioningToHotTemp_ReturnsInterpolatedBrush()
 	{
 		// Arrange
 		var converter = new TireTempConverter();
