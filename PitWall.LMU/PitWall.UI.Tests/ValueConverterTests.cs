@@ -685,7 +685,7 @@ public class ValueConverterTests
 	}
 
 	[Fact]
-	public void TireTempConverter_BoundaryValues_ReturnCorrectColors()
+	public void TireTempConverter_BoundaryValues_ReturnsCorrectColors()
 	{
 		// Arrange
 		var converter = new TireTempConverter();
