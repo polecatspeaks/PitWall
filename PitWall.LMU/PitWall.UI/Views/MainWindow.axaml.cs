@@ -32,6 +32,7 @@ public partial class MainWindow : Window
         DataContextChanged += OnDataContextChanged;
         Opened += OnOpened;
         Closed += OnClosed;
+        KeyDown += OnKeyDown;
     }
 
     private async void OnOpened(object? sender, EventArgs e)
@@ -227,5 +228,63 @@ public partial class MainWindow : Window
 
             plotControl.Refresh();
         }
+    }
+
+    private void OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        if (e.Key == Key.Space && IsTextInputTarget(e.Source))
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case Key.F1:
+                vm.SelectedTabIndex = 0;
+                e.Handled = true;
+                break;
+            case Key.F2:
+                vm.SelectedTabIndex = 1;
+                e.Handled = true;
+                break;
+            case Key.F3:
+                vm.SelectedTabIndex = 2;
+                e.Handled = true;
+                break;
+            case Key.F4:
+                vm.SelectedTabIndex = 3;
+                e.Handled = true;
+                break;
+            case Key.F5:
+                vm.SelectedTabIndex = 4;
+                e.Handled = true;
+                break;
+            case Key.F6:
+                vm.RequestPitNow();
+                e.Handled = true;
+                break;
+            case Key.F12:
+                vm.TriggerEmergencyMode();
+                e.Handled = true;
+                break;
+            case Key.Space:
+                vm.PauseTelemetry();
+                e.Handled = true;
+                break;
+            case Key.Escape:
+                vm.DismissAlerts();
+                e.Handled = true;
+                break;
+        }
+    }
+
+    private static bool IsTextInputTarget(object? source)
+    {
+        return source is TextBox || source is ComboBox;
     }
 }

@@ -211,10 +211,32 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	/// </summary>
 	public void LoadCurrentLapData(int lapNumber)
 	{
-		if (lapNumber < 0) return;
+		if (lapNumber <= 0)
+		{
+			return;
+		}
 
 		CurrentLap = lapNumber;
 		var lapData = _telemetryBuffer.GetLapData(lapNumber);
+
+		var brakeSamples = lapData.Count(s => s.BrakePosition > 0);
+		var brakeStats = lapData
+			.Where(s => s.BrakePosition > 0)
+			.Select(s => s.BrakePosition)
+			.ToList();
+
+		if (brakeStats.Count > 0)
+		{
+			var minBrake = brakeStats.Min();
+			var maxBrake = brakeStats.Max();
+			var avgBrake = brakeStats.Average();
+			Console.WriteLine($"[TelemetryAnalysis:BUFFER] Lap {lapNumber}: {lapData.Length} total samples, {brakeSamples} with brake > 0");
+			Console.WriteLine($"[TelemetryAnalysis:BRAKE_RANGE] Min={minBrake:F3} Max={maxBrake:F3} Avg={avgBrake:F3}");
+		}
+		else
+		{
+			Console.WriteLine($"[TelemetryAnalysis:WARNING] Lap {lapNumber}: ALL {lapData.Length} samples have brake = 0!");
+		}
 
 		if (lapData.Length == 0)
 		{

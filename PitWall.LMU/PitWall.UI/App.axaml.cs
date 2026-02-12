@@ -9,6 +9,7 @@ using PitWall.UI.Views;
 using PitWall.UI.Services;
 using System;
 using System.Net.Http;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
@@ -53,6 +54,18 @@ public partial class App : Application
 
             var apiClient = new HttpClient { BaseAddress = new Uri(apiBase) };
             var agentClientHttp = new HttpClient { BaseAddress = new Uri(agentBase) };
+
+            var apiAutoStart = new ApiAutoStartService(
+                new ApiProbe(),
+                new ProcessLauncher(),
+                appLogger);
+            _ = apiAutoStart.EnsureApiRunningAsync(new Uri(apiBase), AppContext.BaseDirectory, CancellationToken.None);
+
+            var agentAutoStart = new AgentAutoStartService(
+                new ApiProbe("/agent/health"),
+                new ProcessLauncher(),
+                appLogger);
+            _ = agentAutoStart.EnsureAgentRunningAsync(new Uri(agentBase), AppContext.BaseDirectory, CancellationToken.None);
 
             var wsBase = BuildWebSocketBase(apiBase);
             var telemetryClient = new TelemetryStreamClient(wsBase, _loggerFactory.CreateLogger<TelemetryStreamClient>());

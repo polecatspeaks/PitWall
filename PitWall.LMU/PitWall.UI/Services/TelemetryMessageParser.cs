@@ -14,14 +14,27 @@ namespace PitWall.UI.Services
         public static TelemetrySampleDto Parse(string json)
         {
             // DEBUG: Log raw JSON to diagnose brake value issue
-            Console.WriteLine($"[Parser] Raw JSON: {json.Substring(0, Math.Min(200, json.Length))}");
+            Console.WriteLine($"[Parser:RAW_JSON] {json}");
             
             var dto = JsonSerializer.Deserialize<TelemetrySampleDto>(json, Options);
 
             if (dto == null)
             {
-                Console.WriteLine("[Parser:ERROR] Deserialization failed - returning default DTO");
+                var snippet = json.Substring(0, Math.Min(100, json.Length));
+                Console.WriteLine($"[Parser:ERROR] Deserialization returned NULL. Snippet: {snippet}");
                 return new TelemetrySampleDto();
+            }
+
+            Console.WriteLine($"[Parser:VALUES] Speed={dto.SpeedKph:F1} Throttle={dto.ThrottlePosition:F3} Brake={dto.BrakePosition:F3} Steering={dto.SteeringAngle:F3}");
+
+            if (dto.BrakePosition < 0 || dto.BrakePosition > 1.0)
+            {
+                Console.WriteLine($"[Parser:WARNING] Brake out of range: {dto.BrakePosition} (expected 0-1)");
+            }
+
+            if (dto.ThrottlePosition < 0 || dto.ThrottlePosition > 1.0)
+            {
+                Console.WriteLine($"[Parser:WARNING] Throttle out of range: {dto.ThrottlePosition} (expected 0-1)");
             }
 
             // DEFENSIVE: Normalize and validate pedal values (they might be 0-100 or 0-1)
@@ -37,7 +50,7 @@ namespace PitWall.UI.Services
             dto.SteeringAngle = Math.Clamp(dto.SteeringAngle, -1, 1);
 
             // DEBUG: Log deserialized and normalized values
-            Console.WriteLine($"[Parser] After normalization - Throttle: {dto.ThrottlePosition:F3}, Brake: {dto.BrakePosition:F3}, Steering: {dto.SteeringAngle:F3}");
+            Console.WriteLine($"[Parser:NORMALIZED] Throttle={dto.ThrottlePosition:F3} Brake={dto.BrakePosition:F3} Steering={dto.SteeringAngle:F3}");
 
             dto.TyreTempsC ??= Array.Empty<double>();
             return dto;

@@ -312,9 +312,9 @@ INSERT INTO ""Lap"" VALUES (100.0, 1, 1);";
         }
 
         [Fact]
-        public async Task Constructor_NullDatabasePath_ThrowsException()
+        public void Constructor_NullDatabasePath_ThrowsException()
         {
-            Assert.Throws<ArgumentNullException>(() => new LmuTelemetryReader(null));
+            Assert.Throws<ArgumentNullException>(() => new LmuTelemetryReader(null!));
         }
 
         [Fact]

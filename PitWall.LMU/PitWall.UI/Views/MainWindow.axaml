@@ -585,19 +585,26 @@
                                     <ProgressBar Value="{Binding Strategy.CurrentStintTireWear}" Maximum="100" 
                                                 Classes="atlas-progress" Height="12" Foreground="{DynamicResource BrushSuccess}" />
                                     <TextBlock Text="{Binding Strategy.CurrentStintTireWear, StringFormat={}{0:0}%}" FontSize="20" FontWeight="Bold" />
-                                    <TextBlock Text="Within optimal range" FontSize="12" Foreground="{DynamicResource BrushSuccess}" />
+                                    <TextBlock Text="Within optimal range" FontSize="12" Foreground="{DynamicResource BrushSuccess}"
+                                               IsVisible="{Binding Strategy.HasTelemetryData}" />
+                                    <TextBlock Text="Awaiting telemetry data" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}"
+                                               IsVisible="{Binding Strategy.HasNoTelemetryData}" />
                                 </StackPanel>
                             </Border>
                             <Border Classes="atlas-panel" Grid.Column="2">
                                 <StackPanel Spacing="8">
                                     <TextBlock Classes="data-label" Text="PIT WINDOW" />
-                                    <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-                                        <TextBlock Text="LAP" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Strategy.OptimalPitLapStart}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
-                                        <TextBlock Text="–" FontSize="20" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Strategy.OptimalPitLapEnd}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
+                                    <StackPanel IsVisible="{Binding Strategy.HasTelemetryData}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                                            <TextBlock Text="LAP" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Strategy.OptimalPitLapStart}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
+                                            <TextBlock Text="–" FontSize="20" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Strategy.OptimalPitLapEnd}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat={}Recommended: Lap {0}}" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource BrushWarning}" />
                                     </StackPanel>
-                                    <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat={}Recommended: Lap {0}}" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource BrushWarning}" />
+                                    <TextBlock Text="Awaiting telemetry data" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource BrushTextSecondary}"
+                                               IsVisible="{Binding Strategy.HasNoTelemetryData}" />
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -627,7 +634,7 @@
                                 </Border>
                                 <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="8">
                                     <TextBlock Grid.Column="0" Text="{Binding Strategy.RecommendedAction}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource BrushTextSecondary}" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Strategy.StrategyConfidence, StringFormat={}Confidence: {0:0}%}" FontSize="12" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Strategy.StrategyConfidence, StringFormat={}Confidence: {0:P0}}" FontSize="12" VerticalAlignment="Center" />
                                     <Button Grid.Column="2" Content="Override Strategy" Command="{Binding Strategy.OverrideStrategyCommand}" Padding="8,4" />
                                 </Grid>
                             </Grid>
@@ -641,7 +648,7 @@
                                     <Button Content="{Binding Strategy.FuelSaveModeActive, Converter={StaticResource BoolToTextConverter}, ConverterParameter=Fuel Save: ON|Fuel Save: OFF}"
                                            Command="{Binding Strategy.ToggleFuelSaveModeCommand}" Padding="10,6" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <ItemsControl ItemsSource="{Binding Strategy.AlternativeStrategies}">
+                                <ItemsControl ItemsSource="{Binding Strategy.AlternativeStrategies}" IsVisible="{Binding Strategy.HasAlternativeStrategies}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border Background="#1A1A1A" Padding="14" Margin="0,6" CornerRadius="6" 
@@ -664,6 +671,9 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+                                <TextBlock Text="No alternative strategies available." FontSize="12"
+                                           Foreground="{DynamicResource BrushTextSecondary}"
+                                           IsVisible="{Binding Strategy.HasNoAlternativeStrategies}" />
                             </StackPanel>
                         </Border>
 
@@ -686,6 +696,9 @@
                                         <DataGridTextColumn Header="Strategy" Binding="{Binding StrategyType}" Width="120" />
                                     </DataGrid.Columns>
                                 </DataGrid>
+                                <TextBlock Grid.Row="1" Text="No competitor strategies available." FontSize="12"
+                                           Foreground="{DynamicResource BrushTextSecondary}" Margin="8,0,8,8"
+                                           IsVisible="{Binding Strategy.HasNoCompetitorStrategies}" />
                             </Grid>
                         </Border>
                     </Grid>

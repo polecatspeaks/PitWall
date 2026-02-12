@@ -685,6 +685,36 @@ public partial class MainWindowViewModel : ViewModelBase
 		Strategy.UpdateFromRecommendation(recommendation);
 	}
 
+	public void RequestPitNow()
+	{
+		const string message = "Pit this lap";
+		AddAlert($"Pit request: {message}.");
+		Strategy.RecommendedAction = message;
+		Strategy.StrategyConfidence = 1.0;
+		Dashboard.StrategyMessage = message;
+		Dashboard.StrategyConfidence = 1.0;
+	}
+
+	public void TriggerEmergencyMode()
+	{
+		const string message = "Emergency: pit now";
+		AddAlert("Emergency mode: return to pits now.");
+		Strategy.RecommendedAction = message;
+		Strategy.StrategyConfidence = 1.0;
+		Dashboard.StrategyMessage = message;
+		Dashboard.StrategyConfidence = 1.0;
+	}
+
+	public void DismissAlerts()
+	{
+		Dashboard.Alerts.Clear();
+	}
+
+	public void PauseTelemetry()
+	{
+		PauseReplayCommand.Execute(null);
+	}
+
 	public void ApplyRecommendationFailure(string message)
 	{
 		if (!_recommendationHealthy)
@@ -702,6 +732,16 @@ public partial class MainWindowViewModel : ViewModelBase
 		};
 		Dashboard.UpdateRecommendation(fallback);
 		Strategy.UpdateFromRecommendation(fallback);
+	}
+
+	private void AddAlert(string message)
+	{
+		if (Dashboard.Alerts.Contains(message))
+		{
+			return;
+		}
+
+		Dashboard.Alerts.Insert(0, message);
 	}
 
 	partial void OnSelectedSessionIdChanged(int value)

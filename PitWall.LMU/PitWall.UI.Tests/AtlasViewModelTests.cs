@@ -365,6 +365,8 @@ public class StrategyViewModelTests : IDisposable
 		Assert.Equal(2, viewModel.AlternativeStrategies.Count);
 		Assert.Contains(viewModel.AlternativeStrategies, s => s.Name == "2-Stop Aggressive");
 		Assert.Contains(viewModel.AlternativeStrategies, s => s.Name == "1-Stop Conservative");
+		Assert.True(viewModel.HasAlternativeStrategies);
+		Assert.False(viewModel.HasNoAlternativeStrategies);
 	}
 
 	[Fact]
@@ -401,6 +403,25 @@ public class StrategyViewModelTests : IDisposable
 	}
 
 	[Fact]
+	public void UpdateFromRecommendation_WithEmptyRecommendation_UsesFallback()
+	{
+		// Arrange
+		var viewModel = new StrategyViewModel();
+		var recommendation = new RecommendationDto
+		{
+			Recommendation = " ",
+			Confidence = 0.0
+		};
+
+		// Act
+		viewModel.UpdateFromRecommendation(recommendation);
+
+		// Assert
+		Assert.Equal("Awaiting strategy...", viewModel.RecommendedAction);
+		Assert.Equal(0.0, viewModel.StrategyConfidence);
+	}
+
+	[Fact]
 	public void UpdateStintStatus_UpdatesAllStintProperties()
 	{
 		// Arrange
@@ -415,6 +436,8 @@ public class StrategyViewModelTests : IDisposable
 		Assert.Equal(15, viewModel.CurrentLap);
 		Assert.Equal(8, viewModel.StintLap);
 		Assert.Equal(8, viewModel.StintDuration);
+		Assert.True(viewModel.HasTelemetryData);
+		Assert.False(viewModel.HasNoTelemetryData);
 	}
 
 	[Fact]
@@ -431,6 +454,17 @@ public class StrategyViewModelTests : IDisposable
 		Assert.Equal(0.0, viewModel.CurrentStintTireWear);
 		Assert.Equal(1, viewModel.CurrentLap);
 		Assert.Equal(1, viewModel.StintLap);
+		Assert.True(viewModel.HasTelemetryData);
+		Assert.False(viewModel.HasNoTelemetryData);
+	}
+
+	[Fact]
+	public void Constructor_SetsTelemetryUnavailableState()
+	{
+		var viewModel = new StrategyViewModel();
+
+		Assert.False(viewModel.HasTelemetryData);
+		Assert.True(viewModel.HasNoTelemetryData);
 	}
 
 	[Fact]
