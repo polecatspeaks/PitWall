@@ -45,8 +45,8 @@ This checklist reconciles the UI MVP list, UI spec acceptance criteria, and end-
 
 ## Strategy Engine Integration
 - [x] /api/recommend returns strategy with confidence (session 276 returned confidence 0 with no telemetry).
-- [ ] Strategy tab updates with recommendation and confidence (empty-state now shows awaiting telemetry).
-- [ ] Recommendation fallback behavior verified on API failure.
+- [x] Strategy tab updates with recommendation and confidence (empty-state now shows awaiting telemetry).
+- [x] Recommendation fallback behavior verified on API failure.
 
 ## AI Agent Integration
 - [ ] /agent/health reports expected availability.
@@ -54,9 +54,10 @@ This checklist reconciles the UI MVP list, UI spec acceptance criteria, and end-
 - [ ] /agent/llm/discover returns endpoints or clear error state.
 - [ ] /agent/query returns responses; failures update UI status message.
 - [ ] Agent config GET/PUT round-trips and persists to appsettings.Agent.user.json.
+  - UI agent client request/response handling covered by tests for /agent/health, /agent/llm/test, /agent/llm/discover, /agent/config, /agent/query.
 
 ## Performance and UX
-- [ ] UI refresh rate at 10 Hz with 100 Hz telemetry ingest (configured 20 Hz via UiUpdateIntervalSeconds=0.05; runtime validation pending).
+- [x] UI refresh rate at 10 Hz with 100 Hz telemetry ingest (UiUpdateIntervalSeconds=0.1; test asserts cadence).
 - [ ] No layout thrash or jitter under live telemetry load.
 - [ ] Alerts visible and do not auto-hide.
 - [ ] Visual hierarchy matches ui-spec (critical values visible in 1 second).
