@@ -12,6 +12,8 @@
 - [x] `PUT /agent/config` — request construction and error handling verified.
 - [x] `GET /agent/llm/discover` — request construction and error handling verified.
 - [x] `POST /agent/query` — request construction, error handling, and response parsing verified.
+- [x] `GET /agent/health` — request construction and error handling verified.
+- [x] `GET /agent/llm/test` — request construction and error handling verified.
 
 ## Track Map Visualization
 - [x] Track map visualization renders car position — outline and map assets exist for multiple tracks (Silverstone, Spa, Monza, etc.). TrackMapService tests verify map frame production, current point rendering, and graceful handling of missing data.

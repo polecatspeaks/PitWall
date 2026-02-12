@@ -197,6 +197,133 @@ namespace PitWall.UI.Tests
                 async () => await api.DiscoverEndpointsAsync(CancellationToken.None));
         }
 
+        [Fact]
+        public async Task CheckHealthAsync_ReturnsParsedHealth()
+        {
+            var handler = new StubHttpHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"llmEnabled\":true,\"llmAvailable\":true,\"provider\":\"Ollama\",\"model\":\"llama3.2\",\"endpoint\":\"http://localhost:11434\"}", Encoding.UTF8, "application/json")
+            });
+
+            var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
+            var api = new AgentConfigClient(client);
+
+            var result = await api.CheckHealthAsync(CancellationToken.None);
+
+            Assert.True(result.LlmEnabled);
+            Assert.True(result.LlmAvailable);
+            Assert.Equal("Ollama", result.Provider);
+            Assert.Equal("llama3.2", result.Model);
+            Assert.Equal("http://localhost:11434", result.Endpoint);
+        }
+
+        [Fact]
+        public async Task CheckHealthAsync_RequestsCorrectEndpoint()
+        {
+            HttpRequestMessage? capturedRequest = null;
+            var handler = new StubHttpHandler(req =>
+            {
+                capturedRequest = req;
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("{}", Encoding.UTF8, "application/json")
+                };
+            });
+
+            var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
+            var api = new AgentConfigClient(client);
+
+            await api.CheckHealthAsync(CancellationToken.None);
+
+            Assert.NotNull(capturedRequest);
+            Assert.Equal(HttpMethod.Get, capturedRequest.Method);
+            Assert.Contains("/agent/health", capturedRequest.RequestUri?.ToString());
+        }
+
+        [Fact]
+        public async Task CheckHealthAsync_HttpError_ThrowsException()
+        {
+            var handler = new StubHttpHandler(_ => new HttpResponseMessage(HttpStatusCode.InternalServerError));
+            var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
+            var api = new AgentConfigClient(client);
+
+            await Assert.ThrowsAsync<HttpRequestException>(
+                async () => await api.CheckHealthAsync(CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task CheckHealthAsync_NetworkError_ThrowsException()
+        {
+            var handler = new StubHttpHandler(_ => throw new HttpRequestException("Network error"));
+            var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
+            var api = new AgentConfigClient(client);
+
+            await Assert.ThrowsAsync<HttpRequestException>(
+                async () => await api.CheckHealthAsync(CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task TestLlmAsync_ReturnsParsedResult()
+        {
+            var handler = new StubHttpHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"llmEnabled\":true,\"available\":true}", Encoding.UTF8, "application/json")
+            });
+
+            var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
+            var api = new AgentConfigClient(client);
+
+            var result = await api.TestLlmAsync(CancellationToken.None);
+
+            Assert.True(result.LlmEnabled);
+            Assert.True(result.Available);
+        }
+
+        [Fact]
+        public async Task TestLlmAsync_RequestsCorrectEndpoint()
+        {
+            HttpRequestMessage? capturedRequest = null;
+            var handler = new StubHttpHandler(req =>
+            {
+                capturedRequest = req;
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("{}", Encoding.UTF8, "application/json")
+                };
+            });
+
+            var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
+            var api = new AgentConfigClient(client);
+
+            await api.TestLlmAsync(CancellationToken.None);
+
+            Assert.NotNull(capturedRequest);
+            Assert.Equal(HttpMethod.Get, capturedRequest.Method);
+            Assert.Contains("/agent/llm/test", capturedRequest.RequestUri?.ToString());
+        }
+
+        [Fact]
+        public async Task TestLlmAsync_HttpError_ThrowsException()
+        {
+            var handler = new StubHttpHandler(_ => new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
+            var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
+            var api = new AgentConfigClient(client);
+
+            await Assert.ThrowsAsync<HttpRequestException>(
+                async () => await api.TestLlmAsync(CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task TestLlmAsync_NetworkError_ThrowsException()
+        {
+            var handler = new StubHttpHandler(_ => throw new HttpRequestException("Network error"));
+            var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
+            var api = new AgentConfigClient(client);
+
+            await Assert.ThrowsAsync<HttpRequestException>(
+                async () => await api.TestLlmAsync(CancellationToken.None));
+        }
+
         private sealed class StubHttpHandler : HttpMessageHandler
         {
             private readonly Func<HttpRequestMessage, HttpResponseMessage> _handler;

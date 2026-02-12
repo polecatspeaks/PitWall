@@ -95,6 +95,48 @@ namespace PitWall.UI.Services
             }
         }
 
+        public async Task<AgentHealthDto> CheckHealthAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogDebug("Checking agent health.");
+                var response = await _httpClient.GetAsync("/agent/health", cancellationToken);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync(cancellationToken);
+                var result = JsonSerializer.Deserialize<AgentHealthDto>(json, Options);
+
+                _logger.LogDebug("Agent health check completed.");
+                return result ?? new AgentHealthDto();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Agent health check failed.");
+                throw;
+            }
+        }
+
+        public async Task<LlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogDebug("Testing LLM connection.");
+                var response = await _httpClient.GetAsync("/agent/llm/test", cancellationToken);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync(cancellationToken);
+                var result = JsonSerializer.Deserialize<LlmTestDto>(json, Options);
+
+                _logger.LogDebug("LLM connection test completed.");
+                return result ?? new LlmTestDto();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "LLM connection test failed.");
+                throw;
+            }
+        }
+
         private record DiscoveryResponse(string[] Endpoints);
     }
 }
