@@ -54,6 +54,15 @@ public partial class StrategyViewModel : ViewModelBase
 
 	public StrategyViewModel()
 	{
+		var includeSampleData = string.Equals(
+			Environment.GetEnvironmentVariable("PITWALL_SAMPLE_STRATEGY_DATA"),
+			"1",
+			StringComparison.OrdinalIgnoreCase);
+		if (!includeSampleData)
+		{
+			return;
+		}
+
 		// Initialize with sample alternative strategies
 		AlternativeStrategies.Add(new StrategyAlternative
 		{

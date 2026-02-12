@@ -62,7 +62,7 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public void ConnectAsync_WithCancellationToken_CanBeCancelled()
+        public async Task ConnectAsync_WithCancellationToken_CanBeCancelled()
         {
             var uri = new Uri("ws://localhost:5000");
             var client = new TelemetryStreamClient(uri);
@@ -78,7 +78,7 @@ namespace PitWall.UI.Tests
                 cancellationToken: cts.Token);
 
             // Should complete quickly (cancelled or unable to connect)
-            Assert.True(task.IsCompleted || task.IsCanceled || task.IsFaulted);
+            await Assert.ThrowsAnyAsync<Exception>(async () => await task);
         }
 
         [Fact]

@@ -23,13 +23,26 @@ namespace PitWall.Tests
         public SessionSummaryServiceTests()
         {
             _testDbPath = Path.Combine(Path.GetTempPath(), $"test-summary-{Guid.NewGuid():N}.duckdb");
-            _connector = new TestDuckDbConnector(_testDbPath);
-            _metadataStore = new TestSessionMetadataStore();
-            _service = new SessionSummaryService(_connector, _metadataStore, NullLogger<SessionSummaryService>.Instance);
-            InitializeTestDatabase();
+            try
+            {
+                _connector = new TestDuckDbConnector(_testDbPath);
+                _metadataStore = new TestSessionMetadataStore();
+                _service = new SessionSummaryService(_connector, _metadataStore, NullLogger<SessionSummaryService>.Instance);
+                InitializeTestDatabase();
+            }
+            catch
+            {
+                CleanupDatabase();
+                throw;
+            }
         }
 
         public void Dispose()
+        {
+            CleanupDatabase();
+        }
+
+        private void CleanupDatabase()
         {
             if (File.Exists(_testDbPath))
             {

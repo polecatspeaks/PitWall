@@ -263,7 +263,7 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public async void ExportToCsvAsync_WithData_CreatesFile()
+        public async Task ExportToCsvAsync_WithData_CreatesFile()
         {
             var buffer = new TelemetryBuffer();
             AddSampleData(buffer, lapNumber: 1, sampleCount: 10);
@@ -282,13 +282,20 @@ namespace PitWall.UI.Tests
             }
             finally
             {
-                if (System.IO.File.Exists(tempFile))
-                    System.IO.File.Delete(tempFile);
+                try
+                {
+                    if (System.IO.File.Exists(tempFile))
+                        System.IO.File.Delete(tempFile);
+                }
+                catch
+                {
+                    // Best-effort cleanup for temp files.
+                }
             }
         }
 
         [Fact]
-        public async void ExportToCsvAsync_NoLap_UpdatesStatus()
+        public async Task ExportToCsvAsync_NoLap_UpdatesStatus()
         {
             var buffer = new TelemetryBuffer();
             var vm = new TelemetryAnalysisViewModel(buffer);
@@ -300,7 +307,7 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public async void ExportToCsvAsync_NoData_UpdatesStatus()
+        public async Task ExportToCsvAsync_NoData_UpdatesStatus()
         {
             var buffer = new TelemetryBuffer();
             var vm = new TelemetryAnalysisViewModel(buffer);
@@ -563,6 +570,7 @@ namespace PitWall.UI.Tests
 
         private void AddSampleData(TelemetryBuffer buffer, int lapNumber, int sampleCount, double speedBase = 100.0)
         {
+            var baseTime = new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc);
             for (int i = 0; i < sampleCount; i++)
             {
                 buffer.Add(new TelemetrySampleDto
@@ -574,7 +582,7 @@ namespace PitWall.UI.Tests
                     SteeringAngle = 0.0,
                     TyreTempsC = new[] { 80.0, 81.0, 82.0, 83.0 },
                     FuelLiters = 50.0,
-                    Timestamp = DateTime.UtcNow.AddSeconds(i * 0.01)
+                    Timestamp = baseTime.AddSeconds(i * 0.01)
                 });
             }
         }

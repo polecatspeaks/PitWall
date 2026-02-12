@@ -15,7 +15,7 @@ namespace PitWall.Tests
     public class SharedMemoryReaderTests : IDisposable
     {
         private MemoryMappedFile? _testMmf;
-        private const string TestMapName = "test-lmu-reader";
+        private readonly string _testMapName = $"test-lmu-reader-{Guid.NewGuid():N}";
 
         public void Dispose()
         {
@@ -27,7 +27,7 @@ namespace PitWall.Tests
             try
             {
                 // Try to delete existing test map
-                var existing = MemoryMappedFile.OpenExisting(TestMapName);
+                var existing = MemoryMappedFile.OpenExisting(_testMapName);
                 existing.Dispose();
             }
             catch
@@ -36,7 +36,7 @@ namespace PitWall.Tests
             }
 
             // Create new test memory-mapped file
-            _testMmf = MemoryMappedFile.CreateNew(TestMapName, 4096);
+            _testMmf = MemoryMappedFile.CreateNew(_testMapName, 4096);
 
             using (var accessor = _testMmf.CreateViewAccessor())
             {
@@ -305,7 +305,7 @@ namespace PitWall.Tests
             }
 
             CreateTestMemoryMap();
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             var samples = new List<TelemetrySample>();
 
             var cts = new CancellationTokenSource();
@@ -347,7 +347,7 @@ namespace PitWall.Tests
             }
 
             CreateTestMemoryMap();
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             TelemetrySample? sample = null;
 
             await foreach (var s in reader.StreamSamples())
@@ -376,7 +376,7 @@ namespace PitWall.Tests
             CreateTestMemoryMap();
             UpdateTestMemoryMap(100.0, 50.0, 80.0, 60.0, 0.0, 90.0, 90.0, 90.0, 90.0);
 
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             TelemetrySample? sample = null;
 
             await foreach (var s in reader.StreamSamples())
@@ -401,7 +401,7 @@ namespace PitWall.Tests
             }
 
             CreateTestMemoryMap();
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
 
             var cts = new CancellationTokenSource();
             cts.CancelAfter(TimeSpan.FromMilliseconds(100));
@@ -434,7 +434,7 @@ namespace PitWall.Tests
             }
 
             CreateTestMemoryMap();
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             bool eventRaised = false;
             TelemetrySample? eventSample = null;
 
@@ -477,7 +477,7 @@ namespace PitWall.Tests
             CreateTestMemoryMap();
             UpdateTestMemoryMap(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             TelemetrySample? sample = null;
 
             await foreach (var s in reader.StreamSamples())
@@ -506,7 +506,7 @@ namespace PitWall.Tests
             CreateTestMemoryMap();
             UpdateTestMemoryMap(100.0, 50.0, 0.0, 50.0, -0.8, 90.0, 90.0, 90.0, 90.0);
 
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             TelemetrySample? sample = null;
 
             await foreach (var s in reader.StreamSamples())
@@ -530,7 +530,7 @@ namespace PitWall.Tests
             }
 
             CreateTestMemoryMap();
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             TelemetrySample? sample = null;
             var beforeTime = DateTime.UtcNow;
 
@@ -558,7 +558,7 @@ namespace PitWall.Tests
             }
 
             CreateTestMemoryMap();
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             var samples = new List<TelemetrySample>();
             int targetCount = 5;
 
@@ -593,7 +593,7 @@ namespace PitWall.Tests
             }
 
             CreateTestMemoryMap();
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
             TelemetrySample? latestSample = null;
 
             reader.OnTelemetryUpdate += (sender, sample) =>
@@ -621,7 +621,7 @@ namespace PitWall.Tests
             }
 
             CreateTestMemoryMap();
-            var reader = new SharedMemoryReader(TestMapName, 4096);
+            var reader = new SharedMemoryReader(_testMapName, 4096);
 
             var enumerator = reader.StreamSamples().GetAsyncEnumerator();
             await enumerator.MoveNextAsync();

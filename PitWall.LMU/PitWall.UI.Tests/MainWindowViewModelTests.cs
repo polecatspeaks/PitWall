@@ -102,6 +102,13 @@ namespace PitWall.UI.Tests
 			};
 		}
 
+		private static DateTimeOffset CreateLocalDate(int year, int month, int day)
+		{
+			// Store as UTC for StartTimeUtc but preserve the intended local calendar date.
+			var localDate = new DateTime(year, month, day, 12, 0, 0, DateTimeKind.Local);
+			return new DateTimeOffset(localDate).ToUniversalTime();
+		}
+
 		private static TelemetrySampleDto CreateTelemetrySample(
 			int lapNumber = 1,
 			double speedKph = 200.0,
@@ -486,16 +493,16 @@ namespace PitWall.UI.Tests
 			// Arrange
 			var sessions = new List<SessionSummaryDto>
 			{
-				CreateSessionSummary(1, startTime: new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-				CreateSessionSummary(2, startTime: new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero)),
-				CreateSessionSummary(3, startTime: new DateTimeOffset(2024, 3, 1, 0, 0, 0, TimeSpan.Zero))
+				CreateSessionSummary(1, startTime: CreateLocalDate(2024, 1, 1)),
+				CreateSessionSummary(2, startTime: CreateLocalDate(2024, 2, 1)),
+				CreateSessionSummary(3, startTime: CreateLocalDate(2024, 3, 1))
 			};
 			var sessionClient = CreateMockSessionClient(sessions);
 			var vm = CreateViewModel(sessionClient: sessionClient);
 			await vm.LoadSessionsCommand.ExecuteAsync(null);
 
 			// Act
-			vm.SessionFilterFrom = new DateTime(2024, 2, 1);
+			vm.SessionFilterFrom = new DateTime(2024, 2, 1, 0, 0, 0, DateTimeKind.Local);
 
 			// Assert
 			Assert.Equal(2, vm.FilteredSessions.Count);
@@ -512,16 +519,16 @@ namespace PitWall.UI.Tests
 			// Arrange
 			var sessions = new List<SessionSummaryDto>
 			{
-				CreateSessionSummary(1, startTime: new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-				CreateSessionSummary(2, startTime: new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero)),
-				CreateSessionSummary(3, startTime: new DateTimeOffset(2024, 3, 1, 0, 0, 0, TimeSpan.Zero))
+				CreateSessionSummary(1, startTime: CreateLocalDate(2024, 1, 1)),
+				CreateSessionSummary(2, startTime: CreateLocalDate(2024, 2, 1)),
+				CreateSessionSummary(3, startTime: CreateLocalDate(2024, 3, 1))
 			};
 			var sessionClient = CreateMockSessionClient(sessions);
 			var vm = CreateViewModel(sessionClient: sessionClient);
 			await vm.LoadSessionsCommand.ExecuteAsync(null);
 
 			// Act
-			vm.SessionFilterTo = new DateTime(2024, 2, 1);
+			vm.SessionFilterTo = new DateTime(2024, 2, 1, 0, 0, 0, DateTimeKind.Local);
 
 			// Assert
 			Assert.Equal(2, vm.FilteredSessions.Count);
@@ -538,18 +545,18 @@ namespace PitWall.UI.Tests
 			// Arrange
 			var sessions = new List<SessionSummaryDto>
 			{
-				CreateSessionSummary(1, startTime: new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
-				CreateSessionSummary(2, startTime: new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero)),
-				CreateSessionSummary(3, startTime: new DateTimeOffset(2024, 3, 1, 0, 0, 0, TimeSpan.Zero)),
-				CreateSessionSummary(4, startTime: new DateTimeOffset(2024, 4, 1, 0, 0, 0, TimeSpan.Zero))
+				CreateSessionSummary(1, startTime: CreateLocalDate(2024, 1, 1)),
+				CreateSessionSummary(2, startTime: CreateLocalDate(2024, 2, 1)),
+				CreateSessionSummary(3, startTime: CreateLocalDate(2024, 3, 1)),
+				CreateSessionSummary(4, startTime: CreateLocalDate(2024, 4, 1))
 			};
 			var sessionClient = CreateMockSessionClient(sessions);
 			var vm = CreateViewModel(sessionClient: sessionClient);
 			await vm.LoadSessionsCommand.ExecuteAsync(null);
 
 			// Act
-			vm.SessionFilterFrom = new DateTime(2024, 2, 1);
-			vm.SessionFilterTo = new DateTime(2024, 3, 1);
+			vm.SessionFilterFrom = new DateTime(2024, 2, 1, 0, 0, 0, DateTimeKind.Local);
+			vm.SessionFilterTo = new DateTime(2024, 3, 1, 0, 0, 0, DateTimeKind.Local);
 
 			// Assert
 			Assert.Equal(2, vm.FilteredSessions.Count);
@@ -672,7 +679,7 @@ namespace PitWall.UI.Tests
 			// Arrange
 			var sessions = new List<SessionSummaryDto>
 			{
-				CreateSessionSummary(1, startTime: new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)),
+				CreateSessionSummary(1, startTime: CreateLocalDate(2024, 1, 1)),
 				new SessionSummaryDto { SessionId = 2, Track = "Test", Car = "Test", StartTimeUtc = null }
 			};
 			var sessionClient = CreateMockSessionClient(sessions);
@@ -680,7 +687,7 @@ namespace PitWall.UI.Tests
 			await vm.LoadSessionsCommand.ExecuteAsync(null);
 
 			// Act
-			vm.SessionFilterFrom = new DateTime(2024, 1, 1);
+			vm.SessionFilterFrom = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Local);
 
 			// Assert
 			Assert.Single(vm.FilteredSessions);

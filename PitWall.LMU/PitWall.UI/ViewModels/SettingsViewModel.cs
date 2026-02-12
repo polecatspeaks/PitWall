@@ -278,7 +278,14 @@ public partial class SettingsViewModel : ViewModelBase
 			if (result.Success)
 			{
 				await Task.Delay(300);
-				Environment.Exit(0);
+				var suppressExit = string.Equals(
+					Environment.GetEnvironmentVariable("PITWALL_SUPPRESS_EXIT"),
+					"1",
+					StringComparison.OrdinalIgnoreCase);
+				if (!suppressExit)
+				{
+					Environment.Exit(0);
+				}
 			}
 		}
 		catch (Exception ex)

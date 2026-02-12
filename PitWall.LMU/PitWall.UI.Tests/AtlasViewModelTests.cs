@@ -88,7 +88,7 @@ public class DashboardViewModelTests
 /// <summary>
 /// Tests for TelemetryAnalysisViewModel lap selection and data management.
 /// </summary>
-public class TelemetryAnalysisViewModelTests
+public class TelemetryAnalysisViewModelSmokeTests
 {
 	[Fact]
 	public void SelectReferenceLap_UpdatesSelectedLap()
@@ -346,8 +346,21 @@ public class TelemetryAnalysisViewModelTests
 /// <summary>
 /// Tests for StrategyViewModel pit planning and alternative strategies.
 /// </summary>
-public class StrategyViewModelTests
+public class StrategyViewModelTests : IDisposable
 {
+	private readonly string? _previousSampleDataFlag;
+
+	public StrategyViewModelTests()
+	{
+		_previousSampleDataFlag = Environment.GetEnvironmentVariable("PITWALL_SAMPLE_STRATEGY_DATA");
+		Environment.SetEnvironmentVariable("PITWALL_SAMPLE_STRATEGY_DATA", "1");
+	}
+
+	public void Dispose()
+	{
+		Environment.SetEnvironmentVariable("PITWALL_SAMPLE_STRATEGY_DATA", _previousSampleDataFlag);
+	}
+
 	[Fact]
 	public void Constructor_InitializesAlternativeStrategies()
 	{

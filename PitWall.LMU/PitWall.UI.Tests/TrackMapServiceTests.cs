@@ -137,8 +137,8 @@ namespace PitWall.UI.Tests
                 
                 // Add some corners with higher steering/lateral G
                 var isInCorner = (progress > 0.2 && progress < 0.3) || (progress > 0.6 && progress < 0.7);
-                var steeringAngle = isInCorner ? 0.15 : 0.02;
-                var lateralG = isInCorner ? 0.8 : 0.1;
+                var steeringAngle = isInCorner ? 0.6 : 0.02;
+                var lateralG = isInCorner ? 1.5 : 0.1;
                 
                 samples.Add(new TelemetrySampleDto
                 {
@@ -169,7 +169,7 @@ namespace PitWall.UI.Tests
             var store = CreateMetadataStore();
             var service = new TrackMapService(buffer, store);
             
-            var sample = CreateTelemetrySample(steeringAngle: 0.1, lateralG: 0.0);
+            var sample = CreateTelemetrySample(steeringAngle: 0.6, lateralG: 0.0);
             buffer.Add(sample);
 
             // Act
@@ -201,7 +201,7 @@ namespace PitWall.UI.Tests
                 var cornerSample = CreateTelemetrySample(
                     lapNumber: 1,
                     steeringAngle: 0.0,
-                    lateralG: 0.5, // Above 0.35 threshold
+                    lateralG: 1.5, // Above any reasonable threshold
                     latitude: lapData[50].Latitude + i * 0.0001,
                     longitude: lapData[50].Longitude + i * 0.0001);
                 buffer.Add(cornerSample);

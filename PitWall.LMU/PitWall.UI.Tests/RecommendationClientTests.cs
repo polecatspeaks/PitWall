@@ -81,7 +81,10 @@ namespace PitWall.UI.Tests
             await api.GetRecommendationAsync("session with spaces", CancellationToken.None);
 
             Assert.NotNull(capturedUri);
-            Assert.Contains("session%20with%20spaces", capturedUri.ToString());
+            var query = capturedUri.Query.TrimStart('?');
+            var parts = query.Split('=', 2);
+            Assert.Equal("sessionId", parts[0]);
+            Assert.Equal("session with spaces", Uri.UnescapeDataString(parts[1]));
         }
 
         [Fact]
@@ -156,7 +159,10 @@ namespace PitWall.UI.Tests
             await api.GetRecommendationAsync("session&id=123", CancellationToken.None);
 
             Assert.NotNull(capturedUri);
-            Assert.Contains("session%26id%3D123", capturedUri.ToString());
+            var query = capturedUri.Query.TrimStart('?');
+            var parts = query.Split('=', 2);
+            Assert.Equal("sessionId", parts[0]);
+            Assert.Equal("session&id=123", Uri.UnescapeDataString(parts[1]));
         }
 
         [Fact]
