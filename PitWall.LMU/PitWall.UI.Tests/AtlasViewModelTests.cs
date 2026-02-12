@@ -326,12 +326,6 @@ public class TelemetryAnalysisViewModelSmokeTests
 		// Arrange
 		var buffer = new TelemetryBuffer(1000);
 		var viewModel = new TelemetryAnalysisViewModel(buffer);
-		bool propertyChanged = false;
-		viewModel.PropertyChanged += (s, e) =>
-		{
-			if (e.PropertyName == nameof(viewModel.CursorData))
-				propertyChanged = true;
-		};
 
 		// Act
 		buffer.Add(new TelemetrySampleDto { LapNumber = 1, SpeedKph = 200.0 });
@@ -596,6 +590,20 @@ public class AtlasAiAssistantViewModelTests
 		Assert.NotEmpty(viewModel.Messages);
 		Assert.Equal("User", viewModel.Messages[0].Role);
 		Assert.Equal("How much fuel remaining?", viewModel.Messages[0].Text);
+	}
+
+	[Fact]
+	public async Task SendQuery_UpdatesStatusMessage()
+	{
+		// Arrange
+		var viewModel = new AiAssistantViewModel(new NullAgentQueryClient());
+		viewModel.InputText = "Fuel status";
+
+		// Act
+		await viewModel.SendQueryCommand.ExecuteAsync(null);
+
+		// Assert
+		Assert.Contains("Response received", viewModel.StatusMessage);
 	}
 
 	[Fact]

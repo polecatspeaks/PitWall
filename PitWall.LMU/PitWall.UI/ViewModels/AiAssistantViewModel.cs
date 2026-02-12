@@ -39,7 +39,17 @@ public partial class AiAssistantViewModel : ViewModelBase
 	[ObservableProperty]
 	private string raceContext = string.Empty;
 
+	[ObservableProperty]
+	private string statusMessage = "Ready";
+
 	public ObservableCollection<AiMessageViewModel> Messages { get; } = new();
+
+	public bool HasStatus => !string.IsNullOrWhiteSpace(StatusMessage);
+
+	partial void OnStatusMessageChanged(string value)
+	{
+		OnPropertyChanged(nameof(HasStatus));
+	}
 
 	[RelayCommand]
 	private async Task SendQueryAsync()
@@ -60,20 +70,27 @@ public partial class AiAssistantViewModel : ViewModelBase
 		var query = InputText;
 		InputText = string.Empty;
 		IsProcessing = true;
+		StatusMessage = "Sending query...";
 
 		try
 		{
 			var response = await _agentQueryClient.SendQueryAsync(query, CancellationToken.None);
+			var responseText = string.IsNullOrWhiteSpace(response.Answer)
+				? "Agent response unavailable. Check Settings."
+				: response.Answer;
 			
 			Messages.Add(new AiMessageViewModel
 			{
 				Role = "Assistant",
-				Text = response.Answer,
+				Text = responseText,
 				Source = response.Source,
 				Confidence = response.Confidence,
 				Timestamp = DateTime.Now,
 				Context = response.Context
 			});
+			StatusMessage = response.Success
+				? BuildStatusMessage(response)
+				: "Agent response failed. Check Settings.";
 		}
 		catch (Exception ex)
 		{
@@ -83,11 +100,20 @@ public partial class AiAssistantViewModel : ViewModelBase
 				Text = $"Error: {ex.Message}",
 				Timestamp = DateTime.Now
 			});
+			StatusMessage = $"Error: {ex.Message}";
 		}
 		finally
 		{
 			IsProcessing = false;
 		}
+	}
+
+	private static string BuildStatusMessage(AgentResponseDto response)
+	{
+		var source = string.IsNullOrWhiteSpace(response.Source) ? "Unknown" : response.Source;
+		return response.Confidence > 0
+			? $"Response received ({source}, {response.Confidence:P0})"
+			: $"Response received ({source})";
 	}
 
 	[RelayCommand]

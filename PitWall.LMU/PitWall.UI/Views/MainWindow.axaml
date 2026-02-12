@@ -694,14 +694,24 @@
 
             <!-- Tab 4: AI Engineer -->
             <TabItem Header="🤖 AI ENGINEER">
-                <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Margin="16" RowSpacing="12">
+                <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="16" RowSpacing="12">
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
                         <TextBlock Classes="section-header" Text="AI RACE ENGINEER" VerticalAlignment="Center" />
                         <Button Content="Clear History" Command="{Binding AiAssistant.ClearHistoryCommand}" Padding="8,4" VerticalAlignment="Center" />
                     </StackPanel>
 
+                    <Border Grid.Row="1" Background="#141414" CornerRadius="4" Padding="8"
+                           IsVisible="{Binding AiAssistant.HasStatus}">
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <TextBlock Text="{Binding AiAssistant.StatusMessage}" FontSize="12"
+                                      Foreground="{DynamicResource BrushInfo}" />
+                            <TextBlock Text="{Binding Settings.LlmStatusSummary}" FontSize="12"
+                                      Foreground="{DynamicResource BrushTextSecondary}" />
+                        </StackPanel>
+                    </Border>
+
                     <!-- Quick Query Buttons -->
-                    <Border Grid.Row="1" Classes="atlas-panel" Padding="12">
+                    <Border Grid.Row="2" Classes="atlas-panel" Padding="12">
                         <StackPanel Spacing="8">
                             <TextBlock Text="QUICK QUERIES" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" />
                             <WrapPanel>
@@ -715,7 +725,7 @@
                     </Border>
                     
                     <!-- Chat History -->
-                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding AiAssistant.Messages}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -760,7 +770,7 @@
                     </ScrollViewer>
 
                     <!-- Processing Indicator -->
-                    <Border Grid.Row="3" Background="{DynamicResource BrushInfo}" CornerRadius="4" Padding="10" 
+                          <Border Grid.Row="4" Background="{DynamicResource BrushInfo}" CornerRadius="4" Padding="10" 
                            IsVisible="{Binding AiAssistant.IsProcessing}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="⏳" FontSize="16" />
@@ -769,7 +779,7 @@
                     </Border>
 
                     <!-- Input Area -->
-                    <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <Grid Grid.Row="5" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                         <TextBox Grid.Column="0" Text="{Binding AiAssistant.InputText, Mode=TwoWay}" 
                                 Watermark="Ask the race engineer anything..." Height="44" FontSize="14"
                                 IsEnabled="{Binding !AiAssistant.IsProcessing}" />

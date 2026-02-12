@@ -34,7 +34,7 @@ namespace PitWall.UI.Tests
         [Fact]
         public async Task ConnectAsync_WithInvalidUri_ThrowsException()
         {
-            var uri = new Uri("ws://invalid-nonexistent-server-12345.local:9999");
+            var uri = new Uri("http://localhost:5000");
             var client = new TelemetryStreamClient(uri);
 
             await Assert.ThrowsAnyAsync<Exception>(async () =>
@@ -50,7 +50,7 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public async Task ConnectAsync_ConstructsCorrectUri()
+        public void ConnectAsync_ConstructsCorrectUri()
         {
             // This test verifies the URI construction logic
             var baseUri = new Uri("ws://localhost:5000");

@@ -64,6 +64,23 @@ namespace PitWall.UI.Tests
             Assert.Contains("Anthropic", vm.LlmProviders);
         }
 
+        [Fact]
+        public void LlmStatusSummary_UpdatesWhenSettingsChange()
+        {
+            // Arrange
+            var vm = new SettingsViewModel();
+
+            // Act
+            vm.EnableLlm = true;
+            vm.LlmProvider = "OpenAI";
+            vm.LlmEndpoint = "http://localhost:1234";
+
+            // Assert
+            Assert.Contains("Enabled", vm.LlmStatusSummary);
+            Assert.Contains("OpenAI", vm.LlmStatusSummary);
+            Assert.Contains("http://localhost:1234", vm.LlmStatusSummary);
+        }
+
         #region LoadSettingsAsync Tests
 
         [Fact]
@@ -127,7 +144,7 @@ namespace PitWall.UI.Tests
             mockClient.Setup(c => c.GetConfigAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new AgentConfigDto
                 {
-                    LLMProvider = null
+                    LLMProvider = string.Empty
                 });
 
             var vm = new SettingsViewModel(mockClient.Object, new NullStackRestartService());

@@ -44,6 +44,19 @@
 				"Start-Process \"${workspaceFolder}\\PitWall.LMU\\TestResults\\CoverageReport\\index.html\""
 			],
 			"isBackground": false
+		},
+		{
+			"label": "dotnet test UI (blame)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test",
+				"PitWall.LMU/PitWall.UI.Tests/PitWall.UI.Tests.csproj",
+				"--blame"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
 		}
 	]
 }

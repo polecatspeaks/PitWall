@@ -115,9 +115,27 @@ public partial class SettingsViewModel : ViewModelBase
 	[ObservableProperty]
 	private bool isRestarting;
 
+	[ObservableProperty]
+	private string llmStatusSummary = "LLM: Disabled | Provider: Ollama | Endpoint: Not set";
+
 	public ObservableCollection<string> DiscoveredEndpoints { get; } = new();
 
 	public IReadOnlyList<string> LlmProviders { get; } = new[] { "Ollama", "OpenAI", "Anthropic" };
+
+	partial void OnEnableLlmChanged(bool value)
+	{
+		UpdateLlmStatusSummary();
+	}
+
+	partial void OnLlmProviderChanged(string value)
+	{
+		UpdateLlmStatusSummary();
+	}
+
+	partial void OnLlmEndpointChanged(string value)
+	{
+		UpdateLlmStatusSummary();
+	}
 
 	[RelayCommand]
 	private async Task LoadSettingsAsync()
@@ -148,6 +166,8 @@ public partial class SettingsViewModel : ViewModelBase
 			AnthropicModel = config.AnthropicModel ?? string.Empty;
 			AnthropicApiKeyConfigured = config.AnthropicApiKeyConfigured;
 
+			UpdateLlmStatusSummary();
+
 			StatusMessage = "Settings loaded successfully";
 			_logger.LogDebug("Agent settings loaded.");
 		}
@@ -160,6 +180,14 @@ public partial class SettingsViewModel : ViewModelBase
 		{
 			IsLoading = false;
 		}
+	}
+
+	private void UpdateLlmStatusSummary()
+	{
+		var enabled = EnableLlm ? "Enabled" : "Disabled";
+		var provider = string.IsNullOrWhiteSpace(LlmProvider) ? "Unknown" : LlmProvider;
+		var endpoint = string.IsNullOrWhiteSpace(LlmEndpoint) ? "Not set" : LlmEndpoint;
+		LlmStatusSummary = $"LLM: {enabled} | Provider: {provider} | Endpoint: {endpoint}";
 	}
 
 	[RelayCommand]

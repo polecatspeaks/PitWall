@@ -151,6 +151,60 @@ namespace PitWall.UI.Tests
 
 		#endregion
 
+		#region Recommendation Fallback Tests
+
+		[Fact]
+		public void ApplyRecommendationFailure_UpdatesStrategyAndDashboard()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+			const string message = "Strategy offline. Retrying.";
+
+			// Act
+			vm.ApplyRecommendationFailure(message);
+
+			// Assert
+			Assert.Equal(message, vm.Dashboard.StrategyMessage);
+			Assert.Equal(message, vm.Strategy.RecommendedAction);
+			Assert.Equal(0.0, vm.Strategy.StrategyConfidence);
+		}
+
+		[Fact]
+		public void ApplyRecommendationFailure_IgnoresRepeatFailures()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+			vm.ApplyRecommendationFailure("First");
+
+			// Act
+			vm.ApplyRecommendationFailure("Second");
+
+			// Assert
+			Assert.Equal("First", vm.Strategy.RecommendedAction);
+		}
+
+		[Fact]
+		public void ApplyRecommendation_ResetsFailureState()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+			vm.ApplyRecommendationFailure("Offline");
+			var recommendation = new RecommendationDto
+			{
+				Recommendation = "Pit now",
+				Confidence = 0.91
+			};
+
+			// Act
+			vm.ApplyRecommendation(recommendation);
+			vm.ApplyRecommendationFailure("Offline again");
+
+			// Assert
+			Assert.Equal("Offline again", vm.Strategy.RecommendedAction);
+		}
+
+		#endregion
+
 		#region Constructor Tests
 
 		[Fact]

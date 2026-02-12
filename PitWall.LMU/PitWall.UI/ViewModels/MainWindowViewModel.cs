@@ -46,6 +46,7 @@ public partial class MainWindowViewModel : ViewModelBase
 	private int _playbackEndIndex;
 	private double _playbackRate = 1.0;
 	private const int SeekStepSamples = 1000;
+	private bool _recommendationHealthy = true;
 
 	// Domain-specific ViewModels
 	public DashboardViewModel Dashboard { get; }
@@ -667,14 +668,40 @@ public partial class MainWindowViewModel : ViewModelBase
 			try
 			{
 				var recommendation = await _recommendationClient.GetRecommendationAsync(SelectedSessionId.ToString(), cancellationToken);
-				Dashboard.UpdateRecommendation(recommendation);
-				Strategy.UpdateFromRecommendation(recommendation);
+				ApplyRecommendation(recommendation);
 			}
 			catch (Exception ex)
 			{
 				_logger.LogDebug(ex, "Recommendation polling failed.");
+				ApplyRecommendationFailure("Strategy offline. Retrying.");
 			}
 		}
+	}
+
+	public void ApplyRecommendation(RecommendationDto recommendation)
+	{
+		_recommendationHealthy = true;
+		Dashboard.UpdateRecommendation(recommendation);
+		Strategy.UpdateFromRecommendation(recommendation);
+	}
+
+	public void ApplyRecommendationFailure(string message)
+	{
+		if (!_recommendationHealthy)
+		{
+			return;
+		}
+
+		_recommendationHealthy = false;
+		var fallback = new RecommendationDto
+		{
+			SessionId = SelectedSessionId.ToString(),
+			Recommendation = message,
+			Confidence = 0.0,
+			Timestamp = DateTime.UtcNow
+		};
+		Dashboard.UpdateRecommendation(fallback);
+		Strategy.UpdateFromRecommendation(fallback);
 	}
 
 	partial void OnSelectedSessionIdChanged(int value)

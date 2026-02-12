@@ -82,12 +82,13 @@ namespace PitWall.Agent
 				});
 			});
 
-			app.MapPost("/agent/query", async (AgentRequest request, IAgentService agentService) =>
+			app.MapPost("/agent/query", async (AgentRequest? request, IAgentService agentService) =>
 			{
-				if (string.IsNullOrWhiteSpace(request.Query))
-					return Results.BadRequest(new { error = "query is required" });
+				var errors = AgentRequestValidator.ValidateQuery(request);
+				if (errors.Count > 0)
+					return Results.BadRequest(new { errors });
 
-				var response = await agentService.ProcessQueryAsync(request);
+				var response = await agentService.ProcessQueryAsync(request!);
 				return Results.Ok(response);
 			});
 
@@ -104,10 +105,18 @@ namespace PitWall.Agent
 				return Results.Ok(new { llmEnabled = enabled, available });
 			});
 
-			app.MapGet("/agent/llm/discover", async (ILLMDiscoveryService discoveryService) =>
+			app.MapGet("/agent/llm/discover", async (ILLMDiscoveryService discoveryService, ILogger<Program> logger) =>
 			{
-				var endpoints = await discoveryService.DiscoverAsync();
-				return Results.Ok(new { endpoints });
+				try
+				{
+					var endpoints = await discoveryService.DiscoverAsync();
+					return Results.Ok(new { endpoints });
+				}
+				catch (Exception ex)
+				{
+					logger.LogError(ex, "LLM discovery failed.");
+					return Results.Ok(new { endpoints = Array.Empty<string>(), error = ex.Message });
+				}
 			});
 
 			app.MapGet("/agent/config", ([FromServices] AgentOptions options, ILogger<Program> logger) =>
@@ -139,7 +148,7 @@ namespace PitWall.Agent
 				});
 			});
 
-			app.MapPut("/agent/config", async ([FromServices] AgentOptions options, [FromServices] IAgentOptionsStore optionsStore, [FromBody] AgentConfigUpdate update, CancellationToken cancellationToken, ILogger<Program> logger) =>
+			app.MapPut("/agent/config", async ([FromServices] AgentOptions options, [FromServices] IAgentOptionsStore optionsStore, [FromBody] AgentConfigUpdate? update, CancellationToken cancellationToken, ILogger<Program> logger) =>
 			{
 				static string? ReadExtra(AgentConfigUpdate payload, params string[] names)
 				{
@@ -158,7 +167,11 @@ namespace PitWall.Agent
 					return null;
 				}
 
-				if (update.EnableLLM.HasValue)
+				var validationErrors = AgentConfigValidator.Validate(update);
+				if (validationErrors.Count > 0)
+					return Results.BadRequest(new { errors = validationErrors });
+
+				if (update!.EnableLLM.HasValue)
 					options.EnableLLM = update.EnableLLM.Value;
 				if (!string.IsNullOrWhiteSpace(update.LLMProvider))
 					options.LLMProvider = update.LLMProvider;

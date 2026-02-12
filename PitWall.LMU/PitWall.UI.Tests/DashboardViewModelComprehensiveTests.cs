@@ -646,7 +646,7 @@ namespace PitWall.UI.Tests
             };
 
             // Act
-            vm.UpdateCarSpec(spec, null);
+            vm.UpdateCarSpec(spec, string.Empty);
 
             // Assert
             Assert.Equal("--", vm.CarClass);
@@ -660,11 +660,11 @@ namespace PitWall.UI.Tests
             var spec = new CarSpec
             {
                 Name = "Test Car",
-                Power = null
+                Power = string.Empty
             };
 
             // Act
-            vm.UpdateCarSpec(spec, null);
+            vm.UpdateCarSpec(spec, string.Empty);
 
             // Assert
             Assert.Equal("--", vm.CarPower);
