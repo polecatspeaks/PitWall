@@ -95,7 +95,7 @@ namespace PitWall.UI.Services
             }
         }
 
-        public async Task<AgentHealthDto> CheckHealthAsync(CancellationToken cancellationToken)
+        public async Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
         {
             try
             {
@@ -116,7 +116,7 @@ namespace PitWall.UI.Services
             }
         }
 
-        public async Task<LlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+        public async Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
         {
             try
             {
@@ -125,10 +125,10 @@ namespace PitWall.UI.Services
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync(cancellationToken);
-                var result = JsonSerializer.Deserialize<LlmTestDto>(json, Options);
+                var result = JsonSerializer.Deserialize<AgentLlmTestDto>(json, Options);
 
                 _logger.LogDebug("LLM connection test completed.");
-                return result ?? new LlmTestDto();
+                return result ?? new AgentLlmTestDto();
             }
             catch (Exception ex)
             {

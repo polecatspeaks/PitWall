@@ -346,13 +346,13 @@ internal sealed class NullAgentConfigClient : IAgentConfigClient
 		return Task.FromResult<IReadOnlyList<string>>(new[] { "http://localhost:11434", "http://192.168.1.100:11434" });
 	}
 
-	public Task<AgentHealthDto> CheckHealthAsync(CancellationToken cancellationToken)
+	public Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
 	{
 		return Task.FromResult(new AgentHealthDto());
 	}
 
-	public Task<LlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+	public Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
 	{
-		return Task.FromResult(new LlmTestDto());
+		return Task.FromResult(new AgentLlmTestDto());
 	}
 }

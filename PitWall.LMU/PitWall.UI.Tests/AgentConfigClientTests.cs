@@ -198,7 +198,7 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public async Task CheckHealthAsync_ReturnsParsedHealth()
+        public async Task GetHealthAsync_ReturnsParsedHealth()
         {
             var handler = new StubHttpHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
             {
@@ -208,7 +208,7 @@ namespace PitWall.UI.Tests
             var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
             var api = new AgentConfigClient(client);
 
-            var result = await api.CheckHealthAsync(CancellationToken.None);
+            var result = await api.GetHealthAsync(CancellationToken.None);
 
             Assert.True(result.LlmEnabled);
             Assert.True(result.LlmAvailable);
@@ -218,7 +218,7 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public async Task CheckHealthAsync_RequestsCorrectEndpoint()
+        public async Task GetHealthAsync_RequestsCorrectEndpoint()
         {
             HttpRequestMessage? capturedRequest = null;
             var handler = new StubHttpHandler(req =>
@@ -233,7 +233,7 @@ namespace PitWall.UI.Tests
             var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
             var api = new AgentConfigClient(client);
 
-            await api.CheckHealthAsync(CancellationToken.None);
+            await api.GetHealthAsync(CancellationToken.None);
 
             Assert.NotNull(capturedRequest);
             Assert.Equal(HttpMethod.Get, capturedRequest.Method);
@@ -241,25 +241,25 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public async Task CheckHealthAsync_HttpError_ThrowsException()
+        public async Task GetHealthAsync_HttpError_ThrowsException()
         {
             var handler = new StubHttpHandler(_ => new HttpResponseMessage(HttpStatusCode.InternalServerError));
             var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
             var api = new AgentConfigClient(client);
 
             await Assert.ThrowsAsync<HttpRequestException>(
-                async () => await api.CheckHealthAsync(CancellationToken.None));
+                async () => await api.GetHealthAsync(CancellationToken.None));
         }
 
         [Fact]
-        public async Task CheckHealthAsync_NetworkError_ThrowsException()
+        public async Task GetHealthAsync_NetworkError_ThrowsException()
         {
             var handler = new StubHttpHandler(_ => throw new HttpRequestException("Network error"));
             var client = new HttpClient(handler) { BaseAddress = new Uri("http://localhost:5000") };
             var api = new AgentConfigClient(client);
 
             await Assert.ThrowsAsync<HttpRequestException>(
-                async () => await api.CheckHealthAsync(CancellationToken.None));
+                async () => await api.GetHealthAsync(CancellationToken.None));
         }
 
         [Fact]

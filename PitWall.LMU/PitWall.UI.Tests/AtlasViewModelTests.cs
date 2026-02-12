@@ -720,14 +720,14 @@ public class AtlasSettingsViewModelTests
 			return Task.FromResult<IReadOnlyList<string>>(new[] { "http://localhost:11434", "http://192.168.1.100:11434" });
 		}
 
-		public Task<AgentHealthDto> CheckHealthAsync(CancellationToken cancellationToken)
+		public Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
 		{
 			return Task.FromResult(new AgentHealthDto { LlmEnabled = true, LlmAvailable = true });
 		}
 
-		public Task<LlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+		public Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
 		{
-			return Task.FromResult(new LlmTestDto { LlmEnabled = true, Available = true });
+			return Task.FromResult(new AgentLlmTestDto { LlmEnabled = true, Available = true });
 		}
 	}
 }
@@ -1520,13 +1520,13 @@ internal class NullAgentConfigClient : IAgentConfigClient
 		return Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
 	}
 
-	public Task<AgentHealthDto> CheckHealthAsync(CancellationToken cancellationToken)
+	public Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
 	{
 		return Task.FromResult(new AgentHealthDto());
 	}
 
-	public Task<LlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+	public Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
 	{
-		return Task.FromResult(new LlmTestDto());
+		return Task.FromResult(new AgentLlmTestDto());
 	}
 }

@@ -54,10 +54,10 @@ namespace PitWall.UI.Tests
 				.ReturnsAsync(new AgentConfigDto());
 			mock.Setup(x => x.DiscoverEndpointsAsync(It.IsAny<CancellationToken>()))
 				.ReturnsAsync(new List<string>());
-			mock.Setup(x => x.CheckHealthAsync(It.IsAny<CancellationToken>()))
+			mock.Setup(x => x.GetHealthAsync(It.IsAny<CancellationToken>()))
 				.ReturnsAsync(new AgentHealthDto());
 			mock.Setup(x => x.TestLlmAsync(It.IsAny<CancellationToken>()))
-				.ReturnsAsync(new LlmTestDto());
+				.ReturnsAsync(new AgentLlmTestDto());
 			return mock;
 		}
 
