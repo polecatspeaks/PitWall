@@ -205,6 +205,40 @@ namespace PitWall.UI.Tests
 
 		#endregion
 
+		#region UI Refresh Cadence Tests
+
+		[Fact]
+		public void UiUpdateInterval_Is10Hz()
+		{
+			// Assert: UI refresh interval must be 0.1s (10 Hz) per ui-spec.md
+			Assert.Equal(0.1, MainWindowViewModel.UiUpdateIntervalSeconds);
+		}
+
+		#endregion
+
+		#region ApplyRecommendation Tests
+
+		[Fact]
+		public void ApplyRecommendation_UpdatesStrategyRecommendedActionAndConfidence()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+			var recommendation = new RecommendationDto
+			{
+				Recommendation = "Box this lap",
+				Confidence = 0.85
+			};
+
+			// Act
+			vm.ApplyRecommendation(recommendation);
+
+			// Assert
+			Assert.Equal("Box this lap", vm.Strategy.RecommendedAction);
+			Assert.Equal(0.85, vm.Strategy.StrategyConfidence);
+		}
+
+		#endregion
+
 		#region Constructor Tests
 
 		[Fact]
