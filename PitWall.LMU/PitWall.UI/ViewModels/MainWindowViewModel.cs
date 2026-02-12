@@ -36,7 +36,7 @@ public partial class MainWindowViewModel : ViewModelBase
 	private TelemetrySampleDto? _pendingTelemetry;
 	private int _telemetryUpdateScheduled;
 	private long _lastUiUpdateTicks;
-	internal const double UiUpdateIntervalSeconds = 0.1;
+	private const double UiUpdateIntervalSeconds = 0.05;
 	private int _lastLapNumber = int.MinValue;
 	private bool _usePreloadedReplay;
 	private int _preloadedSessionId = -1;
