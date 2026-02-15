@@ -179,13 +179,20 @@ namespace PitWall.UI.Controls
             var point = ScalePoint(CurrentPoint.Value);
             var bounds = MapCanvas.Bounds;
 
+            // If canvas is too small for the label, hide it to avoid positioning issues
+            if (bounds.Width < labelWidth + 8 || bounds.Height < labelHeight + 8)
+            {
+                SegmentLabel.IsVisible = false;
+                return;
+            }
+
             // Place the label above the car marker with a small offset.
             var x = point.X - labelWidth / 2;
             var y = point.Y - CarMarker.Height / 2 - labelHeight - 4;
 
-            // Clamp to canvas bounds.
-            x = Math.Clamp(x, 2, Math.Max(2, bounds.Width - labelWidth - 2));
-            y = Math.Clamp(y, 2, Math.Max(2, bounds.Height - labelHeight - 2));
+            // Clamp to canvas bounds with 4px margins
+            x = Math.Clamp(x, 4, bounds.Width - labelWidth - 4);
+            y = Math.Clamp(y, 4, bounds.Height - labelHeight - 4);
 
             Canvas.SetLeft(SegmentLabel, x);
             Canvas.SetTop(SegmentLabel, y);

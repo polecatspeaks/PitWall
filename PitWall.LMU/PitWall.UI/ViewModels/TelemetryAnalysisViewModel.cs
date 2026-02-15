@@ -50,7 +50,8 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	/// <summary>
 	/// When true, mouse hover controls the cursor — replay cursor updates are suppressed.
 	/// </summary>
-	public bool IsMouseHovering { get; set; }
+	[ObservableProperty]
+	private bool isMouseHovering;
 
 	[ObservableProperty]
 	private string statusMessage = "No telemetry data available";
