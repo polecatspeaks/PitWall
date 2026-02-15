@@ -393,7 +393,8 @@ public partial class MainWindowViewModel : ViewModelBase
 			var laps = _telemetryBuffer.GetAvailableLaps();
 			if (laps.Length > 0)
 			{
-				TelemetryAnalysis.LoadCurrentLapData(laps[^1]);
+				// Load the first lap so the display matches the replay start position.
+				TelemetryAnalysis.LoadCurrentLapData(laps[0]);
 			}
 		});
 		IsPreloading = false;
@@ -639,6 +640,8 @@ public partial class MainWindowViewModel : ViewModelBase
 				}
 			}
 		}
+
+		TelemetryAnalysis.UpdateReplayCursor(telemetry);
 	}
 
 	public void UpdateHoverSample(TelemetrySampleDto? telemetry)
@@ -764,6 +767,13 @@ public partial class MainWindowViewModel : ViewModelBase
 		var trackKey = value.TrackId ?? value.Track;
 		_trackMapService.Reset(trackKey);
 		UpdateCarSpec(value.Car);
+
+		// Trigger preload + map rebuild for the newly selected session
+		if (ReplayEnabled)
+		{
+			IsReplayPlaying = true;
+			StartReplay();
+		}
 	}
 
 	partial void OnSessionFilterFromChanged(DateTime? value)

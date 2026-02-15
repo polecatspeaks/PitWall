@@ -54,10 +54,6 @@ namespace PitWall.UI.Tests
 				.ReturnsAsync(new AgentConfigDto());
 			mock.Setup(x => x.DiscoverEndpointsAsync(It.IsAny<CancellationToken>()))
 				.ReturnsAsync(new List<string>());
-			mock.Setup(x => x.GetHealthAsync(It.IsAny<CancellationToken>()))
-				.ReturnsAsync(new AgentHealthDto());
-			mock.Setup(x => x.TestLlmAsync(It.IsAny<CancellationToken>()))
-				.ReturnsAsync(new AgentLlmTestDto());
 			return mock;
 		}
 
@@ -214,7 +210,6 @@ namespace PitWall.UI.Tests
 		[Fact]
 		public void UiUpdateInterval_Is10Hz()
 		{
-			// Assert: UI refresh interval must be 0.1s (10 Hz) per ui-spec.md
 			Assert.Equal(0.1, MainWindowViewModel.UiUpdateIntervalSeconds);
 		}
 

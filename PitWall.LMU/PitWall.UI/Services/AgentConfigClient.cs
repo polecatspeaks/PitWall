@@ -120,19 +120,19 @@ namespace PitWall.UI.Services
         {
             try
             {
-                _logger.LogDebug("Testing LLM connection.");
+                _logger.LogDebug("Testing agent LLM availability.");
                 var response = await _httpClient.GetAsync("/agent/llm/test", cancellationToken);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync(cancellationToken);
                 var result = JsonSerializer.Deserialize<AgentLlmTestDto>(json, Options);
 
-                _logger.LogDebug("LLM connection test completed.");
+                _logger.LogDebug("Agent LLM test completed.");
                 return result ?? new AgentLlmTestDto();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "LLM connection test failed.");
+                _logger.LogError(ex, "Agent LLM test failed.");
                 throw;
             }
         }

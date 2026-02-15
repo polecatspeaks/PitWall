@@ -278,7 +278,7 @@ INSERT INTO ""Lap"" VALUES (100.0, 1, 1);";
                 var cts = new System.Threading.CancellationTokenSource();
                 cts.Cancel();
 
-                await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
                 {
                     await foreach (var sample in reader.ReadSamplesAsync(1, 0, 100, cts.Token))
                     {

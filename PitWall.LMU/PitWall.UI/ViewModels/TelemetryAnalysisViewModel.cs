@@ -13,7 +13,7 @@ using PitWall.UI.Services;
 namespace PitWall.UI.ViewModels;
 
 /// <summary>
-/// ViewModel for telemetry analysis with waveform displays, lap comparison,
+/// ViewModel for telemetry analysis with waveform displays
 /// and historical data visualization using ScottPlot.
 /// </summary>
 public partial class TelemetryAnalysisViewModel : ViewModelBase
@@ -23,16 +23,34 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	public event EventHandler? DataSeriesUpdated;
 
 	[ObservableProperty]
-	private int? selectedReferenceLap;
-
-	[ObservableProperty]
 	private int currentLap = 1;
 
 	[ObservableProperty]
 	private bool isPlayingBack;
 
 	[ObservableProperty]
-	private double cursorPosition;
+	private double cursorPosition = double.NaN;
+
+	/// <summary>
+	/// Formatted "LAP X / Y" string for display in the telemetry header.
+	/// Automatically updated when <see cref="CurrentLap"/> changes.
+	/// </summary>
+	[ObservableProperty]
+	private string lapDisplay = "LAP --";
+
+	/// <summary>
+	/// Called by CommunityToolkit source generator when <see cref="CurrentLap"/> changes.
+	/// </summary>
+	partial void OnCurrentLapChanged(int value)
+	{
+		var total = AvailableLaps.Count > 0 ? AvailableLaps.Count.ToString() : "--";
+		LapDisplay = value > 0 ? $"LAP {value} / {total}" : "LAP --";
+	}
+
+	/// <summary>
+	/// When true, mouse hover controls the cursor — replay cursor updates are suppressed.
+	/// </summary>
+	public bool IsMouseHovering { get; set; }
 
 	[ObservableProperty]
 	private string statusMessage = "No telemetry data available";
@@ -58,13 +76,6 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 	public ObservableCollection<TelemetryDataPoint> BrakeData { get; } = new();
 	public ObservableCollection<TelemetryDataPoint> SteeringData { get; } = new();
 	public ObservableCollection<TelemetryDataPoint> TireTempData { get; } = new();
-
-	// Reference lap data series (for comparison)
-	public ObservableCollection<TelemetryDataPoint> ReferenceSpeedData { get; } = new();
-	public ObservableCollection<TelemetryDataPoint> ReferenceThrottleData { get; } = new();
-	public ObservableCollection<TelemetryDataPoint> ReferenceBrakeData { get; } = new();
-	public ObservableCollection<TelemetryDataPoint> ReferenceSteeringData { get; } = new();
-	public ObservableCollection<TelemetryDataPoint> ReferenceTireTempData { get; } = new();
 
 	/// <summary>
 	/// Constructor for runtime with dependency injection
@@ -93,48 +104,57 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 
 	private void InitializeCursorDataTable()
 	{
-		CursorData.Add(new CursorDataRow { Parameter = "vSpeed", Unit = "km/h", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-		CursorData.Add(new CursorDataRow { Parameter = "nThrottle", Unit = "%", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-		CursorData.Add(new CursorDataRow { Parameter = "nBrake", Unit = "%", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-		CursorData.Add(new CursorDataRow { Parameter = "rSteer", Unit = "°", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-		CursorData.Add(new CursorDataRow { Parameter = "tTyreCentre_FL", Unit = "°C", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-		CursorData.Add(new CursorDataRow { Parameter = "tTyreCentre_FR", Unit = "°C", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-		CursorData.Add(new CursorDataRow { Parameter = "tTyreCentre_RL", Unit = "°C", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-		CursorData.Add(new CursorDataRow { Parameter = "tTyreCentre_RR", Unit = "°C", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-		CursorData.Add(new CursorDataRow { Parameter = "fFuel", Unit = "L", CurrentValue = "--", ReferenceValue = "--", Delta = "--" });
-	}
-
-	[RelayCommand]
-	private void SelectReferenceLap(int lapNumber)
-	{
-		if (lapNumber < 0) return;
-		
-		SelectedReferenceLap = lapNumber;
-	}
-
-	partial void OnSelectedReferenceLapChanged(int? value)
-	{
-		if (!value.HasValue || value.Value < 0)
-		{
-			ClearReferenceLapData();
-			return;
-		}
-
-		LoadReferenceLapData();
+		CursorData.Add(new CursorDataRow { Parameter = "vSpeed", Unit = "km/h", CurrentValue = "--" });
+		CursorData.Add(new CursorDataRow { Parameter = "nThrottle", Unit = "%", CurrentValue = "--" });
+		CursorData.Add(new CursorDataRow { Parameter = "nBrake", Unit = "%", CurrentValue = "--" });
+		CursorData.Add(new CursorDataRow { Parameter = "rSteer", Unit = "°", CurrentValue = "--" });
+		CursorData.Add(new CursorDataRow { Parameter = "tTyreCentre_FL", Unit = "°C", CurrentValue = "--" });
+		CursorData.Add(new CursorDataRow { Parameter = "tTyreCentre_FR", Unit = "°C", CurrentValue = "--" });
+		CursorData.Add(new CursorDataRow { Parameter = "tTyreCentre_RL", Unit = "°C", CurrentValue = "--" });
+		CursorData.Add(new CursorDataRow { Parameter = "tTyreCentre_RR", Unit = "°C", CurrentValue = "--" });
+		CursorData.Add(new CursorDataRow { Parameter = "fFuel", Unit = "L", CurrentValue = "--" });
 	}
 
 	[RelayCommand]
 	private void PreviousSector()
 	{
-		// TODO: Implement sector-based navigation
-		StatusMessage = "Sector navigation not yet implemented";
+		if (CurrentLap <= 0)
+		{
+			StatusMessage = "No lap loaded";
+			return;
+		}
+
+		var laps = _telemetryBuffer.GetAvailableLaps();
+		var idx = Array.IndexOf(laps, CurrentLap);
+		if (idx > 0)
+		{
+			LoadCurrentLapData(laps[idx - 1]);
+		}
+		else
+		{
+			StatusMessage = $"Already on first available lap ({CurrentLap})";
+		}
 	}
 
 	[RelayCommand]
 	private void NextSector()
 	{
-		// TODO: Implement sector-based navigation
-		StatusMessage = "Sector navigation not yet implemented";
+		if (CurrentLap <= 0)
+		{
+			StatusMessage = "No lap loaded";
+			return;
+		}
+
+		var laps = _telemetryBuffer.GetAvailableLaps();
+		var idx = Array.IndexOf(laps, CurrentLap);
+		if (idx >= 0 && idx < laps.Length - 1)
+		{
+			LoadCurrentLapData(laps[idx + 1]);
+		}
+		else
+		{
+			StatusMessage = $"Already on last available lap ({CurrentLap})";
+		}
 	}
 
 	[RelayCommand]
@@ -194,7 +214,7 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 					$"{(sample.TyreTempsC.Length > 2 ? sample.TyreTempsC[2] : 0):F1}," +
 					$"{(sample.TyreTempsC.Length > 3 ? sample.TyreTempsC[3] : 0):F1}," +
 					$"{sample.FuelLiters:F2}");
-				time += 0.01; // Assuming 100Hz sampling
+				time += 0.02; // 50Hz sampling
 			}
 
 			await File.WriteAllTextAsync(fileName, csv.ToString());
@@ -219,25 +239,6 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		CurrentLap = lapNumber;
 		var lapData = _telemetryBuffer.GetLapData(lapNumber);
 
-		var brakeSamples = lapData.Count(s => s.BrakePosition > 0);
-		var brakeStats = lapData
-			.Where(s => s.BrakePosition > 0)
-			.Select(s => s.BrakePosition)
-			.ToList();
-
-		if (brakeStats.Count > 0)
-		{
-			var minBrake = brakeStats.Min();
-			var maxBrake = brakeStats.Max();
-			var avgBrake = brakeStats.Average();
-			Console.WriteLine($"[TelemetryAnalysis:BUFFER] Lap {lapNumber}: {lapData.Length} total samples, {brakeSamples} with brake > 0");
-			Console.WriteLine($"[TelemetryAnalysis:BRAKE_RANGE] Min={minBrake:F3} Max={maxBrake:F3} Avg={avgBrake:F3}");
-		}
-		else
-		{
-			Console.WriteLine($"[TelemetryAnalysis:WARNING] Lap {lapNumber}: ALL {lapData.Length} samples have brake = 0!");
-		}
-
 		if (lapData.Length == 0)
 		{
 			StatusMessage = $"No data found for lap {lapNumber}";
@@ -248,32 +249,6 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		PopulateDataSeries(lapData, SpeedData, ThrottleData, BrakeData, SteeringData, TireTempData);
 		StatusMessage = $"Loaded {lapData.Length} samples for lap {lapNumber}";
 		RaiseDataSeriesUpdated();
-	}
-
-	private void LoadReferenceLapData()
-	{
-		if (!SelectedReferenceLap.HasValue || SelectedReferenceLap.Value < 0) return;
-
-		var lapData = _telemetryBuffer.GetLapData(SelectedReferenceLap.Value);
-
-		if (lapData.Length == 0)
-		{
-			StatusMessage = $"No data found for reference lap {SelectedReferenceLap}";
-			ClearReferenceLapData();
-			return;
-		}
-
-		PopulateDataSeries(lapData, ReferenceSpeedData, ReferenceThrottleData, ReferenceBrakeData, ReferenceSteeringData, ReferenceTireTempData);
-		StatusMessage = $"Loaded reference lap {SelectedReferenceLap} with {lapData.Length} samples";
-		RaiseDataSeriesUpdated();
-	}
-
-	/// <summary>
-	/// Loads reference lap data (public for testing)
-	/// </summary>
-	public void LoadReferenceLapData(int lapNumber)
-	{
-		SelectedReferenceLap = lapNumber;
 	}
 
 	private void PopulateDataSeries(
@@ -290,35 +265,46 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		steeringSeries.Clear();
 		tireTempSeries.Clear();
 
-		double time = 0;
-		foreach (var sample in samples)
+		// Use actual timestamps relative to first sample for the time axis.
+		// Data is now interpolated to a uniform 50Hz grid.
+		DateTime? firstTimestamp = samples.Length > 0 ? samples[0].Timestamp : null;
+
+		for (int i = 0; i < samples.Length; i++)
 		{
+			var sample = samples[i];
+			double time;
+			if (firstTimestamp.HasValue && sample.Timestamp.HasValue)
+			{
+				time = (sample.Timestamp.Value - firstTimestamp.Value).TotalSeconds;
+			}
+			else
+			{
+				// Fallback: assume 50Hz spacing if timestamps are missing
+				time = i * 0.02;
+			}
+
 			speedSeries.Add(new TelemetryDataPoint { Time = time, Value = sample.SpeedKph });
 			throttleSeries.Add(new TelemetryDataPoint { Time = time, Value = sample.ThrottlePosition * 100 });
 			brakeSeries.Add(new TelemetryDataPoint { Time = time, Value = sample.BrakePosition * 100 });
 			steeringSeries.Add(new TelemetryDataPoint { Time = time, Value = sample.SteeringAngle });
-			
+
 			// Average tire temperature
 			var avgTireTemp = sample.TyreTempsC.Length > 0 ? sample.TyreTempsC.Average() : 0;
 			tireTempSeries.Add(new TelemetryDataPoint { Time = time, Value = avgTireTemp });
-
-			time += 0.01; // 100Hz = 10ms = 0.01s
 		}
 	}
 
 	/// <summary>
-	/// Updates the available laps list from telemetry buffer without disrupting ComboBox selection
+	/// Updates the available laps list from telemetry buffer
 	/// </summary>
 	public void RefreshAvailableLaps()
 	{
 		var laps = _telemetryBuffer.GetAvailableLaps();
-		var selectedLap = SelectedReferenceLap;
 
 		// Check if list has actually changed by comparing both length and content
 		bool needsUpdate = AvailableLaps.Count != laps.Length;
 		if (!needsUpdate && laps.Length > 0)
 		{
-			// Verify all items match
 			for (int i = 0; i < laps.Length; i++)
 			{
 				if (AvailableLaps[i] != laps[i])
@@ -329,7 +315,6 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 			}
 		}
 
-		// If list hasn't changed, just update message and exit without touching collections
 		if (!needsUpdate)
 		{
 			if (laps.Length > 0)
@@ -339,8 +324,6 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 			return;
 		}
 
-		// Only update if list actually changed - add/remove items instead of clearing
-		// to avoid disrupting ComboBox binding
 		var toRemove = AvailableLaps.Where(l => !laps.Contains(l)).ToList();
 		foreach (var lap in toRemove)
 		{
@@ -353,51 +336,99 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 			AvailableLaps.Add(lap);
 		}
 
-		// Verify selection is still valid
 		if (laps.Length > 0)
 		{
-			if (selectedLap.HasValue && laps.Contains(selectedLap.Value))
-			{
-				SelectedReferenceLap = selectedLap;
-			}
-			else if (!SelectedReferenceLap.HasValue || !laps.Contains(SelectedReferenceLap.Value))
-			{
-				SelectedReferenceLap = laps[0];
-			}
 			StatusMessage = $"{laps.Length} laps available for analysis";
 		}
 		else
 		{
-			SelectedReferenceLap = null;
 			StatusMessage = "No telemetry data available yet";
 		}
+
+		// Refresh the lap display with updated total count.
+		OnCurrentLapChanged(CurrentLap);
 	}
 
 	/// <summary>
-	/// Updates cursor data table when user moves crosshair
+	/// Updates cursor data table when user moves crosshair.
+	/// Uses raw sample data for individual tyre temperatures.
 	/// </summary>
 	public void UpdateCursorData(double position)
 	{
 		CursorPosition = position;
 
-		// Find index in data arrays based on time position
-		var currentIndex = (int)(position * 100); // 100Hz sampling
-		var referenceIndex = currentIndex;
+		// Get raw sample for individual tyre temps and fuel
+		var sample = GetSampleAtTime(position);
+		if (sample != null)
+		{
+			UpdateCursorDataFromSample(sample, (int)Math.Round(position / 0.02));
+			return;
+		}
 
-		// Extract current lap values
+		// Fallback to plot data series if no raw sample available
+		var currentIndex = (int)Math.Round(position / 0.02); // 50Hz sampling
 		var currentValues = ExtractValuesAtIndex(SpeedData, ThrottleData, BrakeData, SteeringData, TireTempData, currentIndex);
-		var referenceValues = ExtractValuesAtIndex(ReferenceSpeedData, ReferenceThrottleData, ReferenceBrakeData, ReferenceSteeringData, ReferenceTireTempData, referenceIndex);
 
-		// Update cursor data table
-		UpdateCursorDataRow(0, "vSpeed", currentValues.Speed, referenceValues.Speed, "km/h");
-		UpdateCursorDataRow(1, "nThrottle", currentValues.Throttle, referenceValues.Throttle, "%");
-		UpdateCursorDataRow(2, "nBrake", currentValues.Brake, referenceValues.Brake, "%");
-		UpdateCursorDataRow(3, "rSteer", currentValues.Steering, referenceValues.Steering, "°");
-		UpdateCursorDataRow(4, "tTyreCentre_FL", currentValues.TireTemp, referenceValues.TireTemp, "°C");
-		UpdateCursorDataRow(5, "tTyreCentre_FR", currentValues.TireTemp, referenceValues.TireTemp, "°C");
-		UpdateCursorDataRow(6, "tTyreCentre_RL", currentValues.TireTemp, referenceValues.TireTemp, "°C");
-		UpdateCursorDataRow(7, "tTyreCentre_RR", currentValues.TireTemp, referenceValues.TireTemp, "°C");
-		UpdateCursorDataRow(8, "fFuel", currentValues.Fuel, referenceValues.Fuel, "L");
+		UpdateCursorDataRow(0, "vSpeed", currentValues.Speed, "km/h");
+		UpdateCursorDataRow(1, "nThrottle", currentValues.Throttle, "%");
+		UpdateCursorDataRow(2, "nBrake", currentValues.Brake, "%");
+		UpdateCursorDataRow(3, "rSteer", currentValues.Steering, "°");
+		UpdateCursorDataRow(4, "tTyreCentre_FL", currentValues.TireTemp, "°C");
+		UpdateCursorDataRow(5, "tTyreCentre_FR", currentValues.TireTemp, "°C");
+		UpdateCursorDataRow(6, "tTyreCentre_RL", currentValues.TireTemp, "°C");
+		UpdateCursorDataRow(7, "tTyreCentre_RR", currentValues.TireTemp, "°C");
+		UpdateCursorDataRow(8, "fFuel", currentValues.Fuel, "L");
+		OnPropertyChanged(nameof(CursorData));
+	}
+
+	/// <summary>
+	/// Updates the replay cursor and data table using the active sample.
+	/// Skipped when mouse hover is active.  When the replay moves to a
+	/// different lap the displayed plot is auto-switched so the cursor
+	/// follows the replay progression.
+	/// </summary>
+	public void UpdateReplayCursor(TelemetrySampleDto sample)
+	{
+		if (sample == null || sample.LapNumber < 0)
+		{
+			return;
+		}
+
+		// Don't overwrite cursor data when the user is hovering over the plot.
+		if (IsMouseHovering)
+		{
+			return;
+		}
+
+		// Auto-switch displayed lap to follow the replay.
+		if (sample.LapNumber != CurrentLap && sample.LapNumber > 0)
+		{
+			LoadCurrentLapData(sample.LapNumber);
+		}
+
+		var lapData = _telemetryBuffer.GetLapData(sample.LapNumber);
+		if (lapData.Length == 0)
+		{
+			return;
+		}
+
+		var index = Array.FindIndex(lapData, s => ReferenceEquals(s, sample));
+		if (index < 0 && sample.Timestamp.HasValue)
+		{
+			var timestamp = sample.Timestamp.Value;
+			index = Array.FindIndex(
+				lapData,
+				s => s.Timestamp.HasValue && s.Timestamp.Value == timestamp);
+		}
+
+		if (index < 0)
+		{
+			index = Math.Max(0, lapData.Length - 1);
+		}
+
+		var timeSeconds = Math.Clamp(index, 0, lapData.Length - 1) * 0.02; // 50Hz = 0.02s per sample
+		CursorPosition = timeSeconds;
+		UpdateCursorDataFromSample(sample, index);
 	}
 
 	public TelemetrySampleDto? GetSampleAtTime(double timeSeconds)
@@ -413,12 +444,12 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 			return null;
 		}
 
-		var index = (int)Math.Round(timeSeconds / 0.01);
+		var index = (int)Math.Round(timeSeconds / 0.02); // 50Hz = 0.02s per sample
 		index = Math.Clamp(index, 0, lapData.Length - 1);
 		return lapData[index];
 	}
 
-	private (double Speed, double Throttle, double Brake, double Steering, double TireTemp, double Fuel) ExtractValuesAtIndex(
+	private (double? Speed, double? Throttle, double? Brake, double? Steering, double? TireTemp, double? Fuel) ExtractValuesAtIndex(
 		ObservableCollection<TelemetryDataPoint> speedData,
 		ObservableCollection<TelemetryDataPoint> throttleData,
 		ObservableCollection<TelemetryDataPoint> brakeData,
@@ -426,40 +457,75 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		ObservableCollection<TelemetryDataPoint> tireTempData,
 		int index)
 	{
-		if (index < 0 || speedData.Count == 0)
-			return (0, 0, 0, 0, 0, 0);
-
-		index = Math.Min(index, speedData.Count - 1);
+		if (index < 0)
+		{
+			return (null, null, null, null, null, null);
+		}
 
 		return (
-			index < speedData.Count ? speedData[index].Value : 0,
-			index < throttleData.Count ? throttleData[index].Value : 0,
-			index < brakeData.Count ? brakeData[index].Value : 0,
-			index < steeringData.Count ? steeringData[index].Value : 0,
-			index < tireTempData.Count ? tireTempData[index].Value : 0,
-			0 // Fuel not in series yet
+			speedData.Count > 0 ? speedData[Math.Min(index, speedData.Count - 1)].Value : null,
+			throttleData.Count > 0 ? throttleData[Math.Min(index, throttleData.Count - 1)].Value : null,
+			brakeData.Count > 0 ? brakeData[Math.Min(index, brakeData.Count - 1)].Value : null,
+			steeringData.Count > 0 ? steeringData[Math.Min(index, steeringData.Count - 1)].Value : null,
+			tireTempData.Count > 0 ? tireTempData[Math.Min(index, tireTempData.Count - 1)].Value : null,
+			null // Fuel not in series yet
 		);
 	}
 
-	private void UpdateCursorDataRow(int rowIndex, string parameter, double currentValue, double referenceValue, string unit)
+	private void UpdateCursorDataRow(int rowIndex, string parameter, double? currentValue, string unit)
 	{
 		if (rowIndex >= CursorData.Count) return;
 
 		var row = CursorData[rowIndex];
 		row.Parameter = parameter;
 		row.Unit = unit;
-		row.CurrentValue = currentValue > 0 ? $"{currentValue:F1}" : "--";
-		row.ReferenceValue = referenceValue > 0 ? $"{referenceValue:F1}" : "--";
+		row.CurrentValue = FormatCursorValue(currentValue);
+	}
 
-		if (currentValue > 0 && referenceValue > 0)
+	private static string FormatCursorValue(double? value)
+	{
+		return value.HasValue ? $"{value.Value:F1}" : "--";
+	}
+
+	private void UpdateCursorDataFromSample(TelemetrySampleDto sample, int index)
+	{
+		var current = ExtractFullValuesFromSample(sample);
+
+		UpdateCursorDataRow(0, "vSpeed", current.Speed, "km/h");
+		UpdateCursorDataRow(1, "nThrottle", current.Throttle, "%");
+		UpdateCursorDataRow(2, "nBrake", current.Brake, "%");
+		UpdateCursorDataRow(3, "rSteer", current.Steering, "°");
+		UpdateCursorDataRow(4, "tTyreCentre_FL", current.TyreFL, "°C");
+		UpdateCursorDataRow(5, "tTyreCentre_FR", current.TyreFR, "°C");
+		UpdateCursorDataRow(6, "tTyreCentre_RL", current.TyreRL, "°C");
+		UpdateCursorDataRow(7, "tTyreCentre_RR", current.TyreRR, "°C");
+		UpdateCursorDataRow(8, "fFuel", current.Fuel, "L");
+		OnPropertyChanged(nameof(CursorData));
+	}
+
+	private record struct FullSampleValues(
+		double? Speed, double? Throttle, double? Brake, double? Steering,
+		double? TyreFL, double? TyreFR, double? TyreRL, double? TyreRR,
+		double? Fuel);
+
+	private static FullSampleValues ExtractFullValuesFromSample(TelemetrySampleDto? sample)
+	{
+		if (sample == null)
 		{
-			var delta = currentValue - referenceValue;
-			row.Delta = $"{(delta >= 0 ? "▲" : "▼")} {Math.Abs(delta):F1}";
+			return default;
 		}
-		else
-		{
-			row.Delta = "--";
-		}
+
+		var tyres = sample.TyreTempsC;
+		return new FullSampleValues(
+			sample.SpeedKph,
+			sample.ThrottlePosition * 100.0,
+			sample.BrakePosition * 100.0,
+			sample.SteeringAngle,
+			tyres is { Length: > 0 } ? tyres[0] : null,
+			tyres is { Length: > 1 } ? tyres[1] : null,
+			tyres is { Length: > 2 } ? tyres[2] : null,
+			tyres is { Length: > 3 } ? tyres[3] : null,
+			sample.FuelLiters);
 	}
 
 	private void ClearCurrentLapData()
@@ -469,16 +535,6 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		BrakeData.Clear();
 		SteeringData.Clear();
 		TireTempData.Clear();
-		RaiseDataSeriesUpdated();
-	}
-
-	private void ClearReferenceLapData()
-	{
-		ReferenceSpeedData.Clear();
-		ReferenceThrottleData.Clear();
-		ReferenceBrakeData.Clear();
-		ReferenceSteeringData.Clear();
-		ReferenceTireTempData.Clear();
 		RaiseDataSeriesUpdated();
 	}
 
@@ -498,12 +554,6 @@ public partial class CursorDataRow : ObservableObject
 
 	[ObservableProperty]
 	private string currentValue = "--";
-
-	[ObservableProperty]
-	private string referenceValue = "--";
-
-	[ObservableProperty]
-	private string delta = "--";
 
 	[ObservableProperty]
 	private string unit = string.Empty;

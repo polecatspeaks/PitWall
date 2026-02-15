@@ -28,9 +28,11 @@ This checklist reconciles the UI MVP list, UI spec acceptance criteria, and end-
 - Latest dotnet test run after fixes: total 865, failed 0, succeeded 861, skipped 4.
 
 ## UI MVP (Per FINAL_REPORT.md and ui-spec)
-- [ ] All 5 tabs render and are clickable (Dashboard, Telemetry, Strategy, AI Engineer, Settings).
-- [ ] Status bar visible and updates without jitter.
+- [x] All 5 tabs render and are clickable (Dashboard, Telemetry, Strategy, AI Engineer, Settings).
+- [x] Status bar visible and updates without jitter (no data yet).
 - [ ] Dashboard panels render with bindings (fuel, tires, strategy, timing, weather, alerts).
+  - Alerts panel missing in Dashboard layout (see 2026-02-15 UI verification).
+  - Telemetry cursor table remains blank during replay; no crosshair marker observed (2026-02-15).
 - [x] Telemetry tab shows ScottPlot waveforms (5 AvaPlot controls) populated from TelemetryBuffer.
 - [x] Telemetry cursor data table updates with synchronized crosshair.
 - [x] AI Engineer tab has quick query buttons wired to SendQuickQueryCommand.
@@ -42,10 +44,11 @@ This checklist reconciles the UI MVP list, UI spec acceptance criteria, and end-
 - [ ] Fuel, speed, throttle, brake, steering, and tire temps update at 10 Hz UI refresh.
 - [x] TelemetryBuffer stores history and drives telemetry plots.
 - [x] Brake and telemetry graphs verified (see RCA_SUMMARY_AND_NEXT_STEPS.md).
+  - Telemetry plots show full session without a replay position marker; needs confirmation if intended UX.
 
 ## Strategy Engine Integration
 - [x] /api/recommend returns strategy with confidence (session 276 returned confidence 0 with no telemetry).
-- [x] Strategy tab updates with recommendation and confidence (empty-state now shows awaiting telemetry).
+- [x] Strategy tab updates with recommendation and confidence (tests cover ApplyRecommendation).
 - [x] Recommendation fallback behavior verified on API failure.
 
 ## AI Agent Integration

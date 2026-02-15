@@ -16,8 +16,7 @@ namespace PitWall.UI.Tests
             
             Assert.Equal(1, vm.CurrentLap);
             Assert.False(vm.IsPlayingBack);
-            Assert.Equal(0, vm.CursorPosition);
-            Assert.Null(vm.SelectedReferenceLap);
+            Assert.True(double.IsNaN(vm.CursorPosition));
             Assert.Equal("No telemetry data available", vm.StatusMessage);
             Assert.Equal(9, vm.CursorData.Count);
         }
@@ -63,71 +62,6 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public void LoadReferenceLapData_WithValidData_PopulatesReferenceSeries()
-        {
-            var buffer = new TelemetryBuffer();
-            AddSampleData(buffer, lapNumber: 2, sampleCount: 50);
-            var vm = new TelemetryAnalysisViewModel(buffer);
-            
-            vm.LoadReferenceLapData(2);
-            
-            Assert.Equal(50, vm.ReferenceSpeedData.Count);
-            Assert.Equal(50, vm.ReferenceThrottleData.Count);
-            Assert.Equal(50, vm.ReferenceBrakeData.Count);
-            Assert.Equal(50, vm.ReferenceSteeringData.Count);
-            Assert.Equal(50, vm.ReferenceTireTempData.Count);
-        }
-
-        [Fact]
-        public void LoadReferenceLapData_NegativeLap_DoesNothing()
-        {
-            var buffer = new TelemetryBuffer();
-            var vm = new TelemetryAnalysisViewModel(buffer);
-            
-            vm.LoadReferenceLapData(-1);
-            
-            Assert.Empty(vm.ReferenceSpeedData);
-        }
-
-        [Fact]
-        public void SelectedReferenceLap_WhenSet_LoadsData()
-        {
-            var buffer = new TelemetryBuffer();
-            AddSampleData(buffer, lapNumber: 3, sampleCount: 75);
-            var vm = new TelemetryAnalysisViewModel(buffer);
-            
-            vm.SelectedReferenceLap = 3;
-            
-            Assert.Equal(75, vm.ReferenceSpeedData.Count);
-        }
-
-        [Fact]
-        public void SelectedReferenceLap_NegativeValue_ClearsData()
-        {
-            var buffer = new TelemetryBuffer();
-            AddSampleData(buffer, lapNumber: 3, sampleCount: 75);
-            var vm = new TelemetryAnalysisViewModel(buffer);
-            vm.SelectedReferenceLap = 3;
-            
-            vm.SelectedReferenceLap = -1;
-            
-            Assert.Empty(vm.ReferenceSpeedData);
-        }
-
-        [Fact]
-        public void SelectedReferenceLap_Null_ClearsData()
-        {
-            var buffer = new TelemetryBuffer();
-            AddSampleData(buffer, lapNumber: 3, sampleCount: 75);
-            var vm = new TelemetryAnalysisViewModel(buffer);
-            vm.SelectedReferenceLap = 3;
-            
-            vm.SelectedReferenceLap = null;
-            
-            Assert.Empty(vm.ReferenceSpeedData);
-        }
-
-        [Fact]
         public void RefreshAvailableLaps_WithData_PopulatesLapsList()
         {
             var buffer = new TelemetryBuffer();
@@ -157,31 +91,31 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public void RefreshAvailableLaps_PreservesSelection()
+        public void RefreshAvailableLaps_PreservesLapList()
         {
             var buffer = new TelemetryBuffer();
             AddSampleData(buffer, lapNumber: 1, sampleCount: 10);
             AddSampleData(buffer, lapNumber: 2, sampleCount: 10);
             var vm = new TelemetryAnalysisViewModel(buffer);
-            vm.SelectedReferenceLap = 1;
             
             vm.RefreshAvailableLaps();
             
-            Assert.Equal(1, vm.SelectedReferenceLap);
+            Assert.Equal(2, vm.AvailableLaps.Count);
+            Assert.Contains(1, vm.AvailableLaps);
+            Assert.Contains(2, vm.AvailableLaps);
         }
 
         [Fact]
-        public void RefreshAvailableLaps_InvalidSelection_SetsFirstLap()
+        public void RefreshAvailableLaps_WithNewData_UpdatesList()
         {
             var buffer = new TelemetryBuffer();
             AddSampleData(buffer, lapNumber: 2, sampleCount: 10);
             AddSampleData(buffer, lapNumber: 3, sampleCount: 10);
             var vm = new TelemetryAnalysisViewModel(buffer);
-            vm.SelectedReferenceLap = 1;
             
             vm.RefreshAvailableLaps();
             
-            Assert.Equal(2, vm.SelectedReferenceLap);
+            Assert.Equal(2, vm.AvailableLaps.Count);
         }
 
         [Fact]
@@ -199,19 +133,25 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public void UpdateCursorData_WithReferenceData_ShowsDelta()
+        public void UpdateCursorData_ZeroValues_ShowsZero()
         {
             var buffer = new TelemetryBuffer();
-            AddSampleData(buffer, lapNumber: 1, sampleCount: 100, speedBase: 100);
-            AddSampleData(buffer, lapNumber: 2, sampleCount: 100, speedBase: 110);
+            buffer.Add(new TelemetrySampleDto
+            {
+                LapNumber = 1,
+                SpeedKph = 0,
+                ThrottlePosition = 0,
+                BrakePosition = 0,
+                SteeringAngle = 0,
+                TyreTempsC = new[] { 0.0, 0.0, 0.0, 0.0 },
+                FuelLiters = 0
+            });
             var vm = new TelemetryAnalysisViewModel(buffer);
             vm.LoadCurrentLapData(1);
-            vm.LoadReferenceLapData(2);
-            
-            vm.UpdateCursorData(0.5);
-            
-            var speedRow = vm.CursorData[0];
-            Assert.NotEqual("--", speedRow.Delta);
+
+            vm.UpdateCursorData(0.0);
+
+            Assert.Equal("0.0", vm.CursorData[0].CurrentValue);
         }
 
         [Fact]
@@ -226,6 +166,47 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
+        public void UpdateReplayCursor_WithSample_UpdatesCursorTable()
+        {
+            var buffer = new TelemetryBuffer();
+            AddSampleData(buffer, lapNumber: 1, sampleCount: 50, speedBase: 120);
+            var vm = new TelemetryAnalysisViewModel(buffer);
+            vm.LoadCurrentLapData(1);
+
+            var sample = buffer.GetLapData(1)[10];
+            vm.UpdateReplayCursor(sample);
+
+            Assert.True(vm.CursorPosition >= 0);
+            Assert.NotEqual("--", vm.CursorData[0].CurrentValue);
+        }
+
+        [Fact]
+        public void UpdateReplayCursor_ShowsIndividualTireTemps()
+        {
+            var buffer = new TelemetryBuffer();
+            buffer.Add(new TelemetrySampleDto
+            {
+                LapNumber = 1,
+                SpeedKph = 200,
+                ThrottlePosition = 1.0,
+                BrakePosition = 0,
+                SteeringAngle = 0,
+                TyreTempsC = new[] { 85.0, 90.0, 82.0, 88.0 },
+                FuelLiters = 50
+            });
+            var vm = new TelemetryAnalysisViewModel(buffer);
+            vm.LoadCurrentLapData(1);
+
+            var sample = buffer.GetLapData(1)[0];
+            vm.UpdateReplayCursor(sample);
+
+            Assert.Equal("85.0", vm.CursorData[4].CurrentValue); // FL
+            Assert.Equal("90.0", vm.CursorData[5].CurrentValue); // FR
+            Assert.Equal("82.0", vm.CursorData[6].CurrentValue); // RL
+            Assert.Equal("88.0", vm.CursorData[7].CurrentValue); // RR
+        }
+
+        [Fact]
         public void GetSampleAtTime_WithValidLap_ReturnsSample()
         {
             var buffer = new TelemetryBuffer();
@@ -236,6 +217,70 @@ namespace PitWall.UI.Tests
             var sample = vm.GetSampleAtTime(0.5);
             
             Assert.NotNull(sample);
+        }
+
+        [Fact]
+        public void UpdateReplayCursor_DifferentLap_AutoSwitchesDisplayedLap()
+        {
+            var buffer = new TelemetryBuffer();
+            AddSampleData(buffer, lapNumber: 1, sampleCount: 50, speedBase: 120);
+            AddSampleData(buffer, lapNumber: 2, sampleCount: 50, speedBase: 200);
+            var vm = new TelemetryAnalysisViewModel(buffer);
+            vm.LoadCurrentLapData(1);
+
+            // Set cursor to a known position on lap 1
+            vm.UpdateCursorData(0.1);
+
+            // Replay moves to lap 2 — should auto-switch displayed lap
+            var lap2Sample = buffer.GetLapData(2)[0];
+            vm.UpdateReplayCursor(lap2Sample);
+
+            // ViewModel should now display lap 2 with the cursor showing lap 2 data
+            Assert.Equal(2, vm.CurrentLap);
+            Assert.Equal("200.0", vm.CursorData[0].CurrentValue);
+        }
+
+        [Fact]
+        public void UpdateReplayCursor_MouseHovering_DoesNotOverwriteCursor()
+        {
+            var buffer = new TelemetryBuffer();
+            AddSampleData(buffer, lapNumber: 1, sampleCount: 50, speedBase: 120);
+            var vm = new TelemetryAnalysisViewModel(buffer);
+            vm.LoadCurrentLapData(1);
+
+            vm.UpdateCursorData(0.1);
+            var speedBefore = vm.CursorData[0].CurrentValue;
+
+            vm.IsMouseHovering = true;
+            var sample = buffer.GetLapData(1)[25];
+            vm.UpdateReplayCursor(sample);
+
+            // Cursor should still reflect the hover value, not the replay sample
+            Assert.Equal(speedBefore, vm.CursorData[0].CurrentValue);
+        }
+
+        [Fact]
+        public void LapDisplay_UpdatesWhenCurrentLapChanges()
+        {
+            var buffer = new TelemetryBuffer();
+            AddSampleData(buffer, lapNumber: 1, sampleCount: 10);
+            AddSampleData(buffer, lapNumber: 2, sampleCount: 10);
+            var vm = new TelemetryAnalysisViewModel(buffer);
+            vm.RefreshAvailableLaps();
+
+            vm.LoadCurrentLapData(1);
+
+            Assert.Equal("LAP 1 / 2", vm.LapDisplay);
+
+            vm.LoadCurrentLapData(2);
+            Assert.Equal("LAP 2 / 2", vm.LapDisplay);
+        }
+
+        [Fact]
+        public void LapDisplay_DefaultsToLapDash()
+        {
+            var vm = new TelemetryAnalysisViewModel();
+            Assert.Equal("LAP --", vm.LapDisplay);
         }
 
         [Fact]
@@ -339,36 +384,15 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public void SelectReferenceLapCommand_ValidLap_SetsProperty()
-        {
-            var buffer = new TelemetryBuffer();
-            AddSampleData(buffer, lapNumber: 5, sampleCount: 10);
-            var vm = new TelemetryAnalysisViewModel(buffer);
-            
-            vm.SelectReferenceLapCommand.Execute(5);
-            
-            Assert.Equal(5, vm.SelectedReferenceLap);
-        }
-
-        [Fact]
-        public void SelectReferenceLapCommand_NegativeLap_DoesNothing()
-        {
-            var vm = new TelemetryAnalysisViewModel();
-            vm.SelectedReferenceLap = 1;
-            
-            vm.SelectReferenceLapCommand.Execute(-1);
-            
-            Assert.Equal(1, vm.SelectedReferenceLap);
-        }
-
-        [Fact]
         public void PreviousSectorCommand_ExecutesWithoutError()
         {
             var vm = new TelemetryAnalysisViewModel();
             
             vm.PreviousSectorCommand.Execute(null);
             
-            Assert.Contains("not yet implemented", vm.StatusMessage);
+            // With no buffer data and default CurrentLap=1, navigates to
+            // "Already on first available lap" because no laps are loaded.
+            Assert.Contains("Already on first", vm.StatusMessage);
         }
 
         [Fact]
@@ -378,7 +402,7 @@ namespace PitWall.UI.Tests
             
             vm.NextSectorCommand.Execute(null);
             
-            Assert.Contains("not yet implemented", vm.StatusMessage);
+            Assert.Contains("Already on last", vm.StatusMessage);
         }
 
         [Fact]
@@ -411,20 +435,6 @@ namespace PitWall.UI.Tests
             vm.DataSeriesUpdated += (s, e) => fired = true;
             
             vm.LoadCurrentLapData(1);
-            
-            Assert.True(fired);
-        }
-
-        [Fact]
-        public void DataSeriesUpdated_FiresWhenReferenceDataLoaded()
-        {
-            var buffer = new TelemetryBuffer();
-            AddSampleData(buffer, lapNumber: 2, sampleCount: 10);
-            var vm = new TelemetryAnalysisViewModel(buffer);
-            var fired = false;
-            vm.DataSeriesUpdated += (s, e) => fired = true;
-            
-            vm.LoadReferenceLapData(2);
             
             Assert.True(fired);
         }
@@ -525,8 +535,6 @@ namespace PitWall.UI.Tests
             Assert.Equal("vSpeed", speedRow.Parameter);
             Assert.Equal("km/h", speedRow.Unit);
             Assert.Equal("--", speedRow.CurrentValue);
-            Assert.Equal("--", speedRow.ReferenceValue);
-            Assert.Equal("--", speedRow.Delta);
         }
 
         [Fact]

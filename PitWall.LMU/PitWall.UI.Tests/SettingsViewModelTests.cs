@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using PitWall.UI.Models;
@@ -73,6 +74,21 @@ namespace PitWall.UI.Tests
             {
                 return Task.FromResult(_config);
             }
+
+            public Task<IReadOnlyList<string>> DiscoverEndpointsAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+            }
+
+            public Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new AgentHealthDto());
+            }
+
+            public Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new AgentLlmTestDto());
+            }
         }
 
         private sealed class TrackingConfigClient : IAgentConfigClient
@@ -90,6 +106,21 @@ namespace PitWall.UI.Tests
                 Called = true;
                 LastUpdate = update;
                 return Task.FromResult(new AgentConfigDto());
+            }
+
+            public Task<IReadOnlyList<string>> DiscoverEndpointsAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+            }
+
+            public Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new AgentHealthDto());
+            }
+
+            public Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new AgentLlmTestDto());
             }
         }
 

@@ -7,6 +7,7 @@ using DuckDB.NET.Data;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using PitWall.Core.Models;
+using PitWall.Core.Utilities;
 
 namespace PitWall.Core.Services
 {
@@ -16,6 +17,12 @@ namespace PitWall.Core.Services
         private readonly string _databasePath;
         private readonly int _fallbackSessionCount;
         private readonly ILogger<LmuTelemetryReader> _logger;
+
+        /// <summary>
+        /// Cached interpolated session data to avoid recomputing on each batch request.
+        /// </summary>
+        private InterpolatedSessionCache? _sessionCache;
+        private readonly object _cacheLock = new();
 
         private static readonly string[] RequiredTables =
         {
@@ -35,6 +42,25 @@ namespace PitWall.Core.Services
             _databasePath = databasePath ?? throw new ArgumentNullException(nameof(databasePath));
             _fallbackSessionCount = fallbackSessionCount;
             _logger = logger ?? NullLogger<LmuTelemetryReader>.Instance;
+        }
+
+        /// <summary>
+        /// Pre-computed interpolated data for a session, cached to avoid recomputing per-batch.
+        /// </summary>
+        private sealed class InterpolatedSessionCache
+        {
+            public int SessionId { get; init; }
+            public double[] TimeGrid { get; init; } = Array.Empty<double>();
+            public double[] Speed { get; init; } = Array.Empty<double>();
+            public double[] Throttle { get; init; } = Array.Empty<double>();
+            public double[] Brake { get; init; } = Array.Empty<double>();
+            public double[] Steering { get; init; } = Array.Empty<double>();
+            public double[] Fuel { get; init; } = Array.Empty<double>();
+            public double[][] TyreTemps { get; init; } = Array.Empty<double[]>();
+            public double[] Latitude { get; init; } = Array.Empty<double>();
+            public double[] Longitude { get; init; } = Array.Empty<double>();
+            public double[] LateralG { get; init; } = Array.Empty<double>();
+            public List<(double Timestamp, int LapNumber)> LapBoundaries { get; init; } = new();
         }
 
         public Task<int> GetSessionCountAsync(CancellationToken cancellationToken = default)
@@ -118,73 +144,27 @@ ORDER BY table_name, ordinal_position;";
             if (endRow >= 0 && endRow < startRow)
                 throw new ArgumentOutOfRangeException(nameof(endRow), "endRow must be >= startRow.");
 
-            var rowStart = startRow + 1;
-            var rowEnd = endRow >= 0 ? endRow + 1 : int.MaxValue;
+            _logger.LogDebug("Reading samples from session {SessionId}, rows {StartRow} to {EndRow}.", sessionId, startRow, endRow);
 
-            _logger.LogDebug("Reading samples from session {SessionId}, rows {RowStart} to {RowEnd}.", sessionId, rowStart, rowEnd);
+            // Compute interpolation on a background thread to avoid blocking the caller
+            var cache = await Task.Run(() => GetOrComputeSessionCache(sessionId, cancellationToken), cancellationToken);
 
-            using var connection = new DuckDBConnection($"Data Source={_databasePath}");
-            connection.Open();
-
-            var existingTables = await GetTableNamesAsync(connection, cancellationToken);
-            var missing = RequiredTables.Where(table => !existingTables.Contains(table)).ToList();
-            if (missing.Count > 0)
+            if (cache.TimeGrid.Length == 0)
             {
-                _logger.LogError("Missing required telemetry tables: {MissingTables}", string.Join(", ", missing));
-                throw new InvalidOperationException($"Missing required telemetry tables: {string.Join(", ", missing)}");
+                _logger.LogWarning("No interpolated data for session {SessionId}.", sessionId);
+                yield break;
             }
 
-            var hasGpsLat = existingTables.Contains("GPS Latitude");
-            var hasGpsLon = existingTables.Contains("GPS Longitude");
-            var hasLatG = existingTables.Contains("G Force Lat");
+            // Apply row range filtering and yield aligned samples
+            int actualStart = Math.Max(0, startRow);
+            int actualEnd = endRow >= 0 ? Math.Min(endRow, cache.TimeGrid.Length - 1) : cache.TimeGrid.Length - 1;
 
-            using var command = connection.CreateCommand();
-            command.CommandText = BuildSampleQuery(hasGpsLat, hasGpsLon, hasLatG);
-
-            // Add session_id parameter for each CTE (8 mandatory + up to 3 optional)
-            var paramCount = 8; // speed, clock, throttle, brake, steer, fuel, temps, lap
-            if (hasGpsLat) paramCount++;
-            if (hasGpsLon) paramCount++;
-            if (hasLatG) paramCount++;
-
-            for (int i = 0; i < paramCount; i++)
-            {
-                var sessionParam = command.CreateParameter();
-                sessionParam.Value = sessionId;
-                command.Parameters.Add(sessionParam);
-            }
-
-            var startParam = command.CreateParameter();
-            startParam.Value = rowStart;
-            command.Parameters.Add(startParam);
-
-            var endParam = command.CreateParameter();
-            endParam.Value = rowEnd;
-            command.Parameters.Add(endParam);
-
-            using var reader = command.ExecuteReader();
-            while (reader.Read())
+            for (int i = actualStart; i <= actualEnd; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var gpsTime = GetDouble(reader, 1);
-                var speedMps = GetDouble(reader, 2);
-                var throttle = GetDouble(reader, 3) / 100.0; // Scale from 0-100 to 0-1
-                var brake = GetDouble(reader, 4) / 100.0;    // Scale from 0-100 to 0-1
-                var steering = GetDouble(reader, 5);
-                var fuel = GetDouble(reader, 6);
 
-                var tyreTemps = new double[4];
-                tyreTemps[0] = GetDouble(reader, 7);
-                tyreTemps[1] = GetDouble(reader, 8);
-                tyreTemps[2] = GetDouble(reader, 9);
-                tyreTemps[3] = GetDouble(reader, 10);
-
-                var lapRaw = GetDouble(reader, 11);
-                var lapNumber = lapRaw <= 0 ? 0 : (int)Math.Round(lapRaw);
-
-                var latitude = GetDouble(reader, 12);
-                var longitude = GetDouble(reader, 13);
-                var lateralG = GetDouble(reader, 14);
+                var gpsTime = cache.TimeGrid[i];
+                var lapNumber = AssignLapNumber(gpsTime, cache.LapBoundaries);
 
                 var timestamp = gpsTime <= 0
                     ? DateTime.UtcNow
@@ -192,235 +172,301 @@ ORDER BY table_name, ordinal_position;";
 
                 yield return new TelemetrySample(
                     timestamp,
-                    speedMps * 3.6,
-                    tyreTemps,
-                    fuel,
-                    brake,
-                    throttle,
-                    steering)
+                    cache.Speed[i],
+                    new[] { cache.TyreTemps[0][i], cache.TyreTemps[1][i], cache.TyreTemps[2][i], cache.TyreTemps[3][i] },
+                    cache.Fuel[i],
+                    cache.Brake[i],
+                    cache.Throttle[i],
+                    cache.Steering[i])
                 {
                     LapNumber = lapNumber,
-                    Latitude = latitude,
-                    Longitude = longitude,
-                    LateralG = lateralG
+                    Latitude = cache.Latitude[i],
+                    Longitude = cache.Longitude[i],
+                    LateralG = cache.LateralG[i]
                 };
             }
 
-            _logger.LogDebug("Finished streaming telemetry samples.");
+            _logger.LogDebug("Finished streaming {Count} interpolated telemetry samples.", actualEnd - actualStart + 1);
         }
 
-        private static string BuildSampleQuery(bool hasGpsLat, bool hasGpsLon, bool hasLatG)
+        /// <summary>
+        /// Gets cached interpolated data for a session, computing it if necessary.
+        /// Thread-safe: only one thread computes at a time, others wait.
+        /// </summary>
+        private InterpolatedSessionCache GetOrComputeSessionCache(int sessionId, CancellationToken cancellationToken)
         {
-            var gpsLatCte = hasGpsLat
-                ? "SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS lat FROM \"GPS Latitude\" WHERE session_id = ?"
-                : "SELECT rn, NULL AS lat FROM gps_clock";
+            lock (_cacheLock)
+            {
+                if (_sessionCache != null && _sessionCache.SessionId == sessionId)
+                {
+                    _logger.LogDebug("Using cached interpolated data for session {SessionId} ({GridSize} points).",
+                        sessionId, _sessionCache.TimeGrid.Length);
+                    return _sessionCache;
+                }
+            }
 
-            var gpsLonCte = hasGpsLon
-                ? "SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS lon FROM \"GPS Longitude\" WHERE session_id = ?"
-                : "SELECT rn, NULL AS lon FROM gps_clock";
+            _logger.LogInformation("Computing interpolated data for session {SessionId}...", sessionId);
+            var computed = ComputeInterpolatedSession(sessionId, cancellationToken);
 
-            var latGCte = hasLatG
-                ? "SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS lat_g FROM \"G Force Lat\" WHERE session_id = ?"
-                : "SELECT rn, NULL AS lat_g FROM gps_clock";
+            lock (_cacheLock)
+            {
+                _sessionCache = computed;
+            }
 
-            var gpsLatCountCte = hasGpsLat
-                ? "SELECT COUNT(*) AS cnt FROM gps_lat"
-                : "SELECT COUNT(*) AS cnt FROM gps_clock";
+            _logger.LogInformation("Cached interpolated data for session {SessionId}: {GridSize} points.",
+                sessionId, computed.TimeGrid.Length);
+            return computed;
+        }
 
-            var gpsLonCountCte = hasGpsLon
-                ? "SELECT COUNT(*) AS cnt FROM gps_lon"
-                : "SELECT COUNT(*) AS cnt FROM gps_clock";
+        /// <summary>
+        /// Loads all channel data from DuckDB and interpolates onto a uniform 50Hz time grid.
+        /// </summary>
+        private InterpolatedSessionCache ComputeInterpolatedSession(int sessionId, CancellationToken cancellationToken)
+        {
+            using var connection = new DuckDBConnection($"Data Source={_databasePath}");
+            connection.Open();
 
-            var latGCountCte = hasLatG
-                ? "SELECT COUNT(*) AS cnt FROM lat_g"
-                : "SELECT COUNT(*) AS cnt FROM gps_clock";
+            var existingTables = GetTableNamesAsync(connection, cancellationToken).GetAwaiter().GetResult();
+            var missing = RequiredTables.Where(table => !existingTables.Contains(table)).ToList();
+            if (missing.Count > 0)
+            {
+                _logger.LogError("Missing required telemetry tables: {MissingTables}", string.Join(", ", missing));
+                throw new InvalidOperationException($"Missing required telemetry tables: {string.Join(", ", missing)}");
+            }
 
-            return @"
-WITH gps_clock AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS gps_time
-    FROM ""GPS Time""
-    WHERE session_id = ?
-),
-speed AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS speed
-    FROM ""GPS Speed""
-    WHERE session_id = ?
-),
-throttle AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS throttle
-    FROM ""Throttle Pos""
-    WHERE session_id = ?
-),
-brake AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS brake
-    FROM ""Brake Pos""
-    WHERE session_id = ?
-),
-steer AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS steering
-    FROM ""Steering Pos""
-    WHERE session_id = ?
-),
-fuel AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value AS fuel
-    FROM ""Fuel Level""
-    WHERE session_id = ?
-),
-temps AS (
-    SELECT row_number() OVER (ORDER BY rowid) AS rn, value1, value2, value3, value4
-    FROM ""TyresTempCentre""
-    WHERE session_id = ?
-),
-lap AS (
-    SELECT ts, value AS lap
-    FROM main.""Lap""
-    WHERE session_id = ?
-),
-gps_lat AS (
-    " + gpsLatCte + @"
-),
-gps_lon AS (
-    " + gpsLonCte + @"
-),
-lat_g AS (
-    " + latGCte + @"
-),
-clock_count AS (SELECT COUNT(*) AS cnt FROM gps_clock),
-speed_count AS (SELECT COUNT(*) AS cnt FROM speed),
-throttle_count AS (SELECT COUNT(*) AS cnt FROM throttle),
-brake_count AS (SELECT COUNT(*) AS cnt FROM brake),
-steer_count AS (SELECT COUNT(*) AS cnt FROM steer),
-fuel_count AS (SELECT COUNT(*) AS cnt FROM fuel),
-temps_count AS (SELECT COUNT(*) AS cnt FROM temps),
-lap_count AS (SELECT COUNT(*) AS cnt FROM lap),
-gps_lat_count AS (
-    " + gpsLatCountCte + @"
-),
-gps_lon_count AS (
-    " + gpsLonCountCte + @"
-),
-lat_g_count AS (
-    " + latGCountCte + @"
-),
-speed_map AS (
-    SELECT c.rn,
-           s.speed
-    FROM gps_clock c
-    CROSS JOIN speed_count sc
-    CROSS JOIN clock_count cc
-    LEFT JOIN speed s
-        ON s.rn = CAST(FLOOR((c.rn - 1) * sc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-),
-throttle_map AS (
-    SELECT c.rn,
-           t.throttle
-    FROM gps_clock c
-    CROSS JOIN throttle_count tc
-    CROSS JOIN clock_count cc
-    LEFT JOIN throttle t
-        ON t.rn = CAST(FLOOR((c.rn - 1) * tc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-),
-brake_map AS (
-    SELECT c.rn,
-           b.brake
-    FROM gps_clock c
-    CROSS JOIN brake_count bc
-    CROSS JOIN clock_count cc
-    LEFT JOIN brake b
-        ON b.rn = CAST(FLOOR((c.rn - 1) * bc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-),
-steer_map AS (
-    SELECT c.rn,
-           s.steering
-    FROM gps_clock c
-    CROSS JOIN steer_count sc
-    CROSS JOIN clock_count cc
-    LEFT JOIN steer s
-        ON s.rn = CAST(FLOOR((c.rn - 1) * sc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-),
-fuel_map AS (
-    SELECT c.rn,
-           f.fuel
-    FROM gps_clock c
-    CROSS JOIN fuel_count fc
-    CROSS JOIN clock_count cc
-    LEFT JOIN fuel f
-        ON f.rn = CAST(FLOOR((c.rn - 1) * fc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-),
-temps_map AS (
-    SELECT c.rn,
-           tm.value1,
-           tm.value2,
-           tm.value3,
-           tm.value4
-    FROM gps_clock c
-    CROSS JOIN temps_count tc
-    CROSS JOIN clock_count cc
-    LEFT JOIN temps tm
-        ON tm.rn = CAST(FLOOR((c.rn - 1) * tc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-),
-lap_map AS (
-    SELECT c.rn,
-           COALESCE(MAX(l.lap), 0) AS lap
-    FROM gps_clock c
-    LEFT JOIN lap l ON l.ts <= c.gps_time
-    GROUP BY c.rn
-),
-gps_lat_map AS (
-    SELECT c.rn,
-           gl.lat
-    FROM gps_clock c
-    CROSS JOIN gps_lat_count glc
-    CROSS JOIN clock_count cc
-    LEFT JOIN gps_lat gl
-        ON gl.rn = CAST(FLOOR((c.rn - 1) * glc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-),
-gps_lon_map AS (
-    SELECT c.rn,
-           gl.lon
-    FROM gps_clock c
-    CROSS JOIN gps_lon_count glc
-    CROSS JOIN clock_count cc
-    LEFT JOIN gps_lon gl
-        ON gl.rn = CAST(FLOOR((c.rn - 1) * glc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-),
-lat_g_map AS (
-    SELECT c.rn,
-           lg.lat_g
-    FROM gps_clock c
-    CROSS JOIN lat_g_count lgc
-    CROSS JOIN clock_count cc
-    LEFT JOIN lat_g lg
-        ON lg.rn = CAST(FLOOR((c.rn - 1) * lgc.cnt::DOUBLE / cc.cnt) + 1 AS BIGINT)
-)
-SELECT gps_clock.rn,
-       COALESCE(gps_clock.gps_time, 0) AS gps_time,
-       speed_map.speed,
-       COALESCE(throttle_map.throttle, 0) AS throttle,
-       COALESCE(brake_map.brake, 0) AS brake,
-       COALESCE(steer_map.steering, 0) AS steering,
-       COALESCE(fuel_map.fuel, 0) AS fuel,
-       COALESCE(temps_map.value1, 0) AS value1,
-       COALESCE(temps_map.value2, 0) AS value2,
-       COALESCE(temps_map.value3, 0) AS value3,
-       COALESCE(temps_map.value4, 0) AS value4,
-       COALESCE(lap_map.lap, 0) AS lap,
-       COALESCE(gps_lat_map.lat, 0) AS lat,
-       COALESCE(gps_lon_map.lon, 0) AS lon,
-       COALESCE(lat_g_map.lat_g, 0) AS lat_g
-FROM gps_clock
-LEFT JOIN speed_map ON speed_map.rn = gps_clock.rn
-LEFT JOIN throttle_map ON throttle_map.rn = gps_clock.rn
-LEFT JOIN brake_map ON brake_map.rn = gps_clock.rn
-LEFT JOIN steer_map ON steer_map.rn = gps_clock.rn
-LEFT JOIN fuel_map ON fuel_map.rn = gps_clock.rn
-LEFT JOIN temps_map ON temps_map.rn = gps_clock.rn
-LEFT JOIN lap_map ON lap_map.rn = gps_clock.rn
-LEFT JOIN gps_lat_map ON gps_lat_map.rn = gps_clock.rn
-LEFT JOIN gps_lon_map ON gps_lon_map.rn = gps_clock.rn
-LEFT JOIN lat_g_map ON lat_g_map.rn = gps_clock.rn
-WHERE gps_clock.rn BETWEEN ? AND ?
-ORDER BY gps_clock.rn;";
+            // Step 1: Load GPS Time as master timeline
+            var gpsTimeValues = LoadChannelValues(connection, "GPS Time", sessionId, cancellationToken);
+            if (gpsTimeValues.Length == 0)
+            {
+                _logger.LogWarning("No GPS Time data found for session {SessionId}.", sessionId);
+                return new InterpolatedSessionCache { SessionId = sessionId };
+            }
+
+            double masterStart = gpsTimeValues[0];
+            double masterEnd = gpsTimeValues[^1];
+            _logger.LogDebug("Master timeline: {Start:F3}s to {End:F3}s, {Count} samples.",
+                masterStart, masterEnd, gpsTimeValues.Length);
+
+            // Step 2: Create uniform 50Hz time grid
+            const int targetFrequencyHz = 50;
+            var timeGrid = ChannelInterpolator.CreateTimeGrid(masterStart, masterEnd, targetFrequencyHz);
+            if (timeGrid.Length == 0)
+            {
+                _logger.LogWarning("Empty time grid for session {SessionId}.", sessionId);
+                return new InterpolatedSessionCache { SessionId = sessionId };
+            }
+
+            _logger.LogDebug("Created {GridSize} point time grid at {Freq}Hz.", timeGrid.Length, targetFrequencyHz);
+
+            // Step 3: Load and interpolate each channel onto the time grid
+            // Speed: stored in m/s, convert to km/h (* 3.6)
+            var speedValues = LoadChannelValues(connection, "GPS Speed", sessionId, cancellationToken);
+            var speedTimestamps = ChannelInterpolator.EstimateChannelTimestamps(speedValues.Length, masterStart, masterEnd);
+            var speedInterp = ChannelInterpolator.Interpolate(speedTimestamps, speedValues, timeGrid, scaleFactor: 3.6);
+
+            // Throttle: stored 0-100, convert to 0-1 (/ 100)
+            var throttleValues = LoadChannelValues(connection, "Throttle Pos", sessionId, cancellationToken);
+            var throttleTimestamps = ChannelInterpolator.EstimateChannelTimestamps(throttleValues.Length, masterStart, masterEnd);
+            var throttleInterp = ChannelInterpolator.Interpolate(throttleTimestamps, throttleValues, timeGrid, scaleFactor: 0.01);
+
+            // Brake: stored 0-100, convert to 0-1 (/ 100)
+            var brakeValues = LoadChannelValues(connection, "Brake Pos", sessionId, cancellationToken);
+            var brakeTimestamps = ChannelInterpolator.EstimateChannelTimestamps(brakeValues.Length, masterStart, masterEnd);
+            var brakeInterp = ChannelInterpolator.Interpolate(brakeTimestamps, brakeValues, timeGrid, scaleFactor: 0.01);
+
+            // Steering
+            var steerValues = LoadChannelValues(connection, "Steering Pos", sessionId, cancellationToken);
+            var steerTimestamps = ChannelInterpolator.EstimateChannelTimestamps(steerValues.Length, masterStart, masterEnd);
+            var steerInterp = ChannelInterpolator.Interpolate(steerTimestamps, steerValues, timeGrid);
+
+            // Fuel
+            var fuelValues = LoadChannelValues(connection, "Fuel Level", sessionId, cancellationToken);
+            var fuelTimestamps = ChannelInterpolator.EstimateChannelTimestamps(fuelValues.Length, masterStart, masterEnd);
+            var fuelInterp = ChannelInterpolator.Interpolate(fuelTimestamps, fuelValues, timeGrid);
+
+            // Tire temperatures (4 columns: value1-value4)
+            var tempsData = LoadMultiColumnValues(connection, "TyresTempCentre", sessionId, 4, cancellationToken);
+            var tempsTimestamps = ChannelInterpolator.EstimateChannelTimestamps(
+                tempsData.Length > 0 ? tempsData[0].Length : 0, masterStart, masterEnd);
+            var tempsInterp = tempsData.Length == 4
+                ? ChannelInterpolator.InterpolateMultiColumn(tempsTimestamps, tempsData, timeGrid)
+                : new[] { new double[timeGrid.Length], new double[timeGrid.Length], new double[timeGrid.Length], new double[timeGrid.Length] };
+
+            // Optional channels
+            double[] latInterp, lonInterp, latGInterp;
+
+            if (existingTables.Contains("GPS Latitude"))
+            {
+                var latValues = LoadChannelValues(connection, "GPS Latitude", sessionId, cancellationToken);
+                var latTimestamps = ChannelInterpolator.EstimateChannelTimestamps(latValues.Length, masterStart, masterEnd);
+                latInterp = ChannelInterpolator.Interpolate(latTimestamps, latValues, timeGrid);
+            }
+            else
+            {
+                latInterp = new double[timeGrid.Length];
+            }
+
+            if (existingTables.Contains("GPS Longitude"))
+            {
+                var lonValues = LoadChannelValues(connection, "GPS Longitude", sessionId, cancellationToken);
+                var lonTimestamps = ChannelInterpolator.EstimateChannelTimestamps(lonValues.Length, masterStart, masterEnd);
+                lonInterp = ChannelInterpolator.Interpolate(lonTimestamps, lonValues, timeGrid);
+            }
+            else
+            {
+                lonInterp = new double[timeGrid.Length];
+            }
+
+            if (existingTables.Contains("G Force Lat"))
+            {
+                var latGValues = LoadChannelValues(connection, "G Force Lat", sessionId, cancellationToken);
+                var latGTimestamps = ChannelInterpolator.EstimateChannelTimestamps(latGValues.Length, masterStart, masterEnd);
+                latGInterp = ChannelInterpolator.Interpolate(latGTimestamps, latGValues, timeGrid);
+            }
+            else
+            {
+                latGInterp = new double[timeGrid.Length];
+            }
+
+            // Step 4: Load lap boundaries
+            var lapBoundaries = LoadLapBoundaries(connection, sessionId, cancellationToken);
+
+            return new InterpolatedSessionCache
+            {
+                SessionId = sessionId,
+                TimeGrid = timeGrid,
+                Speed = speedInterp,
+                Throttle = throttleInterp,
+                Brake = brakeInterp,
+                Steering = steerInterp,
+                Fuel = fuelInterp,
+                TyreTemps = tempsInterp,
+                Latitude = latInterp,
+                Longitude = lonInterp,
+                LateralG = latGInterp,
+                LapBoundaries = lapBoundaries
+            };
+        }
+
+        /// <summary>
+        /// Loads all values from a single-value channel table, ordered by rowid.
+        /// </summary>
+        private static double[] LoadChannelValues(
+            DuckDBConnection connection,
+            string tableName,
+            int sessionId,
+            CancellationToken cancellationToken)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = $"SELECT value FROM \"{tableName}\" WHERE session_id = ? ORDER BY rowid";
+            var param = command.CreateParameter();
+            param.Value = sessionId;
+            command.Parameters.Add(param);
+
+            var values = new List<double>();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                values.Add(GetDouble(reader, 0));
+            }
+
+            return values.ToArray();
+        }
+
+        /// <summary>
+        /// Loads all values from a multi-column channel table (e.g. TyresTempCentre with value1-value4).
+        /// Returns an array of columns, where each column is an array of values.
+        /// </summary>
+        private static double[][] LoadMultiColumnValues(
+            DuckDBConnection connection,
+            string tableName,
+            int sessionId,
+            int columnCount,
+            CancellationToken cancellationToken)
+        {
+            using var command = connection.CreateCommand();
+            var columnNames = string.Join(", ", Enumerable.Range(1, columnCount).Select(i => $"value{i}"));
+            command.CommandText = $"SELECT {columnNames} FROM \"{tableName}\" WHERE session_id = ? ORDER BY rowid";
+            var param = command.CreateParameter();
+            param.Value = sessionId;
+            command.Parameters.Add(param);
+
+            var columns = new List<double>[columnCount];
+            for (int c = 0; c < columnCount; c++)
+                columns[c] = new List<double>();
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                for (int c = 0; c < columnCount; c++)
+                {
+                    columns[c].Add(GetDouble(reader, c));
+                }
+            }
+
+            return columns.Select(c => c.ToArray()).ToArray();
+        }
+
+        /// <summary>
+        /// Loads lap boundary timestamps from the Lap table.
+        /// Returns a sorted list of (timestamp, lapNumber) tuples.
+        /// </summary>
+        private static List<(double Timestamp, int LapNumber)> LoadLapBoundaries(
+            DuckDBConnection connection,
+            int sessionId,
+            CancellationToken cancellationToken)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT ts, value FROM \"Lap\" WHERE session_id = ? ORDER BY ts";
+            var param = command.CreateParameter();
+            param.Value = sessionId;
+            command.Parameters.Add(param);
+
+            var boundaries = new List<(double Timestamp, int LapNumber)>();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var ts = GetDouble(reader, 0);
+                var lapRaw = GetDouble(reader, 1);
+                var lapNumber = lapRaw <= 0 ? 0 : (int)Math.Round(lapRaw);
+                boundaries.Add((ts, lapNumber));
+            }
+
+            return boundaries;
+        }
+
+        /// <summary>
+        /// Assigns a lap number to a given GPS time based on lap boundary timestamps.
+        /// Uses the most recent lap boundary that is at or before the given time.
+        /// </summary>
+        private static int AssignLapNumber(double gpsTime, List<(double Timestamp, int LapNumber)> lapBoundaries)
+        {
+            if (lapBoundaries.Count == 0)
+                return 0;
+
+            // Binary search for the last boundary <= gpsTime
+            int lo = 0;
+            int hi = lapBoundaries.Count - 1;
+            int bestIdx = -1;
+
+            while (lo <= hi)
+            {
+                int mid = lo + (hi - lo) / 2;
+                if (lapBoundaries[mid].Timestamp <= gpsTime)
+                {
+                    bestIdx = mid;
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
+            }
+
+            return bestIdx >= 0 ? lapBoundaries[bestIdx].LapNumber : 0;
         }
 
         private static Task<HashSet<string>> GetTableNamesAsync(
