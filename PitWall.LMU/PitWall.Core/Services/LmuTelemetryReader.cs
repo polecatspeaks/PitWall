@@ -37,6 +37,22 @@ namespace PitWall.Core.Services
             "Lap"
         };
 
+        /// <summary>
+        /// Optional tables that may be loaded if available. Combined with RequiredTables for SQL injection protection.
+        /// </summary>
+        private static readonly string[] OptionalTables =
+        {
+            "GPS Latitude",
+            "GPS Longitude",
+            "G Force Lat"
+        };
+
+        /// <summary>
+        /// All known tables that can be safely queried. Used for SQL injection protection.
+        /// </summary>
+        private static readonly HashSet<string> AllowedTables = 
+            new(RequiredTables.Concat(OptionalTables), StringComparer.OrdinalIgnoreCase);
+
 
         public LmuTelemetryReader(string databasePath, int fallbackSessionCount = 0, ILogger<LmuTelemetryReader>? logger = null)
         {
@@ -233,7 +249,7 @@ ORDER BY table_name, ordinal_position;";
             using var connection = new DuckDBConnection($"Data Source={_databasePath}");
             connection.Open();
 
-            var existingTables = GetTableNamesAsync(connection, cancellationToken).GetAwaiter().GetResult();
+            var existingTables = GetTableNames(connection, cancellationToken);
             var missing = RequiredTables.Where(table => !existingTables.Contains(table)).ToList();
             if (missing.Count > 0)
             {
@@ -364,6 +380,12 @@ ORDER BY table_name, ordinal_position;";
             int sessionId,
             CancellationToken cancellationToken)
         {
+            // Validate table name to prevent SQL injection
+            if (!AllowedTables.Contains(tableName))
+            {
+                throw new ArgumentException($"Invalid table name '{tableName}'. Must be one of the allowed tables.", nameof(tableName));
+            }
+
             using var command = connection.CreateCommand();
             command.CommandText = $"SELECT value FROM \"{tableName}\" WHERE session_id = ? ORDER BY rowid";
             var param = command.CreateParameter();
@@ -392,6 +414,12 @@ ORDER BY table_name, ordinal_position;";
             int columnCount,
             CancellationToken cancellationToken)
         {
+            // Validate table name to prevent SQL injection
+            if (!AllowedTables.Contains(tableName))
+            {
+                throw new ArgumentException($"Invalid table name '{tableName}'. Must be one of the allowed tables.", nameof(tableName));
+            }
+
             using var command = connection.CreateCommand();
             var columnNames = string.Join(", ", Enumerable.Range(1, columnCount).Select(i => $"value{i}"));
             command.CommandText = $"SELECT {columnNames} FROM \"{tableName}\" WHERE session_id = ? ORDER BY rowid";
@@ -476,7 +504,7 @@ ORDER BY table_name, ordinal_position;";
             return bestIdx >= 0 ? lapBoundaries[bestIdx].LapNumber : 0;
         }
 
-        private static Task<HashSet<string>> GetTableNamesAsync(
+        private static HashSet<string> GetTableNames(
             DuckDBConnection connection,
             CancellationToken cancellationToken)
         {
@@ -494,7 +522,7 @@ WHERE table_schema = 'main';";
                 names.Add(reader.GetString(0));
             }
 
-            return Task.FromResult(names);
+            return names;
         }
 
         private static double GetDouble(DuckDBDataReader reader, int ordinal)
@@ -519,10 +547,26 @@ WHERE table_schema = 'main';";
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes resources used by this reader.
+        /// </summary>
+        /// <param name="disposing">
+        /// <see langword="true" /> to dispose managed resources; <see langword="false" /> to skip managed cleanup.
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
             if (_disposed)
                 return;
 
-            _cacheSemaphore.Dispose();
+            if (disposing)
+            {
+                _cacheSemaphore.Dispose();
+            }
+
             _disposed = true;
         }
     }

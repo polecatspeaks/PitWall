@@ -24,6 +24,7 @@ namespace PitWall.UI.Services
     /// </summary>
     public sealed class ApiProbe : IApiProbe
     {
+        private static readonly HttpClient SharedClient = new();
         private readonly TimeSpan _timeout;
         private readonly string _probePath;
 
@@ -49,13 +50,8 @@ namespace PitWall.UI.Services
                 using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 cts.CancelAfter(_timeout);
 
-                using var client = new HttpClient
-                {
-                    BaseAddress = apiBase,
-                    Timeout = _timeout
-                };
-
-                using var response = await client.GetAsync(_probePath, cts.Token);
+                var requestUri = new Uri(apiBase, _probePath);
+                using var response = await SharedClient.GetAsync(requestUri, cts.Token);
                 return response.IsSuccessStatusCode;
             }
             catch

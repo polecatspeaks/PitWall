@@ -184,8 +184,8 @@ namespace PitWall.UI.Controls
             var y = point.Y - CarMarker.Height / 2 - labelHeight - 4;
 
             // Clamp to canvas bounds.
-            x = Math.Clamp(x, 2, Math.Max(2, bounds.Width - labelWidth - 2));
-            y = Math.Clamp(y, 2, Math.Max(2, bounds.Height - labelHeight - 2));
+            x = Math.Clamp(x, 0, Math.Max(0, bounds.Width - labelWidth - 4));
+            y = Math.Clamp(y, 0, Math.Max(0, bounds.Height - labelHeight - 4));
 
             Canvas.SetLeft(SegmentLabel, x);
             Canvas.SetTop(SegmentLabel, y);

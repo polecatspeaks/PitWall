@@ -747,13 +747,13 @@ public partial class MainWindowViewModel : ViewModelBase
 		Dashboard.Alerts.Insert(0, message);
 	}
 
-	private bool _isUpdatingSessionSelection = false;
+	private int _isUpdatingSessionSelection = 0;
 
 	partial void OnSelectedSessionIdChanged(int value)
 	{
 		// Don't auto-start from ID change if triggered by OnSelectedSessionChanged
 		// to avoid double-triggering StartReplay()
-		if (_isUpdatingSessionSelection)
+		if (Interlocked.CompareExchange(ref _isUpdatingSessionSelection, 0, 0) == 1)
 			return;
 
 		if (ReplayEnabled && IsReplayPlaying)
@@ -768,7 +768,7 @@ public partial class MainWindowViewModel : ViewModelBase
 			return;
 
 		// Prevent double-triggering when we set SelectedSessionId
-		_isUpdatingSessionSelection = true;
+		Interlocked.Exchange(ref _isUpdatingSessionSelection, 1);
 		try
 		{
 			SelectedSessionId = value.SessionId;
@@ -789,7 +789,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		}
 		finally
 		{
-			_isUpdatingSessionSelection = false;
+			Interlocked.Exchange(ref _isUpdatingSessionSelection, 0);
 		}
 	}
 
