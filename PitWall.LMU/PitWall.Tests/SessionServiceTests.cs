@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -378,7 +379,7 @@ namespace PitWall.Tests
                 int sessionId, 
                 int startRow, 
                 int endRow, 
-                CancellationToken cancellationToken = default)
+                [EnumeratorCancellation] CancellationToken cancellationToken = default)
             {
                 LastSessionId = sessionId;
                 LastStartRow = startRow;

@@ -8,6 +8,7 @@ using ScottPlot.Avalonia;
 using ScottPlot.Plottables;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 
@@ -32,6 +33,7 @@ public partial class MainWindow : Window
         DataContextChanged += OnDataContextChanged;
         Opened += OnOpened;
         Closed += OnClosed;
+        KeyDown += OnKeyDown;
     }
 
     private async void OnOpened(object? sender, EventArgs e)
@@ -53,6 +55,7 @@ public partial class MainWindow : Window
         if (_telemetryViewModel != null)
         {
             _telemetryViewModel.DataSeriesUpdated -= OnDataSeriesUpdated;
+            _telemetryViewModel.PropertyChanged -= OnTelemetryPropertyChanged;
             _telemetryViewModel = null;
         }
 
@@ -90,11 +93,33 @@ public partial class MainWindow : Window
         if (_telemetryViewModel != null)
         {
             _telemetryViewModel.DataSeriesUpdated -= OnDataSeriesUpdated;
+            _telemetryViewModel.PropertyChanged -= OnTelemetryPropertyChanged;
         }
 
         _telemetryViewModel = telemetry;
         _telemetryViewModel.DataSeriesUpdated += OnDataSeriesUpdated;
+        _telemetryViewModel.PropertyChanged += OnTelemetryPropertyChanged;
         UpdateAllPlots();
+    }
+
+    private void OnTelemetryPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (_telemetryViewModel == null)
+        {
+            return;
+        }
+
+        if (e.PropertyName == nameof(TelemetryAnalysisViewModel.CursorPosition))
+        {
+            var time = _telemetryViewModel.CursorPosition;
+            if (double.IsNaN(time) || double.IsInfinity(time))
+            {
+                return;
+            }
+
+            _cursorTimeSeconds = time;
+            UpdateCursorLines();
+        }
     }
 
     private void OnDataSeriesUpdated(object? sender, EventArgs e)
@@ -115,19 +140,34 @@ public partial class MainWindow : Window
             return;
         }
 
-        UpdatePlot(_speedPlot, _telemetryViewModel.SpeedData, _telemetryViewModel.ReferenceSpeedData, Colors.OrangeRed, Colors.DeepSkyBlue);
-        UpdatePlot(_throttlePlot, _telemetryViewModel.ThrottleData, _telemetryViewModel.ReferenceThrottleData, Colors.OrangeRed, Colors.DeepSkyBlue);
-        UpdatePlot(_brakePlot, _telemetryViewModel.BrakeData, _telemetryViewModel.ReferenceBrakeData, Colors.OrangeRed, Colors.DeepSkyBlue);
-        UpdatePlot(_steeringPlot, _telemetryViewModel.SteeringData, _telemetryViewModel.ReferenceSteeringData, Colors.OrangeRed, Colors.DeepSkyBlue);
-        UpdatePlot(_tireTempPlot, _telemetryViewModel.TireTempData, _telemetryViewModel.ReferenceTireTempData, Colors.OrangeRed, Colors.DeepSkyBlue);
+        // Sync cursor time from ViewModel before rebuilding plots,
+        // so the green cursor line is positioned correctly after a plot rebuild.
+        var vmCursorTime = _telemetryViewModel.CursorPosition;
+        if (!double.IsNaN(vmCursorTime) && !double.IsInfinity(vmCursorTime) && vmCursorTime > 0)
+        {
+            _cursorTimeSeconds = vmCursorTime;
+        }
+
+        UpdatePlot(_speedPlot, _telemetryViewModel.SpeedData, Colors.OrangeRed, PlotAxisMode.SpeedZeroBased);
+        UpdatePlot(_throttlePlot, _telemetryViewModel.ThrottleData, Colors.OrangeRed, PlotAxisMode.Percentage);
+        UpdatePlot(_brakePlot, _telemetryViewModel.BrakeData, Colors.OrangeRed, PlotAxisMode.Percentage);
+        UpdatePlot(_steeringPlot, _telemetryViewModel.SteeringData, Colors.OrangeRed, PlotAxisMode.SymmetricAuto);
+        UpdatePlot(_tireTempPlot, _telemetryViewModel.TireTempData, Colors.OrangeRed, PlotAxisMode.AutoScale);
+    }
+
+    private enum PlotAxisMode
+    {
+        AutoScale,
+        Percentage,      // Fixed 0-100
+        SpeedZeroBased,  // 0 to max+10%
+        SymmetricAuto    // -max to +max
     }
 
     private void UpdatePlot(
         AvaPlot? plotControl,
         System.Collections.Generic.IReadOnlyCollection<TelemetryDataPoint> currentData,
-        System.Collections.Generic.IReadOnlyCollection<TelemetryDataPoint> referenceData,
         Color currentColor,
-        Color referenceColor)
+        PlotAxisMode axisMode = PlotAxisMode.AutoScale)
     {
         if (plotControl == null)
         {
@@ -144,15 +184,8 @@ public partial class MainWindow : Window
             plot.Add.SignalXY(xs, ys, color: currentColor);
         }
 
-        if (referenceData.Count > 0)
-        {
-            var xs = referenceData.Select(point => point.Time).ToArray();
-            var ys = referenceData.Select(point => point.Value).ToArray();
-            plot.Add.SignalXY(xs, ys, color: referenceColor);
-        }
-
-        var cursorLine = plot.Add.VerticalLine(0, color: Colors.DimGray);
-        cursorLine.LineWidth = 1;
+        var cursorLine = plot.Add.VerticalLine(0, color: Colors.Lime);
+        cursorLine.LineWidth = 2;
         if (_cursorTimeSeconds.HasValue)
         {
             cursorLine.X = _cursorTimeSeconds.Value;
@@ -165,7 +198,42 @@ public partial class MainWindow : Window
 
         _cursorLines[plotControl] = cursorLine;
 
-        plot.Axes.AutoScale();
+        // Set Y-axis ranges appropriate to the channel type
+        switch (axisMode)
+        {
+            case PlotAxisMode.Percentage:
+                plot.Axes.AutoScale();
+                plot.Axes.SetLimitsY(-2, 105);
+                break;
+
+            case PlotAxisMode.SpeedZeroBased:
+                plot.Axes.AutoScale();
+                if (currentData.Count > 0)
+                {
+                    var maxSpeed = currentData.Max(p => p.Value);
+                    plot.Axes.SetLimitsY(-5, Math.Max(50, maxSpeed * 1.1));
+                }
+                else
+                {
+                    plot.Axes.SetLimitsY(0, 350);
+                }
+                break;
+
+            case PlotAxisMode.SymmetricAuto:
+                plot.Axes.AutoScale();
+                if (currentData.Count > 0)
+                {
+                    var maxAbs = currentData.Max(p => Math.Abs(p.Value));
+                    maxAbs = Math.Max(1, maxAbs * 1.2);
+                    plot.Axes.SetLimitsY(-maxAbs, maxAbs);
+                }
+                break;
+
+            default:
+                plot.Axes.AutoScale();
+                break;
+        }
+
         plotControl.InvalidateVisual();
     }
 
@@ -195,6 +263,7 @@ public partial class MainWindow : Window
             return;
         }
 
+        _telemetryViewModel.IsMouseHovering = true;
         _cursorTimeSeconds = time;
         UpdateCursorLines();
         _telemetryViewModel.UpdateCursorData(time);
@@ -207,7 +276,26 @@ public partial class MainWindow : Window
 
     private void OnPlotPointerExited(object? sender, PointerEventArgs e)
     {
-        _cursorTimeSeconds = null;
+        if (_telemetryViewModel != null)
+        {
+            _telemetryViewModel.IsMouseHovering = false;
+
+            // Restore the replay cursor position instead of hiding the line.
+            // CursorPosition is kept in sync by UpdateReplayCursor during playback.
+            var replayTime = _telemetryViewModel.CursorPosition;
+            if (!double.IsNaN(replayTime) && !double.IsInfinity(replayTime) && replayTime > 0)
+            {
+                _cursorTimeSeconds = replayTime;
+            }
+            else
+            {
+                _cursorTimeSeconds = null;
+            }
+        }
+        else
+        {
+            _cursorTimeSeconds = null;
+        }
         UpdateCursorLines();
     }
 
@@ -227,5 +315,69 @@ public partial class MainWindow : Window
 
             plotControl.Refresh();
         }
+    }
+
+    private void OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        if (e.Key == Key.Space && IsTextInputTarget(e.Source))
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case Key.F1:
+                vm.SelectedTabIndex = 0;
+                e.Handled = true;
+                break;
+            case Key.F2:
+                vm.SelectedTabIndex = 1;
+                e.Handled = true;
+                break;
+            case Key.F3:
+                vm.SelectedTabIndex = 2;
+                e.Handled = true;
+                break;
+            case Key.F4:
+                vm.SelectedTabIndex = 3;
+                e.Handled = true;
+                break;
+            case Key.F5:
+                vm.SelectedTabIndex = 4;
+                e.Handled = true;
+                break;
+            case Key.F6:
+                vm.RequestPitNow();
+                e.Handled = true;
+                break;
+            case Key.F12:
+                vm.TriggerEmergencyMode();
+                e.Handled = true;
+                break;
+            case Key.Space:
+                vm.PauseTelemetry();
+                e.Handled = true;
+                break;
+            case Key.Escape:
+                vm.DismissAlerts();
+                e.Handled = true;
+                break;
+        }
+    }
+
+    private static bool IsTextInputTarget(object? source)
+    {
+        // Check for common text input controls that should receive Space key input.
+        // Uses type inheritance check to catch TextBox subclasses like MaskedTextBox.
+        return source is TextBox 
+            || source is ComboBox 
+            || source is AutoCompleteBox
+            || source is NumericUpDown
+            || (source?.GetType().IsAssignableTo(typeof(TextBox)) == true);
     }
 }

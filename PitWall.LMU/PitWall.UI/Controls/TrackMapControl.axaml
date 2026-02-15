@@ -7,6 +7,9 @@
             <Canvas x:Name="MapCanvas">
                 <Path x:Name="TrackPath" Stroke="#00D9FF" StrokeThickness="2" />
                 <Ellipse x:Name="CarMarker" Width="8" Height="8" Fill="#FFB800" />
+                <Border x:Name="SegmentLabel" Background="#CC111111" CornerRadius="3" Padding="4,2" IsVisible="False">
+                    <TextBlock x:Name="SegmentLabelText" FontSize="10" FontWeight="Bold" Foreground="#FFB800" />
+                </Border>
             </Canvas>
         </Grid>
     </Border>

@@ -319,9 +319,11 @@
                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="16">
                         <StackPanel Orientation="Horizontal" Spacing="16">
                             <TextBlock Classes="section-header" Text="TELEMETRY ANALYSIS" VerticalAlignment="Center" />
+                            <Border Background="#1A1A2E" CornerRadius="4" Padding="8,2" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding TelemetryAnalysis.LapDisplay}" FontSize="14" FontWeight="Bold"
+                                          Foreground="#00D9FF" VerticalAlignment="Center" />
+                            </Border>
                             <TextBlock Text="{Binding TelemetryAnalysis.StatusMessage}" FontSize="12" 
-                                      Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding LastSampleReceived}" FontSize="12"
                                       Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
                             <TextBlock Text="{Binding TelemetryAnalysis.SectorLabel}" FontSize="12"
                                       Foreground="{DynamicResource BrushInfo}" VerticalAlignment="Center" />
@@ -331,12 +333,8 @@
                         
                         <!-- Lap Selector and Controls -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="Reference Lap:" VerticalAlignment="Center" />
-                            <ComboBox Width="80" ItemsSource="{Binding TelemetryAnalysis.AvailableLaps}" 
-                                     SelectedItem="{Binding TelemetryAnalysis.SelectedReferenceLap}" />
-                            
-                            <Button Content="◀ Prev" Command="{Binding TelemetryAnalysis.PreviousSectorCommand}" Padding="8,4" />
-                            <Button Content="Next ▶" Command="{Binding TelemetryAnalysis.NextSectorCommand}" Padding="8,4" />
+                            <Button Content="◀ Prev Lap" Command="{Binding TelemetryAnalysis.PreviousLapCommand}" Padding="8,4" />
+                            <Button Content="Next Lap ▶" Command="{Binding TelemetryAnalysis.NextLapCommand}" Padding="8,4" />
                             <Button Content="Zoom In" Command="{Binding TelemetryAnalysis.ZoomInCommand}" Padding="8,4" />
                             <Button Content="Zoom Out" Command="{Binding TelemetryAnalysis.ZoomOutCommand}" Padding="8,4" />
                             <Button Content="Export CSV" Classes="atlas-button-primary" 
@@ -345,7 +343,7 @@
                     </Grid>
 
                     <!-- Plots and Replay Controls -->
-                    <Grid Grid.Row="1" ColumnDefinitions="3*,1.2*" ColumnSpacing="16">
+                    <Grid Grid.Row="1" ColumnDefinitions="3*,Auto,1.2*" ColumnSpacing="0">
                         <Grid Grid.Column="0" RowDefinitions="*,Auto" RowSpacing="16">
                             <!-- Waveform Plots Placeholder -->
                             <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
@@ -418,136 +416,160 @@
                             </ScrollViewer>
 
                             <!-- Cursor Data Table -->
-                            <Border Grid.Row="1" Classes="atlas-panel" MaxHeight="250">
-                                <Grid RowDefinitions="Auto,*">
-                                    <TextBlock Grid.Row="0" Classes="section-header" Text="CURSOR DATA" Margin="8" />
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding TelemetryAnalysis.CursorData}" 
-                                             AutoGenerateColumns="False" IsReadOnly="True" 
-                                             GridLinesVisibility="All" Background="#0D0D0D" 
-                                             HeadersVisibility="Column" CanUserReorderColumns="False"
-                                             CanUserResizeColumns="True" CanUserSortColumns="False">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Parameter" Binding="{Binding Parameter}" Width="150" />
-                                            <DataGridTextColumn Header="Current" Binding="{Binding CurrentValue}" Width="100" />
-                                            <DataGridTextColumn Header="Reference" Binding="{Binding ReferenceValue}" Width="100" />
-                                            <DataGridTextColumn Header="Delta" Binding="{Binding Delta}" Width="100" />
-                                            <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </Grid>
+                            <Border Grid.Row="1" Classes="atlas-panel" MinHeight="180">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="section-header" Text="CURSOR DATA" Margin="0,0,0,6" />
+                                    <!-- Header row -->
+                                    <Grid ColumnDefinitions="130,120,50" Background="#111111" Margin="0,0,0,2">
+                                        <TextBlock Grid.Column="0" Text="Parameter" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" Margin="4,3" />
+                                        <TextBlock Grid.Column="1" Text="Current" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" Margin="4,3" />
+                                        <TextBlock Grid.Column="2" Text="Unit" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" Margin="4,3" />
+                                    </Grid>
+                                    <!-- Data rows -->
+                                    <ItemsControl ItemsSource="{Binding TelemetryAnalysis.CursorData}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="130,120,50" Margin="0,1">
+                                                    <TextBlock Grid.Column="0" Text="{Binding Parameter}" FontSize="12" Foreground="{DynamicResource BrushInfo}" FontFamily="Cascadia Mono, Consolas, Menlo" Margin="4,2" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding CurrentValue}" FontSize="12" Foreground="White" FontFamily="Cascadia Mono, Consolas, Menlo" Margin="4,2" />
+                                                    <TextBlock Grid.Column="2" Text="{Binding Unit}" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="4,2" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
                             </Border>
                         </Grid>
 
-                        <!-- Replay Controls -->
-                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
-                            <StackPanel Spacing="12">
-                            <Border Classes="atlas-panel">
-                                <StackPanel Spacing="10">
-                                    <TextBlock Classes="data-label" Text="TRACK MAP" FontSize="14" FontWeight="Bold" />
-                                    <controls:TrackMapControl MinHeight="180" TrackPoints="{Binding TrackMap.TrackPoints}" CurrentPoint="{Binding TrackMap.CurrentPoint}" />
-                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                                        <StackPanel Grid.Column="0" Spacing="4">
-                                            <TextBlock Classes="data-label" Text="SECTOR" />
-                                            <TextBlock Text="{Binding TelemetryAnalysis.SectorLabel}" FontWeight="Bold" FontSize="13" />
+                        <!-- Resizable Splitter -->
+                        <GridSplitter Grid.Column="1" Width="6" Background="#333333"
+                                      ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"
+                                      Cursor="SizeWestEast" />
+
+                        <!-- Track Map + Replay Controls (resizable vertically) -->
+                        <Grid Grid.Column="2" RowDefinitions="3*,Auto,2*" MinWidth="280" MaxWidth="700">
+                            <!-- Track Map (fills available vertical space) -->
+                            <Border Grid.Row="0" Classes="atlas-panel">
+                                <Grid RowDefinitions="*,Auto">
+                                    <controls:TrackMapControl Grid.Row="0" MinHeight="150"
+                                        TrackPoints="{Binding TrackMap.TrackPoints}" CurrentPoint="{Binding TrackMap.CurrentPoint}"
+                                        CornerLabel="{Binding TrackMap.CornerLabel}" />
+                                    <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="4" Margin="0,4,0,0">
+                                        <StackPanel Grid.Column="0" Spacing="1">
+                                            <TextBlock Classes="data-label" Text="SECTOR" FontSize="10" />
+                                            <TextBlock Text="{Binding TelemetryAnalysis.SectorLabel}" FontWeight="Bold" FontSize="12" />
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Spacing="4">
-                                            <TextBlock Classes="data-label" Text="CORNER" />
-                                            <TextBlock Text="{Binding TelemetryAnalysis.CornerLabel}" FontWeight="Bold" FontSize="13" />
+                                        <StackPanel Grid.Column="1" Spacing="1">
+                                            <TextBlock Classes="data-label" Text="CORNER" FontSize="10" />
+                                            <TextBlock Text="{Binding TelemetryAnalysis.CornerLabel}" FontWeight="Bold" FontSize="12" />
                                         </StackPanel>
                                     </Grid>
-                                    <TextBlock Text="{Binding TelemetryAnalysis.TrackName}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" />
-                                </StackPanel>
+                                </Grid>
                             </Border>
-                            <Border Classes="atlas-panel">
-                                <StackPanel Spacing="10">
-                                    <TextBlock Classes="data-label" Text="REPLAY CONTROLS" FontSize="14" FontWeight="Bold" />
-                                    <CheckBox Content="Enable replay" IsChecked="{Binding ReplayEnabled}" />
 
-                                    <StackPanel Spacing="6">
-                                        <TextBlock Classes="data-label" Text="FILTERS" FontSize="12" />
-                                        <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="8">
-                                            <TextBlock Text="From" VerticalAlignment="Center" />
-                                            <DatePicker SelectedDate="{Binding SessionFilterFrom}" />
-                                            <TextBlock Text="To" VerticalAlignment="Center" />
-                                            <DatePicker SelectedDate="{Binding SessionFilterTo}" />
-                                        </Grid>
-                                        <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="8">
-                                            <TextBlock Text="Track" VerticalAlignment="Center" />
-                                            <TextBox Text="{Binding SessionFilterTrack, Mode=TwoWay}" Watermark="Any" />
-                                            <TextBlock Text="Car" VerticalAlignment="Center" />
-                                            <TextBox Text="{Binding SessionFilterCar, Mode=TwoWay}" Watermark="Any" />
-                                        </Grid>
-                                    </StackPanel>
+                            <!-- Vertical Splitter -->
+                            <GridSplitter Grid.Row="1" Height="6" Background="#333333"
+                                          ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
+                                          Cursor="SizeNorthSouth" />
 
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="Session:" VerticalAlignment="Center" Width="70" />
-                                        <ComboBox Width="220" ItemsSource="{Binding FilteredSessions}"
+                            <!-- Compact Replay Controls (scrollable) -->
+                            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                            <Border Classes="atlas-panel" Padding="8">
+                                <StackPanel Spacing="4">
+                                    <!-- Session selector + play controls -->
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
+                                        <ComboBox Grid.Column="0" ItemsSource="{Binding FilteredSessions}"
                                                  SelectedItem="{Binding SelectedSession}"
-                                                 DisplayMemberBinding="{Binding DisplayName}" />
-                                        <Button Content="Reload" Command="{Binding LoadSessionsCommand}" />
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="Track:" VerticalAlignment="Center" Width="50" />
-                                        <TextBox Width="140" Text="{Binding SessionMetadataTrack, Mode=TwoWay}" />
-                                        <TextBlock Text="Car:" VerticalAlignment="Center" Width="40" />
-                                        <TextBox Width="100" Text="{Binding SessionMetadataCar, Mode=TwoWay}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="Track ID:" VerticalAlignment="Center" Width="70" />
-                                        <TextBox Width="220" Text="{Binding SessionMetadataTrackId, Mode=TwoWay}" Watermark="SimHub trackId" />
-                                    </StackPanel>
-                                    <Button Content="Save Metadata" Command="{Binding SaveSessionMetadataCommand}" />
-
-                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsEnabled="{Binding ReplayEnabled}">
-                                        <TextBox Grid.Column="0" Watermark="Start Row" Text="{Binding ReplayStartRow, Mode=TwoWay}" />
-                                        <TextBox Grid.Column="1" Watermark="End Row" Text="{Binding ReplayEndRow, Mode=TwoWay}" />
+                                                 DisplayMemberBinding="{Binding DisplayName}" FontSize="11" MinHeight="28" />
+                                        <Button Grid.Column="1" Content="↻" Command="{Binding LoadSessionsCommand}" Padding="6,2" FontSize="11" MinHeight="28" ToolTip.Tip="Refresh sessions" />
                                     </Grid>
 
-                                    <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
-                                        <TextBlock Text="Interval (ms):" VerticalAlignment="Center" Width="100" />
-                                        <ComboBox Width="120" ItemsSource="{Binding ReplayIntervalsMs}" 
-                                                 SelectedItem="{Binding ReplayIntervalMs}" />
+                                    <!-- Transport buttons -->
+                                    <StackPanel Orientation="Horizontal" Spacing="4" IsEnabled="{Binding ReplayEnabled}">
+                                        <Button Content="▶" Command="{Binding PlayReplayCommand}" Padding="8,4" FontSize="14" ToolTip.Tip="Play" />
+                                        <Button Content="⏸" Command="{Binding PauseReplayCommand}" Padding="8,4" FontSize="14" ToolTip.Tip="Pause" />
+                                        <Button Content="⏹" Command="{Binding StopReplayCommand}" Padding="8,4" FontSize="14" ToolTip.Tip="Stop" />
+                                        <Button Content="⏮" Command="{Binding RestartReplayCommand}" Padding="8,4" FontSize="14" ToolTip.Tip="Restart" />
+                                        <Button Content="⏪" Command="{Binding RewindCommand}" Padding="8,4" FontSize="14" ToolTip.Tip="Rewind" />
+                                        <Button Content="⏩" Command="{Binding FastForwardCommand}" Padding="8,4" FontSize="14" ToolTip.Tip="Fast Forward" />
                                     </StackPanel>
 
-                                    <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
-                                        <Button Content="Play" Command="{Binding PlayReplayCommand}" />
-                                        <Button Content="Pause" Command="{Binding PauseReplayCommand}" />
-                                        <Button Content="Stop" Command="{Binding StopReplayCommand}" />
-                                        <Button Content="Restart" Command="{Binding RestartReplayCommand}" />
-                                        <Button Content="Apply" Command="{Binding ApplyReplaySettingsCommand}" />
-                                    </StackPanel>
+                                    <!-- Status bar -->
+                                    <Border Background="#111111" CornerRadius="4" Padding="6,4">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <TextBlock Text="{Binding TelemetryAnalysis.LapDisplay}" FontSize="11" FontWeight="Bold"
+                                                      Foreground="#00D9FF" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ReplayStatusMessage}" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding ReplayProgressPercent, StringFormat='{}{0:0}%'}" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" />
+                                                <TextBlock Text="{Binding ReplaySpeed, StringFormat='{}x{0:0.##}'}" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                    <ProgressBar Classes="atlas-progress" Height="4" Value="{Binding ReplayProgressPercent}" Maximum="100" />
 
-                                    <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
-                                        <Button Content="Rewind" Command="{Binding RewindCommand}" />
-                                        <Button Content="Fast Forward" Command="{Binding FastForwardCommand}" />
-                                    </StackPanel>
+                                    <!-- Advanced (collapsed by default) -->
+                                    <Expander Header="Advanced" FontSize="10" Padding="0" IsExpanded="False">
+                                        <StackPanel Spacing="3" Margin="0,4,0,0">
+                                            <CheckBox Content="Enable Replay" IsChecked="{Binding ReplayEnabled}" FontSize="10" />
+                                            <Grid ColumnDefinitions="*,*" ColumnSpacing="4">
+                                                <TextBox Grid.Column="0" Watermark="Start" Text="{Binding ReplayStartRow, Mode=TwoWay}" FontSize="10" MinHeight="24" />
+                                                <TextBox Grid.Column="1" Watermark="End" Text="{Binding ReplayEndRow, Mode=TwoWay}" FontSize="10" MinHeight="24" />
+                                            </Grid>
+                                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                                                <TextBlock Text="Int(ms)" FontSize="10" VerticalAlignment="Center" />
+                                                <ComboBox Grid.Column="1" ItemsSource="{Binding ReplayIntervalsMs}" 
+                                                         SelectedItem="{Binding ReplayIntervalMs}" FontSize="10" MinHeight="28" />
+                                            </Grid>
+                                            <StackPanel Orientation="Horizontal" Spacing="3">
+                                                <Button Content=".5x" Command="{Binding HalfSpeedForwardCommand}" Padding="4,2" FontSize="10" />
+                                                <Button Content=".25x" Command="{Binding QuarterSpeedForwardCommand}" Padding="4,2" FontSize="10" />
+                                                <Button Content="-.5x" Command="{Binding HalfSpeedReverseCommand}" Padding="4,2" FontSize="10" />
+                                                <Button Content="-.25x" Command="{Binding QuarterSpeedReverseCommand}" Padding="4,2" FontSize="10" />
+                                                <Button Content="Apply" Command="{Binding ApplyReplaySettingsCommand}" Padding="4,2" FontSize="10" />
+                                            </StackPanel>
+                                            <!-- Filters -->
+                                            <Expander Header="Filters" FontSize="10" Padding="0" IsExpanded="False">
+                                                <StackPanel Spacing="3" Margin="0,4,0,0">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="4">
+                                                        <TextBlock Text="From" FontSize="10" VerticalAlignment="Center" />
+                                                        <DatePicker Grid.Column="1" SelectedDate="{Binding SessionFilterFrom}" />
+                                                        <TextBlock Grid.Column="2" Text="To" FontSize="10" VerticalAlignment="Center" />
+                                                        <DatePicker Grid.Column="3" SelectedDate="{Binding SessionFilterTo}" />
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="4">
+                                                        <TextBlock Text="Track" FontSize="10" VerticalAlignment="Center" />
+                                                        <TextBox Grid.Column="1" Text="{Binding SessionFilterTrack, Mode=TwoWay}" Watermark="Any" FontSize="10" MinHeight="24" />
+                                                        <TextBlock Grid.Column="2" Text="Car" FontSize="10" VerticalAlignment="Center" />
+                                                        <TextBox Grid.Column="3" Text="{Binding SessionFilterCar, Mode=TwoWay}" Watermark="Any" FontSize="10" MinHeight="24" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Expander>
+                                            <!-- Metadata -->
+                                            <Expander Header="Metadata" FontSize="10" Padding="0" IsExpanded="False">
+                                                <StackPanel Spacing="3" Margin="0,4,0,0">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="4">
+                                                        <TextBlock Text="Track" FontSize="10" VerticalAlignment="Center" />
+                                                        <TextBox Grid.Column="1" Text="{Binding SessionMetadataTrack, Mode=TwoWay}" FontSize="10" MinHeight="24" />
+                                                        <TextBlock Grid.Column="2" Text="Car" FontSize="10" VerticalAlignment="Center" />
+                                                        <TextBox Grid.Column="3" Text="{Binding SessionMetadataCar, Mode=TwoWay}" FontSize="10" MinHeight="24" />
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                                                        <TextBlock Text="Track ID" FontSize="10" VerticalAlignment="Center" />
+                                                        <TextBox Grid.Column="1" Text="{Binding SessionMetadataTrackId, Mode=TwoWay}" Watermark="SimHub trackId" FontSize="10" MinHeight="24" />
+                                                    </Grid>
+                                                    <Button Content="Save Metadata" Command="{Binding SaveSessionMetadataCommand}" Padding="6,2" FontSize="10" />
+                                                </StackPanel>
+                                            </Expander>
+                                        </StackPanel>
+                                    </Expander>
 
-                                    <StackPanel Orientation="Horizontal" Spacing="8" IsEnabled="{Binding ReplayEnabled}">
-                                        <Button Content="0.5x" Command="{Binding HalfSpeedForwardCommand}" />
-                                        <Button Content="0.25x" Command="{Binding QuarterSpeedForwardCommand}" />
-                                        <Button Content="-0.5x" Command="{Binding HalfSpeedReverseCommand}" />
-                                        <Button Content="-0.25x" Command="{Binding QuarterSpeedReverseCommand}" />
-                                    </StackPanel>
-
-                                    <StackPanel Spacing="6">
-                                        <TextBlock Classes="data-label" Text="PRELOAD" FontSize="12" />
-                                        <ProgressBar Classes="atlas-progress" Height="6" IsIndeterminate="{Binding IsPreloading}" />
-                                        <TextBlock Text="{Binding PreloadStatusMessage}" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
-                                    </StackPanel>
-
-                                    <StackPanel Spacing="6">
-                                        <TextBlock Classes="data-label" Text="REPLAY PROGRESS" FontSize="12" />
-                                        <ProgressBar Classes="atlas-progress" Height="8" Value="{Binding ReplayProgressPercent}" Maximum="100" />
-                                        <TextBlock Text="{Binding ReplayProgressPercent, StringFormat='Progress: {0:0}%'}" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
-                                        <TextBlock Text="{Binding ReplaySpeed, StringFormat='Speed: {0:0.##}x'}" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" />
-                                    </StackPanel>
-
-                                    <TextBlock Text="{Binding ReplayStatusMessage}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" />
+                                    <!-- Preload indicator -->
+                                    <ProgressBar Classes="atlas-progress" Height="3" IsIndeterminate="{Binding IsPreloading}" IsVisible="{Binding IsPreloading}" />
                                 </StackPanel>
                             </Border>
-                            </StackPanel>
-                        </ScrollViewer>
+                            </ScrollViewer>
+                        </Grid>
                     </Grid>
 
                     <!-- Note about ScottPlot -->
@@ -555,7 +577,7 @@
                         <StackPanel Spacing="4">
                             <TextBlock Text="📊 Telemetry Waveforms" FontWeight="Bold" FontSize="12" />
                             <TextBlock TextWrapping="Wrap" FontSize="11">
-                                Scroll to zoom and drag to pan. Reference lap overlays in blue for quick comparison.
+                                Scroll to zoom and drag to pan.
                             </TextBlock>
                         </StackPanel>
                     </Border>
@@ -585,19 +607,26 @@
                                     <ProgressBar Value="{Binding Strategy.CurrentStintTireWear}" Maximum="100" 
                                                 Classes="atlas-progress" Height="12" Foreground="{DynamicResource BrushSuccess}" />
                                     <TextBlock Text="{Binding Strategy.CurrentStintTireWear, StringFormat={}{0:0}%}" FontSize="20" FontWeight="Bold" />
-                                    <TextBlock Text="Within optimal range" FontSize="12" Foreground="{DynamicResource BrushSuccess}" />
+                                    <TextBlock Text="Within optimal range" FontSize="12" Foreground="{DynamicResource BrushSuccess}"
+                                               IsVisible="{Binding Strategy.HasTelemetryData}" />
+                                    <TextBlock Text="Awaiting telemetry data" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}"
+                                               IsVisible="{Binding Strategy.HasNoTelemetryData}" />
                                 </StackPanel>
                             </Border>
                             <Border Classes="atlas-panel" Grid.Column="2">
                                 <StackPanel Spacing="8">
                                     <TextBlock Classes="data-label" Text="PIT WINDOW" />
-                                    <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-                                        <TextBlock Text="LAP" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Strategy.OptimalPitLapStart}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
-                                        <TextBlock Text="–" FontSize="20" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Strategy.OptimalPitLapEnd}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
+                                    <StackPanel IsVisible="{Binding Strategy.HasTelemetryData}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                                            <TextBlock Text="LAP" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Strategy.OptimalPitLapStart}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
+                                            <TextBlock Text="–" FontSize="20" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Strategy.OptimalPitLapEnd}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat={}Recommended: Lap {0}}" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource BrushWarning}" />
                                     </StackPanel>
-                                    <TextBlock Text="{Binding Strategy.NextPitLap, StringFormat={}Recommended: Lap {0}}" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource BrushWarning}" />
+                                    <TextBlock Text="Awaiting telemetry data" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource BrushTextSecondary}"
+                                               IsVisible="{Binding Strategy.HasNoTelemetryData}" />
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -627,7 +656,7 @@
                                 </Border>
                                 <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="8">
                                     <TextBlock Grid.Column="0" Text="{Binding Strategy.RecommendedAction}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource BrushTextSecondary}" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Strategy.StrategyConfidence, StringFormat={}Confidence: {0:0}%}" FontSize="12" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Strategy.StrategyConfidence, StringFormat={}Confidence: {0:P0}}" FontSize="12" VerticalAlignment="Center" />
                                     <Button Grid.Column="2" Content="Override Strategy" Command="{Binding Strategy.OverrideStrategyCommand}" Padding="8,4" />
                                 </Grid>
                             </Grid>
@@ -641,7 +670,7 @@
                                     <Button Content="{Binding Strategy.FuelSaveModeActive, Converter={StaticResource BoolToTextConverter}, ConverterParameter=Fuel Save: ON|Fuel Save: OFF}"
                                            Command="{Binding Strategy.ToggleFuelSaveModeCommand}" Padding="10,6" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <ItemsControl ItemsSource="{Binding Strategy.AlternativeStrategies}">
+                                <ItemsControl ItemsSource="{Binding Strategy.AlternativeStrategies}" IsVisible="{Binding Strategy.HasAlternativeStrategies}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border Background="#1A1A1A" Padding="14" Margin="0,6" CornerRadius="6" 
@@ -664,6 +693,9 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+                                <TextBlock Text="No alternative strategies available." FontSize="12"
+                                           Foreground="{DynamicResource BrushTextSecondary}"
+                                           IsVisible="{Binding Strategy.HasNoAlternativeStrategies}" />
                             </StackPanel>
                         </Border>
 
@@ -686,6 +718,9 @@
                                         <DataGridTextColumn Header="Strategy" Binding="{Binding StrategyType}" Width="120" />
                                     </DataGrid.Columns>
                                 </DataGrid>
+                                <TextBlock Grid.Row="1" Text="No competitor strategies available." FontSize="12"
+                                           Foreground="{DynamicResource BrushTextSecondary}" Margin="8,0,8,8"
+                                           IsVisible="{Binding Strategy.HasNoCompetitorStrategies}" />
                             </Grid>
                         </Border>
                     </Grid>

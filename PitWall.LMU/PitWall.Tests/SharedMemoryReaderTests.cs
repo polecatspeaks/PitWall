@@ -235,12 +235,7 @@ namespace PitWall.Tests
         {
             // This test verifies that OnError is invoked for exceptions other than FileNotFoundException
             var reader = new SharedMemoryReader("invalid-map-name-!@#$%");
-            bool errorRaised = false;
-
-            reader.OnError += (sender, ex) =>
-            {
-                errorRaised = true;
-            };
+            reader.OnError += (sender, ex) => { };
 
             await reader.StartAsync(100);
             await Task.Delay(100);

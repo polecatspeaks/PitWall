@@ -205,6 +205,39 @@ namespace PitWall.UI.Tests
 
 		#endregion
 
+		#region UI Refresh Cadence Tests
+
+		[Fact]
+		public void UiUpdateInterval_Is10Hz()
+		{
+			Assert.Equal(0.1, MainWindowViewModel.UiUpdateIntervalSeconds);
+		}
+
+		#endregion
+
+		#region ApplyRecommendation Tests
+
+		[Fact]
+		public void ApplyRecommendation_UpdatesStrategyRecommendedActionAndConfidence()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+			var recommendation = new RecommendationDto
+			{
+				Recommendation = "Box this lap",
+				Confidence = 0.85
+			};
+
+			// Act
+			vm.ApplyRecommendation(recommendation);
+
+			// Assert
+			Assert.Equal("Box this lap", vm.Strategy.RecommendedAction);
+			Assert.Equal(0.85, vm.Strategy.StrategyConfidence);
+		}
+
+		#endregion
+
 		#region Constructor Tests
 
 		[Fact]
@@ -1301,6 +1334,77 @@ namespace PitWall.UI.Tests
 
 			// Assert
 			Assert.Equal("--", vm.GapDisplay);
+		}
+
+		#endregion
+
+		#region Shortcut Action Tests
+
+		[Fact]
+		public void RequestPitNow_AddsAlertAndUpdatesStrategy()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+
+			// Act
+			vm.RequestPitNow();
+
+			// Assert
+			Assert.Single(vm.Dashboard.Alerts);
+			Assert.Contains("Pit request", vm.Dashboard.Alerts[0]);
+			Assert.Equal("Pit this lap", vm.Strategy.RecommendedAction);
+			Assert.Equal(1.0, vm.Strategy.StrategyConfidence);
+			Assert.Equal("Pit this lap", vm.Dashboard.StrategyMessage);
+			Assert.Equal(1.0, vm.Dashboard.StrategyConfidence);
+		}
+
+		[Fact]
+		public void TriggerEmergencyMode_AddsAlertAndUpdatesStrategy()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+
+			// Act
+			vm.TriggerEmergencyMode();
+
+			// Assert
+			Assert.Single(vm.Dashboard.Alerts);
+			Assert.Contains("Emergency mode", vm.Dashboard.Alerts[0]);
+			Assert.Equal("Emergency: pit now", vm.Strategy.RecommendedAction);
+			Assert.Equal(1.0, vm.Strategy.StrategyConfidence);
+			Assert.Equal("Emergency: pit now", vm.Dashboard.StrategyMessage);
+			Assert.Equal(1.0, vm.Dashboard.StrategyConfidence);
+		}
+
+		[Fact]
+		public void DismissAlerts_ClearsDashboardAlerts()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+			vm.Dashboard.Alerts.Add("Alert 1");
+			vm.Dashboard.Alerts.Add("Alert 2");
+
+			// Act
+			vm.DismissAlerts();
+
+			// Assert
+			Assert.Empty(vm.Dashboard.Alerts);
+		}
+
+		[Fact]
+		public void PauseTelemetry_PausesReplay()
+		{
+			// Arrange
+			var vm = CreateViewModel();
+			vm.IsReplayPlaying = true;
+
+			// Act
+			vm.PauseTelemetry();
+
+			// Assert
+			Assert.False(vm.IsReplayPlaying);
+			Assert.True(vm.IsReplayPaused);
+			Assert.Equal("Replay paused", vm.ReplayStatusMessage);
 		}
 
 		#endregion

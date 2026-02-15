@@ -24,6 +24,9 @@ namespace PitWall.UI.Controls
         public static readonly StyledProperty<string?> MapImageUriProperty =
             AvaloniaProperty.Register<TrackMapControl, string?>(nameof(MapImageUri));
 
+        public static readonly StyledProperty<string?> CornerLabelProperty =
+            AvaloniaProperty.Register<TrackMapControl, string?>(nameof(CornerLabel));
+
         public TrackMapControl()
         {
             InitializeComponent();
@@ -38,6 +41,11 @@ namespace PitWall.UI.Controls
                 if (args.Property == MapImageUriProperty)
                 {
                     UpdateMapImage();
+                }
+
+                if (args.Property == CornerLabelProperty)
+                {
+                    UpdateSegmentLabel();
                 }
             };
         }
@@ -66,10 +74,17 @@ namespace PitWall.UI.Controls
             set => SetValue(MapImageUriProperty, value);
         }
 
+        public string? CornerLabel
+        {
+            get => GetValue(CornerLabelProperty);
+            set => SetValue(CornerLabelProperty, value);
+        }
+
         private void UpdateVisuals()
         {
             UpdateTrackPath();
             UpdateCarMarker();
+            UpdateSegmentLabel();
         }
 
         private void UpdateMapImage()
@@ -145,6 +160,44 @@ namespace PitWall.UI.Controls
             CarMarker.IsVisible = true;
         }
 
+        private void UpdateSegmentLabel()
+        {
+            if (CurrentPoint is null || string.IsNullOrWhiteSpace(CornerLabel))
+            {
+                SegmentLabel.IsVisible = false;
+                return;
+            }
+
+            SegmentLabelText.Text = CornerLabel;
+            SegmentLabel.IsVisible = true;
+
+            // Measure the label so we can position it precisely.
+            SegmentLabel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var labelWidth = SegmentLabel.DesiredSize.Width;
+            var labelHeight = SegmentLabel.DesiredSize.Height;
+
+            var point = ScalePoint(CurrentPoint.Value);
+            var bounds = MapCanvas.Bounds;
+
+            // If canvas is too small for the label, hide it to avoid positioning issues
+            if (bounds.Width < labelWidth + 8 || bounds.Height < labelHeight + 8)
+            {
+                SegmentLabel.IsVisible = false;
+                return;
+            }
+
+            // Place the label above the car marker with a small offset.
+            var x = point.X - labelWidth / 2;
+            var y = point.Y - CarMarker.Height / 2 - labelHeight - 4;
+
+            // Clamp to canvas bounds with 4px margins
+            x = Math.Clamp(x, 4, bounds.Width - labelWidth - 4);
+            y = Math.Clamp(y, 4, bounds.Height - labelHeight - 4);
+
+            Canvas.SetLeft(SegmentLabel, x);
+            Canvas.SetTop(SegmentLabel, y);
+        }
+
         private Point ScalePoint(Point point)
         {
             var bounds = MapCanvas.Bounds;
@@ -153,8 +206,7 @@ namespace PitWall.UI.Controls
 
             var offsetX = Padding;
             var offsetY = Padding;
-            var width = availableWidth;
-            var height = availableHeight;
+            double width, height;
 
             if (MapImage.Source is Bitmap bitmap && bitmap.PixelSize.Width > 0 && bitmap.PixelSize.Height > 0)
             {
@@ -163,6 +215,16 @@ namespace PitWall.UI.Controls
                 height = bitmap.PixelSize.Height * scale;
                 offsetX = Padding + (availableWidth - width) / 2;
                 offsetY = Padding + (availableHeight - height) / 2;
+            }
+            else
+            {
+                // Use uniform scaling to preserve track aspect ratio.
+                // Normalized points are already centered in 0-1 space.
+                var uniformSize = Math.Min(availableWidth, availableHeight);
+                width = uniformSize;
+                height = uniformSize;
+                offsetX = Padding + (availableWidth - uniformSize) / 2;
+                offsetY = Padding + (availableHeight - uniformSize) / 2;
             }
 
             var x = offsetX + (point.X * width);

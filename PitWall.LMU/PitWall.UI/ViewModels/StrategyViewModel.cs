@@ -25,19 +25,31 @@ public partial class StrategyViewModel : ViewModelBase
 	private int stintDuration = 15;
 
 	[ObservableProperty]
-	private int optimalPitLapStart = 16;
+	private int optimalPitLapStart;
 
 	[ObservableProperty]
-	private int optimalPitLapEnd = 20;
+	private int optimalPitLapEnd;
 
 	[ObservableProperty]
-	private int nextPitLap = 18;
+	private int nextPitLap;
 
 	[ObservableProperty]
 	private double strategyConfidence = 85.0;
 
 	[ObservableProperty]
 	private string recommendedAction = "Continue current stint";
+
+	[ObservableProperty]
+	private bool hasAlternativeStrategies;
+
+	[ObservableProperty]
+	private bool hasNoAlternativeStrategies = true;
+
+	[ObservableProperty]
+	private bool hasCompetitorStrategies;
+
+	[ObservableProperty]
+	private bool hasNoCompetitorStrategies = true;
 
 	[ObservableProperty]
 	private bool fuelSaveModeActive;
@@ -48,18 +60,28 @@ public partial class StrategyViewModel : ViewModelBase
 	[ObservableProperty]
 	private int currentLap = 1;
 
+	[ObservableProperty]
+	private bool hasTelemetryData;
+
+	[ObservableProperty]
+	private bool hasNoTelemetryData = true;
+
 	public ObservableCollection<StrategyAlternative> AlternativeStrategies { get; } = new();
 	public ObservableCollection<PitStopMarker> PitStopMarkers { get; } = new();
 	public ObservableCollection<CompetitorStrategy> CompetitorStrategies { get; } = new();
 
 	public StrategyViewModel()
 	{
+		AlternativeStrategies.CollectionChanged += (_, _) => RefreshStrategyCollections();
+		CompetitorStrategies.CollectionChanged += (_, _) => RefreshStrategyCollections();
+
 		var includeSampleData = string.Equals(
 			Environment.GetEnvironmentVariable("PITWALL_SAMPLE_STRATEGY_DATA"),
 			"1",
 			StringComparison.OrdinalIgnoreCase);
 		if (!includeSampleData)
 		{
+			RefreshStrategyCollections();
 			return;
 		}
 
@@ -98,6 +120,8 @@ public partial class StrategyViewModel : ViewModelBase
 			EstimatedNextPit = 24,
 			StrategyType = "2-Stop"
 		});
+
+		RefreshStrategyCollections();
 	}
 
 	[RelayCommand]
@@ -121,8 +145,18 @@ public partial class StrategyViewModel : ViewModelBase
 
 	public void UpdateFromRecommendation(RecommendationDto recommendation)
 	{
-		RecommendedAction = recommendation.Recommendation ?? string.Empty;
+		RecommendedAction = string.IsNullOrWhiteSpace(recommendation.Recommendation)
+			? "Awaiting strategy..."
+			: recommendation.Recommendation;
 		StrategyConfidence = recommendation.Confidence;
+	}
+
+	private void RefreshStrategyCollections()
+	{
+		HasAlternativeStrategies = AlternativeStrategies.Count > 0;
+		HasNoAlternativeStrategies = !HasAlternativeStrategies;
+		HasCompetitorStrategies = CompetitorStrategies.Count > 0;
+		HasNoCompetitorStrategies = !HasCompetitorStrategies;
 	}
 
 	/// <summary>
@@ -130,6 +164,8 @@ public partial class StrategyViewModel : ViewModelBase
 	/// </summary>
 	public void UpdateStintStatus(double fuelPct, double tireWear, int lap, int stintLaps)
 	{
+		HasTelemetryData = true;
+		HasNoTelemetryData = false;
 		CurrentStintFuelPercentage = fuelPct;
 		CurrentStintTireWear = tireWear;
 		CurrentLap = lap;
@@ -142,6 +178,11 @@ public partial class StrategyViewModel : ViewModelBase
 	/// </summary>
 	public void CalculatePitWindow(double fuelPerLap, double tireWearPerLap, double tankCapacity)
 	{
+		if (fuelPerLap <= 0 || tireWearPerLap <= 0 || tankCapacity <= 0)
+		{
+			return;
+		}
+
 		var fuelLapsRemaining = (int)((CurrentStintFuelPercentage / 100.0) * tankCapacity / fuelPerLap);
 		var tireLapsRemaining = (int)((100.0 - CurrentStintTireWear) / tireWearPerLap);
 		

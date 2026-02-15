@@ -36,7 +36,7 @@ public partial class MainWindowViewModel : ViewModelBase
 	private TelemetrySampleDto? _pendingTelemetry;
 	private int _telemetryUpdateScheduled;
 	private long _lastUiUpdateTicks;
-	private const double UiUpdateIntervalSeconds = 0.05;
+	internal const double UiUpdateIntervalSeconds = 0.1;
 	private int _lastLapNumber = int.MinValue;
 	private bool _usePreloadedReplay;
 	private int _preloadedSessionId = -1;
@@ -393,7 +393,8 @@ public partial class MainWindowViewModel : ViewModelBase
 			var laps = _telemetryBuffer.GetAvailableLaps();
 			if (laps.Length > 0)
 			{
-				TelemetryAnalysis.LoadCurrentLapData(laps[^1]);
+				// Load the first lap so the display matches the replay start position.
+				TelemetryAnalysis.LoadCurrentLapData(laps[0]);
 			}
 		});
 		IsPreloading = false;
@@ -639,6 +640,8 @@ public partial class MainWindowViewModel : ViewModelBase
 				}
 			}
 		}
+
+		TelemetryAnalysis.UpdateReplayCursor(telemetry);
 	}
 
 	public void UpdateHoverSample(TelemetrySampleDto? telemetry)
@@ -685,6 +688,36 @@ public partial class MainWindowViewModel : ViewModelBase
 		Strategy.UpdateFromRecommendation(recommendation);
 	}
 
+	public void RequestPitNow()
+	{
+		const string message = "Pit this lap";
+		AddAlert($"Pit request: {message}.");
+		Strategy.RecommendedAction = message;
+		Strategy.StrategyConfidence = 1.0;
+		Dashboard.StrategyMessage = message;
+		Dashboard.StrategyConfidence = 1.0;
+	}
+
+	public void TriggerEmergencyMode()
+	{
+		const string message = "Emergency: pit now";
+		AddAlert("Emergency mode: return to pits now.");
+		Strategy.RecommendedAction = message;
+		Strategy.StrategyConfidence = 1.0;
+		Dashboard.StrategyMessage = message;
+		Dashboard.StrategyConfidence = 1.0;
+	}
+
+	public void DismissAlerts()
+	{
+		Dashboard.Alerts.Clear();
+	}
+
+	public void PauseTelemetry()
+	{
+		PauseReplayCommand.Execute(null);
+	}
+
 	public void ApplyRecommendationFailure(string message)
 	{
 		if (!_recommendationHealthy)
@@ -704,8 +737,25 @@ public partial class MainWindowViewModel : ViewModelBase
 		Strategy.UpdateFromRecommendation(fallback);
 	}
 
+	private void AddAlert(string message)
+	{
+		if (Dashboard.Alerts.Contains(message))
+		{
+			return;
+		}
+
+		Dashboard.Alerts.Insert(0, message);
+	}
+
+	private int _isUpdatingSessionSelection = 0;
+
 	partial void OnSelectedSessionIdChanged(int value)
 	{
+		// Don't auto-start from ID change if triggered by OnSelectedSessionChanged
+		// to avoid double-triggering StartReplay()
+		if (Interlocked.CompareExchange(ref _isUpdatingSessionSelection, 0, 0) == 1)
+			return;
+
 		if (ReplayEnabled && IsReplayPlaying)
 		{
 			StartReplay();
@@ -717,13 +767,30 @@ public partial class MainWindowViewModel : ViewModelBase
 		if (value == null)
 			return;
 
-		SelectedSessionId = value.SessionId;
-		SessionMetadataTrack = value.Track;
-		SessionMetadataTrackId = value.TrackId ?? string.Empty;
-		SessionMetadataCar = value.Car;
-		var trackKey = value.TrackId ?? value.Track;
-		_trackMapService.Reset(trackKey);
-		UpdateCarSpec(value.Car);
+		// Prevent double-triggering when we set SelectedSessionId
+		Interlocked.Exchange(ref _isUpdatingSessionSelection, 1);
+		try
+		{
+			SelectedSessionId = value.SessionId;
+			SessionMetadataTrack = value.Track;
+			SessionMetadataTrackId = value.TrackId ?? string.Empty;
+			SessionMetadataCar = value.Car;
+			var trackKey = value.TrackId ?? value.Track;
+			_trackMapService.Reset(trackKey);
+			UpdateCarSpec(value.Car);
+
+			// Trigger preload + map rebuild for the newly selected session.
+			// Only auto-start if replay was already playing to avoid surprising
+			// the user when they're just browsing sessions.
+			if (ReplayEnabled && IsReplayPlaying)
+			{
+				StartReplay();
+			}
+		}
+		finally
+		{
+			Interlocked.Exchange(ref _isUpdatingSessionSelection, 0);
+		}
 	}
 
 	partial void OnSessionFilterFromChanged(DateTime? value)

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using PitWall.UI.Models;
@@ -100,6 +101,21 @@ namespace PitWall.UI.Tests
             public Task<AgentConfigDto> UpdateConfigAsync(AgentConfigUpdateDto update, CancellationToken cancellationToken)
             {
                 return Task.FromResult(new AgentConfigDto());
+            }
+
+            public Task<IReadOnlyList<string>> DiscoverEndpointsAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+            }
+
+            public Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new AgentHealthDto());
+            }
+
+            public Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+            {
+                return Task.FromResult(new AgentLlmTestDto());
             }
         }
     }

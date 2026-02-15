@@ -543,15 +543,15 @@ namespace PitWall.Tests
         #region Confidence Calculation Tests
 
         [Theory]
-        [InlineData(1.0, 3.0, 1.0)]
-        [InlineData(2.9, 3.0, 1.0)]
-        [InlineData(3.5, 3.0, 0.9)]
-        [InlineData(4.4, 3.0, 0.9)]
-        [InlineData(5.0, 3.0, 0.8)]
-        [InlineData(5.9, 3.0, 0.8)]
-        [InlineData(7.0, 3.0, 0.7)]
-        [InlineData(10.0, 3.0, 0.7)]
-        public void TryAnswer_FuelQuery_CalculatesCorrectConfidence(double fuelLaps, double threshold, double expectedConfidence)
+        [InlineData(1.0, 1.0)]
+        [InlineData(2.9, 1.0)]
+        [InlineData(3.5, 0.9)]
+        [InlineData(4.4, 0.9)]
+        [InlineData(5.0, 0.8)]
+        [InlineData(5.9, 0.8)]
+        [InlineData(7.0, 0.7)]
+        [InlineData(10.0, 0.7)]
+        public void TryAnswer_FuelQuery_CalculatesCorrectConfidence(double fuelLaps, double expectedConfidence)
         {
             // Arrange
             var context = new RaceContext

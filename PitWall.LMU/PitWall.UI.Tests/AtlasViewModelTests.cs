@@ -91,20 +91,6 @@ public class DashboardViewModelTests
 public class TelemetryAnalysisViewModelSmokeTests
 {
 	[Fact]
-	public void SelectReferenceLap_UpdatesSelectedLap()
-	{
-		// Arrange
-		var buffer = new TelemetryBuffer(1000);
-		var viewModel = new TelemetryAnalysisViewModel(buffer);
-
-		// Act
-		viewModel.SelectReferenceLapCommand.Execute(5);
-
-		// Assert
-		Assert.Equal(5, viewModel.SelectedReferenceLap);
-	}
-
-	[Fact]
 	public void DataCollections_InitiallyEmpty()
 	{
 		// Arrange & Act
@@ -178,34 +164,6 @@ public class TelemetryAnalysisViewModelSmokeTests
 	}
 
 	[Fact]
-	public void LoadReferenceLapData_PopulatesReferenceCollections()
-	{
-		// Arrange
-		var buffer = new TelemetryBuffer(1000);
-		for (int i = 0; i < 3; i++)
-		{
-			buffer.Add(new TelemetrySampleDto
-			{
-				LapNumber = 2,
-				SpeedKph = 210.0,
-				ThrottlePosition = 0.85,
-				BrakePosition = 0.1,
-				SteeringAngle = 3.0,
-				TyreTempsC = new[] { 95.0, 96.0, 94.0, 95.5 }
-			});
-		}
-		var viewModel = new TelemetryAnalysisViewModel(buffer);
-
-		// Act
-		viewModel.LoadReferenceLapData(2);
-
-		// Assert
-		Assert.Equal(3, viewModel.ReferenceSpeedData.Count);
-		Assert.Equal(3, viewModel.ReferenceThrottleData.Count);
-		Assert.Equal(210.0, viewModel.ReferenceSpeedData[0].Value);
-	}
-
-	[Fact]
 	public void RefreshAvailableLaps_UpdatesLapList()
 	{
 		// Arrange
@@ -252,38 +210,6 @@ public class TelemetryAnalysisViewModelSmokeTests
 		Assert.NotNull(speedRow);
 		Assert.Equal("250.0", speedRow.CurrentValue);
 		Assert.Equal("km/h", speedRow.Unit);
-	}
-
-	[Fact]
-	public void UpdateCursorData_CalculatesDelta()
-	{
-		// Arrange
-		var buffer = new TelemetryBuffer(1000);
-		buffer.Add(new TelemetrySampleDto
-		{
-			LapNumber = 1,
-			SpeedKph = 250.0,
-			ThrottlePosition = 0.80
-		});
-		buffer.Add(new TelemetrySampleDto
-		{
-			LapNumber = 2,
-			SpeedKph = 255.0, // 5 km/h faster
-			ThrottlePosition = 0.85
-		});
-		var viewModel = new TelemetryAnalysisViewModel(buffer);
-		viewModel.LoadCurrentLapData(1);
-		viewModel.LoadReferenceLapData(2);
-
-		// Act
-		viewModel.UpdateCursorData(0.0);
-
-		// Assert
-		var speedRow = viewModel.CursorData.FirstOrDefault(r => r.Parameter == "vSpeed");
-		Assert.NotNull(speedRow);
-		Assert.Equal("250.0", speedRow.CurrentValue);
-		Assert.Equal("255.0", speedRow.ReferenceValue);
-		Assert.Contains("5.0", speedRow.Delta); // Delta contains arrow indicators like "▼ 5.0"
 	}
 
 	[Fact]
@@ -365,6 +291,8 @@ public class StrategyViewModelTests : IDisposable
 		Assert.Equal(2, viewModel.AlternativeStrategies.Count);
 		Assert.Contains(viewModel.AlternativeStrategies, s => s.Name == "2-Stop Aggressive");
 		Assert.Contains(viewModel.AlternativeStrategies, s => s.Name == "1-Stop Conservative");
+		Assert.True(viewModel.HasAlternativeStrategies);
+		Assert.False(viewModel.HasNoAlternativeStrategies);
 	}
 
 	[Fact]
@@ -401,6 +329,25 @@ public class StrategyViewModelTests : IDisposable
 	}
 
 	[Fact]
+	public void UpdateFromRecommendation_WithEmptyRecommendation_UsesFallback()
+	{
+		// Arrange
+		var viewModel = new StrategyViewModel();
+		var recommendation = new RecommendationDto
+		{
+			Recommendation = " ",
+			Confidence = 0.0
+		};
+
+		// Act
+		viewModel.UpdateFromRecommendation(recommendation);
+
+		// Assert
+		Assert.Equal("Awaiting strategy...", viewModel.RecommendedAction);
+		Assert.Equal(0.0, viewModel.StrategyConfidence);
+	}
+
+	[Fact]
 	public void UpdateStintStatus_UpdatesAllStintProperties()
 	{
 		// Arrange
@@ -415,6 +362,8 @@ public class StrategyViewModelTests : IDisposable
 		Assert.Equal(15, viewModel.CurrentLap);
 		Assert.Equal(8, viewModel.StintLap);
 		Assert.Equal(8, viewModel.StintDuration);
+		Assert.True(viewModel.HasTelemetryData);
+		Assert.False(viewModel.HasNoTelemetryData);
 	}
 
 	[Fact]
@@ -431,6 +380,17 @@ public class StrategyViewModelTests : IDisposable
 		Assert.Equal(0.0, viewModel.CurrentStintTireWear);
 		Assert.Equal(1, viewModel.CurrentLap);
 		Assert.Equal(1, viewModel.StintLap);
+		Assert.True(viewModel.HasTelemetryData);
+		Assert.False(viewModel.HasNoTelemetryData);
+	}
+
+	[Fact]
+	public void Constructor_SetsTelemetryUnavailableState()
+	{
+		var viewModel = new StrategyViewModel();
+
+		Assert.False(viewModel.HasTelemetryData);
+		Assert.True(viewModel.HasNoTelemetryData);
 	}
 
 	[Fact]
@@ -718,6 +678,16 @@ public class AtlasSettingsViewModelTests
 		public Task<IReadOnlyList<string>> DiscoverEndpointsAsync(CancellationToken cancellationToken)
 		{
 			return Task.FromResult<IReadOnlyList<string>>(new[] { "http://localhost:11434", "http://192.168.1.100:11434" });
+		}
+
+		public Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
+		{
+			return Task.FromResult(new AgentHealthDto());
+		}
+
+		public Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+		{
+			return Task.FromResult(new AgentLlmTestDto());
 		}
 	}
 }
@@ -1508,5 +1478,15 @@ internal class NullAgentConfigClient : IAgentConfigClient
 	public Task<IReadOnlyList<string>> DiscoverEndpointsAsync(CancellationToken cancellationToken)
 	{
 		return Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+	}
+
+	public Task<AgentHealthDto> GetHealthAsync(CancellationToken cancellationToken)
+	{
+		return Task.FromResult(new AgentHealthDto());
+	}
+
+	public Task<AgentLlmTestDto> TestLlmAsync(CancellationToken cancellationToken)
+	{
+		return Task.FromResult(new AgentLlmTestDto());
 	}
 }

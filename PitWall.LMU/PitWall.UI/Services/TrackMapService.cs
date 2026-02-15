@@ -595,11 +595,16 @@ namespace PitWall.UI.Services
                 var bounds = GetBounds(rawPoints);
                 var width = Math.Max(1.0, bounds.maxX - bounds.minX);
                 var height = Math.Max(1.0, bounds.maxY - bounds.minY);
+                var scale = Math.Max(width, height);
+                var normalizedWidth = width / scale;
+                var normalizedHeight = height / scale;
+                var padX = (1.0 - normalizedWidth) / 2.0;
+                var padY = (1.0 - normalizedHeight) / 2.0;
 
                 var normalized = rawPoints
                     .Select(point => new Point(
-                        (point.X - bounds.minX) / width,
-                        (point.Y - bounds.minY) / height))
+                        padX + (point.X - bounds.minX) / scale,
+                        padY + (point.Y - bounds.minY) / scale))
                     .ToList();
 
                 return new TrackMapState
@@ -791,11 +796,16 @@ namespace PitWall.UI.Services
                 var bounds = GetBounds(points);
                 var width = Math.Max(1.0, bounds.maxX - bounds.minX);
                 var height = Math.Max(1.0, bounds.maxY - bounds.minY);
+                var scale = Math.Max(width, height);
+                var normalizedWidth = width / scale;
+                var normalizedHeight = height / scale;
+                var padX = (1.0 - normalizedWidth) / 2.0;
+                var padY = (1.0 - normalizedHeight) / 2.0;
 
                 return points
                     .Select(point => new Point(
-                        (point.X - bounds.minX) / width,
-                        (point.Y - bounds.minY) / height))
+                        padX + (point.X - bounds.minX) / scale,
+                        padY + (point.Y - bounds.minY) / scale))
                     .ToList();
             }
 

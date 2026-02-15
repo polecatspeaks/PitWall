@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PitWall.UI", "PitWall.UI\Pi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PitWall.UI.Tests", "PitWall.UI.Tests\PitWall.UI.Tests.csproj", "{F160946A-F012-4670-ADB8-E36DDB3F4B76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PitWall.JsonAnalyzer", "PitWall.JsonAnalyzer\PitWall.JsonAnalyzer.csproj", "{AEF16441-4ECA-47C0-A34A-6942A247341D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,18 @@ Global
 		{F160946A-F012-4670-ADB8-E36DDB3F4B76}.Release|x64.Build.0 = Release|Any CPU
 		{F160946A-F012-4670-ADB8-E36DDB3F4B76}.Release|x86.ActiveCfg = Release|Any CPU
 		{F160946A-F012-4670-ADB8-E36DDB3F4B76}.Release|x86.Build.0 = Release|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Debug|x64.Build.0 = Debug|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Debug|x86.Build.0 = Debug|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Release|x64.ActiveCfg = Release|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Release|x64.Build.0 = Release|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Release|x86.ActiveCfg = Release|Any CPU
+		{AEF16441-4ECA-47C0-A34A-6942A247341D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

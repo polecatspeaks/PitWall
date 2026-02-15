@@ -9,6 +9,8 @@ using PitWall.UI.Views;
 using PitWall.UI.Services;
 using System;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
@@ -18,6 +20,7 @@ namespace PitWall.UI;
 public partial class App : Application
 {
     private ILoggerFactory? _loggerFactory;
+    private CancellationTokenSource? _autoStartCts;
 
     public override void Initialize()
     {
@@ -54,6 +57,37 @@ public partial class App : Application
             var apiClient = new HttpClient { BaseAddress = new Uri(apiBase) };
             var agentClientHttp = new HttpClient { BaseAddress = new Uri(agentBase) };
 
+            appLogger.LogInformation("Starting backend services...");
+            
+            _autoStartCts = new CancellationTokenSource();
+            var apiAutoStart = new ApiAutoStartService(
+                new ApiProbe(),
+                new ProcessLauncher(),
+                appLogger);
+            var apiStartTask = apiAutoStart.EnsureApiRunningAsync(new Uri(apiBase), AppContext.BaseDirectory, _autoStartCts.Token);
+
+            var agentAutoStart = new AgentAutoStartService(
+                new ApiProbe("/agent/health"),
+                new ProcessLauncher(),
+                appLogger);
+            var agentStartTask = agentAutoStart.EnsureAgentRunningAsync(new Uri(agentBase), AppContext.BaseDirectory, _autoStartCts.Token);
+
+            // Wait for both services to start on background thread to avoid blocking UI
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.WhenAll(apiStartTask, agentStartTask).ConfigureAwait(false);
+                    appLogger.LogInformation("Backend services ready: API={ApiBase}, Agent={AgentBase}", apiBase, agentBase);
+                }
+                catch (Exception ex)
+                {
+                    appLogger.LogError(ex, "One or more backend services failed to start. UI will continue but some features may be unavailable.");
+                }
+            });
+
+            desktop.ShutdownRequested += OnShutdownRequested;
+
             var wsBase = BuildWebSocketBase(apiBase);
             var telemetryClient = new TelemetryStreamClient(wsBase, _loggerFactory.CreateLogger<TelemetryStreamClient>());
             var recommendationClient = new RecommendationClient(apiClient, _loggerFactory.CreateLogger<RecommendationClient>());
@@ -77,6 +111,45 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void OnShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
+    {
+        try
+        {
+            _autoStartCts?.Cancel();
+        }
+        catch
+        {
+            // Ignore cancellation errors during shutdown
+        }
+
+        try
+        {
+            _autoStartCts?.Dispose();
+        }
+        catch
+        {
+            // Ignore disposal errors during shutdown
+        }
+
+        try
+        {
+            _loggerFactory?.Dispose();
+        }
+        catch
+        {
+            // Ignore logger disposal errors during shutdown
+        }
+
+        try
+        {
+            Log.CloseAndFlush();
+        }
+        catch
+        {
+            // Ignore Serilog flush errors during shutdown
+        }
     }
 
     private void DisableAvaloniaDataAnnotationValidation()
