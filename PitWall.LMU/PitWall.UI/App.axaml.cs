@@ -70,16 +70,19 @@ public partial class App : Application
                 appLogger);
             var agentStartTask = agentAutoStart.EnsureAgentRunningAsync(new Uri(agentBase), AppContext.BaseDirectory, CancellationToken.None);
 
-            // Wait for both services to start
-            try
+            // Wait for both services to start on background thread to avoid blocking UI
+            Task.Run(async () =>
             {
-                Task.WhenAll(apiStartTask, agentStartTask).GetAwaiter().GetResult();
-                appLogger.LogInformation("Backend services ready: API={ApiBase}, Agent={AgentBase}", apiBase, agentBase);
-            }
-            catch (Exception ex)
-            {
-                appLogger.LogError(ex, "One or more backend services failed to start. UI will continue but some features may be unavailable.");
-            }
+                try
+                {
+                    await Task.WhenAll(apiStartTask, agentStartTask).ConfigureAwait(false);
+                    appLogger.LogInformation("Backend services ready: API={ApiBase}, Agent={AgentBase}", apiBase, agentBase);
+                }
+                catch (Exception ex)
+                {
+                    appLogger.LogError(ex, "One or more backend services failed to start. UI will continue but some features may be unavailable.");
+                }
+            });
 
             var wsBase = BuildWebSocketBase(apiBase);
             var telemetryClient = new TelemetryStreamClient(wsBase, _loggerFactory.CreateLogger<TelemetryStreamClient>());

@@ -147,7 +147,7 @@ ORDER BY table_name, ordinal_position;";
             _logger.LogDebug("Reading samples from session {SessionId}, rows {StartRow} to {EndRow}.", sessionId, startRow, endRow);
 
             // Compute interpolation on a background thread to avoid blocking the caller
-            var cache = await Task.Run(() => GetOrComputeSessionCache(sessionId, cancellationToken), cancellationToken);
+            var cache = await GetOrComputeSessionCacheAsync(sessionId, cancellationToken).ConfigureAwait(false);
 
             if (cache.TimeGrid.Length == 0)
             {
@@ -194,9 +194,9 @@ ORDER BY table_name, ordinal_position;";
         /// Thread-safe: uses SemaphoreSlim to serialize computation and prevent duplicate work.
         /// Only one thread can compute at a time, while others wait for the result.
         /// </summary>
-        private InterpolatedSessionCache GetOrComputeSessionCache(int sessionId, CancellationToken cancellationToken)
+        private async Task<InterpolatedSessionCache> GetOrComputeSessionCacheAsync(int sessionId, CancellationToken cancellationToken)
         {
-            _cacheSemaphore.Wait(cancellationToken);
+            await _cacheSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 if (_sessionCache != null && _sessionCache.SessionId == sessionId)
@@ -518,7 +518,7 @@ WHERE table_schema = 'main';";
         /// </summary>
         public void Dispose()
         {
-            _cacheSemaphore?.Dispose();
+            _cacheSemaphore.Dispose();
         }
     }
 }
