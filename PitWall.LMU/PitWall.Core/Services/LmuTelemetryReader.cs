@@ -23,6 +23,7 @@ namespace PitWall.Core.Services
         /// </summary>
         private InterpolatedSessionCache? _sessionCache;
         private readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
+        private bool _disposed;
 
         private static readonly string[] RequiredTables =
         {
@@ -518,7 +519,11 @@ WHERE table_schema = 'main';";
         /// </summary>
         public void Dispose()
         {
+            if (_disposed)
+                return;
+
             _cacheSemaphore.Dispose();
+            _disposed = true;
         }
     }
 }
