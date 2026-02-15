@@ -384,11 +384,11 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public void PreviousSectorCommand_ExecutesWithoutError()
+        public void PreviousLapCommand_ExecutesWithoutError()
         {
             var vm = new TelemetryAnalysisViewModel();
             
-            vm.PreviousSectorCommand.Execute(null);
+            vm.PreviousLapCommand.Execute(null);
             
             // With no buffer data and default CurrentLap=1, navigates to
             // "Already on first available lap" because no laps are loaded.
@@ -396,11 +396,11 @@ namespace PitWall.UI.Tests
         }
 
         [Fact]
-        public void NextSectorCommand_ExecutesWithoutError()
+        public void NextLapCommand_ExecutesWithoutError()
         {
             var vm = new TelemetryAnalysisViewModel();
             
-            vm.NextSectorCommand.Execute(null);
+            vm.NextLapCommand.Execute(null);
             
             Assert.Contains("Already on last", vm.StatusMessage);
         }

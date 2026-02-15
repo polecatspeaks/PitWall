@@ -115,8 +115,11 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		CursorData.Add(new CursorDataRow { Parameter = "fFuel", Unit = "L", CurrentValue = "--" });
 	}
 
+	/// <summary>
+	/// Navigate to the previous lap in the telemetry buffer.
+	/// </summary>
 	[RelayCommand]
-	private void PreviousSector()
+	private void PreviousLap()
 	{
 		if (CurrentLap <= 0)
 		{
@@ -136,8 +139,11 @@ public partial class TelemetryAnalysisViewModel : ViewModelBase
 		}
 	}
 
+	/// <summary>
+	/// Navigate to the next lap in the telemetry buffer.
+	/// </summary>
 	[RelayCommand]
-	private void NextSector()
+	private void NextLap()
 	{
 		if (CurrentLap <= 0)
 		{
