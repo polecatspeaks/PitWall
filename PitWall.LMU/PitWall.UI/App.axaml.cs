@@ -115,10 +115,41 @@ public partial class App : Application
 
     private void OnShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
     {
-        _autoStartCts?.Cancel();
-        _autoStartCts?.Dispose();
-        _loggerFactory?.Dispose();
-        Log.CloseAndFlush();
+        try
+        {
+            _autoStartCts?.Cancel();
+        }
+        catch
+        {
+            // Ignore cancellation errors during shutdown
+        }
+
+        try
+        {
+            _autoStartCts?.Dispose();
+        }
+        catch
+        {
+            // Ignore disposal errors during shutdown
+        }
+
+        try
+        {
+            _loggerFactory?.Dispose();
+        }
+        catch
+        {
+            // Ignore logger disposal errors during shutdown
+        }
+
+        try
+        {
+            Log.CloseAndFlush();
+        }
+        catch
+        {
+            // Ignore Serilog flush errors during shutdown
+        }
     }
 
     private void DisableAvaloniaDataAnnotationValidation()

@@ -24,9 +24,10 @@ namespace PitWall.UI.Services
     /// </summary>
     public sealed class ApiProbe : IApiProbe
     {
+        // Shared HttpClient with generous timeout - per-request timeouts are controlled via CancellationTokenSource
         private static readonly HttpClient SharedClient = new()
         {
-            Timeout = TimeSpan.FromMilliseconds(500)
+            Timeout = TimeSpan.FromSeconds(5)
         };
         private readonly TimeSpan _timeout;
         private readonly string _probePath;
