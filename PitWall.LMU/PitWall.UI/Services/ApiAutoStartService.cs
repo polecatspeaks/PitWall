@@ -24,7 +24,10 @@ namespace PitWall.UI.Services
     /// </summary>
     public sealed class ApiProbe : IApiProbe
     {
-        private static readonly HttpClient SharedClient = new();
+        private static readonly HttpClient SharedClient = new()
+        {
+            Timeout = TimeSpan.FromMilliseconds(500)
+        };
         private readonly TimeSpan _timeout;
         private readonly string _probePath;
 

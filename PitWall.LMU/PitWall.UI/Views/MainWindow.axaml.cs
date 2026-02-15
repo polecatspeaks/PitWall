@@ -372,11 +372,12 @@ public partial class MainWindow : Window
 
     private static bool IsTextInputTarget(object? source)
     {
-        // Check for common text input controls that should receive Space key input
+        // Check for common text input controls that should receive Space key input.
+        // The name-based check catches custom TextBox subclasses like MaskedTextBox.
         return source is TextBox 
             || source is ComboBox 
             || source is AutoCompleteBox
             || source is NumericUpDown
-            || (source is Control control && control.GetType().Name.Contains("TextBox"));
+            || (source is Control { } control && control.GetType().FullName?.Contains("TextBox") == true);
     }
 }

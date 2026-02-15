@@ -383,7 +383,7 @@ ORDER BY table_name, ordinal_position;";
             // Validate table name to prevent SQL injection
             if (!AllowedTables.Contains(tableName))
             {
-                throw new ArgumentException($"Invalid table name '{tableName}'. Must be one of the allowed tables.", nameof(tableName));
+                throw new ArgumentException("Invalid table name. Must be one of the allowed telemetry tables.", nameof(tableName));
             }
 
             using var command = connection.CreateCommand();
@@ -417,7 +417,7 @@ ORDER BY table_name, ordinal_position;";
             // Validate table name to prevent SQL injection
             if (!AllowedTables.Contains(tableName))
             {
-                throw new ArgumentException($"Invalid table name '{tableName}'. Must be one of the allowed tables.", nameof(tableName));
+                throw new ArgumentException("Invalid table name. Must be one of the allowed telemetry tables.", nameof(tableName));
             }
 
             using var command = connection.CreateCommand();
