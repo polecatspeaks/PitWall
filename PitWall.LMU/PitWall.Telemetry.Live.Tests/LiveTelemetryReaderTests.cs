@@ -285,9 +285,19 @@ namespace PitWall.Telemetry.Live.Tests
             // Arrange
             var mockSource = new Mock<ITelemetryDataSource>();
             mockSource.Setup(m => m.IsAvailable()).Returns(true);
+            
+            var testSnapshot = new TelemetrySnapshot
+            {
+                Timestamp = DateTime.UtcNow,
+                SessionId = string.Empty, // Empty session ID to test generation
+                AllVehicles = new(),
+                Session = new SessionInfo(),
+                Scoring = new ScoringInfo()
+            };
+            
             mockSource
                 .Setup(m => m.ReadSnapshotAsync())
-                .ReturnsAsync(CreateSampleSnapshot());
+                .ReturnsAsync(testSnapshot);
 
             var reader = new LiveTelemetryReader(mockSource.Object);
 
@@ -297,6 +307,40 @@ namespace PitWall.Telemetry.Live.Tests
             // Assert
             Assert.NotNull(snapshot);
             Assert.NotEmpty(snapshot.SessionId);
+        }
+
+        [Fact]
+        public async Task ReadAsync_SetsTimestamp_WhenDefault()
+        {
+            // Arrange
+            var mockSource = new Mock<ITelemetryDataSource>();
+            mockSource.Setup(m => m.IsAvailable()).Returns(true);
+            
+            var testSnapshot = new TelemetrySnapshot
+            {
+                Timestamp = default, // Default timestamp to test auto-setting
+                SessionId = "test-session",
+                AllVehicles = new(),
+                Session = new SessionInfo(),
+                Scoring = new ScoringInfo()
+            };
+            
+            mockSource
+                .Setup(m => m.ReadSnapshotAsync())
+                .ReturnsAsync(testSnapshot);
+
+            var reader = new LiveTelemetryReader(mockSource.Object);
+
+            // Act
+            var beforeTime = DateTime.UtcNow;
+            var snapshot = await reader.ReadAsync();
+            var afterTime = DateTime.UtcNow;
+
+            // Assert
+            Assert.NotNull(snapshot);
+            Assert.NotEqual(default, snapshot.Timestamp);
+            Assert.True(snapshot.Timestamp >= beforeTime);
+            Assert.True(snapshot.Timestamp <= afterTime);
         }
 
         private TelemetrySnapshot CreateSampleSnapshot()

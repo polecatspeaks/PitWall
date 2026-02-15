@@ -31,7 +31,7 @@ namespace PitWall.Telemetry.Live.Storage
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS sessions (
+                CREATE TABLE IF NOT EXISTS live_sessions (
                     session_id TEXT PRIMARY KEY,
                     start_time TIMESTAMP,
                     track_name TEXT,
@@ -46,7 +46,7 @@ namespace PitWall.Telemetry.Live.Storage
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS laps (
+                CREATE TABLE IF NOT EXISTS live_laps (
                     session_id TEXT,
                     vehicle_id INTEGER,
                     lap_number INTEGER,
@@ -69,7 +69,7 @@ namespace PitWall.Telemetry.Live.Storage
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS telemetry_samples (
+                CREATE TABLE IF NOT EXISTS live_telemetry_samples (
                     session_id TEXT,
                     vehicle_id INTEGER,
                     timestamp TIMESTAMP,
@@ -134,7 +134,7 @@ namespace PitWall.Telemetry.Live.Storage
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS events (
+                CREATE TABLE IF NOT EXISTS live_events (
                     session_id TEXT,
                     vehicle_id INTEGER,
                     timestamp TIMESTAMP,

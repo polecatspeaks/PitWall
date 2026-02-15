@@ -47,7 +47,7 @@ namespace PitWall.Telemetry.Live.Tests
             command.CommandText = @"
                 SELECT COUNT(*) 
                 FROM information_schema.tables 
-                WHERE table_name = $1";
+                WHERE table_name = ? AND table_schema = 'main'";
             var param = command.CreateParameter();
             param.Value = tableName;
             command.Parameters.Add(param);
@@ -83,8 +83,8 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            Assert.True(TableExists(db, "sessions"));
-            var columns = GetTableColumns(db, "sessions");
+            Assert.True(TableExists(db, "live_sessions"));
+            var columns = GetTableColumns(db, "live_sessions");
             
             // Essential session metadata
             Assert.Contains("session_id", columns);
@@ -106,7 +106,7 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            var pkColumns = GetPrimaryKeyColumns(db, "sessions");
+            var pkColumns = GetPrimaryKeyColumns(db, "live_sessions");
             Assert.Single(pkColumns);
             Assert.Equal("session_id", pkColumns[0]);
         }
@@ -122,8 +122,8 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            Assert.True(TableExists(db, "laps"));
-            var columns = GetTableColumns(db, "laps");
+            Assert.True(TableExists(db, "live_laps"));
+            var columns = GetTableColumns(db, "live_laps");
             
             // Primary key components
             Assert.Contains("session_id", columns);
@@ -153,7 +153,7 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            var pkColumns = GetPrimaryKeyColumns(db, "laps");
+            var pkColumns = GetPrimaryKeyColumns(db, "live_laps");
             Assert.Equal(3, pkColumns.Count);
             Assert.Contains("session_id", pkColumns);
             Assert.Contains("vehicle_id", pkColumns);
@@ -171,8 +171,8 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            Assert.True(TableExists(db, "telemetry_samples"));
-            var columns = GetTableColumns(db, "telemetry_samples");
+            Assert.True(TableExists(db, "live_telemetry_samples"));
+            var columns = GetTableColumns(db, "live_telemetry_samples");
             
             // Primary key components
             Assert.Contains("session_id", columns);
@@ -210,7 +210,7 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            var pkColumns = GetPrimaryKeyColumns(db, "telemetry_samples");
+            var pkColumns = GetPrimaryKeyColumns(db, "live_telemetry_samples");
             Assert.Equal(3, pkColumns.Count);
             Assert.Contains("session_id", pkColumns);
             Assert.Contains("vehicle_id", pkColumns);
@@ -228,7 +228,7 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            var columns = GetTableColumns(db, "telemetry_samples");
+            var columns = GetTableColumns(db, "live_telemetry_samples");
             
             // Tyre temperatures (3 zones per tyre)
             Assert.Contains("fl_temp_inner", columns);
@@ -256,7 +256,7 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            var columns = GetTableColumns(db, "telemetry_samples");
+            var columns = GetTableColumns(db, "live_telemetry_samples");
             
             Assert.Contains("fl_brake_temp", columns);
             Assert.Contains("fr_brake_temp", columns);
@@ -275,7 +275,7 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            var columns = GetTableColumns(db, "telemetry_samples");
+            var columns = GetTableColumns(db, "live_telemetry_samples");
             
             Assert.Contains("fl_susp_deflection", columns);
             Assert.Contains("fr_susp_deflection", columns);
@@ -294,8 +294,8 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            Assert.True(TableExists(db, "events"));
-            var columns = GetTableColumns(db, "events");
+            Assert.True(TableExists(db, "live_events"));
+            var columns = GetTableColumns(db, "live_events");
             
             Assert.Contains("session_id", columns);
             Assert.Contains("vehicle_id", columns);
@@ -315,7 +315,7 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db);
 
             // Assert
-            var pkColumns = GetPrimaryKeyColumns(db, "events");
+            var pkColumns = GetPrimaryKeyColumns(db, "live_events");
             Assert.Equal(4, pkColumns.Count);
             Assert.Contains("session_id", pkColumns);
             Assert.Contains("vehicle_id", pkColumns);
@@ -335,10 +335,10 @@ namespace PitWall.Telemetry.Live.Tests
             schema.CreateTables(db); // Should not throw
 
             // Assert
-            Assert.True(TableExists(db, "sessions"));
-            Assert.True(TableExists(db, "laps"));
-            Assert.True(TableExists(db, "telemetry_samples"));
-            Assert.True(TableExists(db, "events"));
+            Assert.True(TableExists(db, "live_sessions"));
+            Assert.True(TableExists(db, "live_laps"));
+            Assert.True(TableExists(db, "live_telemetry_samples"));
+            Assert.True(TableExists(db, "live_events"));
         }
 
         [Fact]

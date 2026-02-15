@@ -4,9 +4,10 @@ using System.Collections.Generic;
 namespace PitWall.Telemetry.Live.Models
 {
     /// <summary>
-    /// Represents a complete telemetry snapshot from LMU shared memory.
-    /// Includes data from Telemetry, Scoring, and Electronics structures.
-    /// Based on 231-field schema discovered from 2.5GB telemetry capture.
+    /// Represents a high-level telemetry snapshot from LMU shared memory.
+    /// Designed to unify key data from Telemetry, Scoring, and (in future) Electronics structures.
+    /// Based on a 231-field schema discovered from 2.5GB telemetry capture, but currently exposes only a curated subset.
+    /// This model is an initial foundation and will be expanded as additional fields are implemented.
     /// </summary>
     public class TelemetrySnapshot
     {
@@ -88,7 +89,13 @@ namespace PitWall.Telemetry.Live.Models
         public double LastImpactTime { get; set; }
         
         // Tires
-        public WheelData[] Wheels { get; set; } = new WheelData[4];
+        public WheelData[] Wheels { get; set; } =
+        {
+            new WheelData(),
+            new WheelData(),
+            new WheelData(),
+            new WheelData()
+        };
     }
 
     /// <summary>
