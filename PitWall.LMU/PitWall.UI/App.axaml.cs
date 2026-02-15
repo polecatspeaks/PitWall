@@ -10,6 +10,7 @@ using PitWall.UI.Services;
 using System;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
@@ -59,13 +60,23 @@ public partial class App : Application
                 new ApiProbe(),
                 new ProcessLauncher(),
                 appLogger);
-            _ = apiAutoStart.EnsureApiRunningAsync(new Uri(apiBase), AppContext.BaseDirectory, CancellationToken.None);
+            var apiStartTask = apiAutoStart.EnsureApiRunningAsync(new Uri(apiBase), AppContext.BaseDirectory, CancellationToken.None);
+            apiStartTask.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                    appLogger.LogError(t.Exception, "API auto-start failed");
+            }, TaskScheduler.Default);
 
             var agentAutoStart = new AgentAutoStartService(
                 new ApiProbe("/agent/health"),
                 new ProcessLauncher(),
                 appLogger);
-            _ = agentAutoStart.EnsureAgentRunningAsync(new Uri(agentBase), AppContext.BaseDirectory, CancellationToken.None);
+            var agentStartTask = agentAutoStart.EnsureAgentRunningAsync(new Uri(agentBase), AppContext.BaseDirectory, CancellationToken.None);
+            agentStartTask.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                    appLogger.LogError(t.Exception, "Agent auto-start failed");
+            }, TaskScheduler.Default);
 
             var wsBase = BuildWebSocketBase(apiBase);
             var telemetryClient = new TelemetryStreamClient(wsBase, _loggerFactory.CreateLogger<TelemetryStreamClient>());

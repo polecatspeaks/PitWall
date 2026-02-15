@@ -144,9 +144,6 @@ public partial class DashboardViewModel : ViewModelBase
 		FuelLiters = $"{telemetry.FuelLiters:0.0} L";
 		SpeedDisplay = $"{telemetry.SpeedKph:0.0} KPH";
 
-		// Debug logging
-		Console.WriteLine($"[Dashboard:INPUT] Raw={telemetry.BrakePosition:F3} Throttle={telemetry.ThrottlePosition:F3} Steering={telemetry.SteeringAngle:F3}");
-
 		var throttle = Math.Clamp(telemetry.ThrottlePosition, 0, 1);
 		var brake = Math.Clamp(telemetry.BrakePosition, 0, 1);
 		var steering = Math.Clamp(telemetry.SteeringAngle, -1, 1);
@@ -158,9 +155,6 @@ public partial class DashboardViewModel : ViewModelBase
 		ThrottleDisplay = $"{ThrottlePercent:0}%";
 		BrakeDisplay = $"{BrakePercent:0}%";
 		SteeringDisplay = $"{steering:0.00}";
-
-		Console.WriteLine($"[Dashboard:CLAMPED] Brake={brake:F3} ({BrakePercent:F1}%) Throttle={throttle:F3} Steering={steering:F3}");
-		Console.WriteLine($"[Dashboard:DISPLAY] BrakePercent={BrakePercent:F1}% BrakeDisplay={BrakeDisplay}");
 
 		if (telemetry.TyreTempsC.Length >= 4)
 		{

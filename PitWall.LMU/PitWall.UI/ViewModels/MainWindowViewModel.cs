@@ -768,10 +768,11 @@ public partial class MainWindowViewModel : ViewModelBase
 		_trackMapService.Reset(trackKey);
 		UpdateCarSpec(value.Car);
 
-		// Trigger preload + map rebuild for the newly selected session
-		if (ReplayEnabled)
+		// Trigger preload + map rebuild for the newly selected session.
+		// Only auto-start if replay was already playing to avoid surprising
+		// the user when they're just browsing sessions.
+		if (ReplayEnabled && IsReplayPlaying)
 		{
-			IsReplayPlaying = true;
 			StartReplay();
 		}
 	}

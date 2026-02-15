@@ -191,7 +191,9 @@ ORDER BY table_name, ordinal_position;";
 
         /// <summary>
         /// Gets cached interpolated data for a session, computing it if necessary.
-        /// Thread-safe: only one thread computes at a time, others wait.
+        /// Thread-safe: computation is serialized under the lock to prevent duplicate work.
+        /// Holding the lock during I/O-bound compute is acceptable here because callers
+        /// are on background threads and serializing avoids redundant DuckDB reads.
         /// </summary>
         private InterpolatedSessionCache GetOrComputeSessionCache(int sessionId, CancellationToken cancellationToken)
         {
@@ -203,19 +205,19 @@ ORDER BY table_name, ordinal_position;";
                         sessionId, _sessionCache.TimeGrid.Length);
                     return _sessionCache;
                 }
-            }
 
-            _logger.LogInformation("Computing interpolated data for session {SessionId}...", sessionId);
-            var computed = ComputeInterpolatedSession(sessionId, cancellationToken);
+                _logger.LogInformation("Computing interpolated data for session {SessionId}...", sessionId);
 
-            lock (_cacheLock)
-            {
+                // Clear old cache before computing new one to release memory sooner
+                _sessionCache = null;
+
+                var computed = ComputeInterpolatedSession(sessionId, cancellationToken);
                 _sessionCache = computed;
-            }
 
-            _logger.LogInformation("Cached interpolated data for session {SessionId}: {GridSize} points.",
-                sessionId, computed.TimeGrid.Length);
-            return computed;
+                _logger.LogInformation("Cached interpolated data for session {SessionId}: {GridSize} points.",
+                    sessionId, computed.TimeGrid.Length);
+                return computed;
+            }
         }
 
         /// <summary>
