@@ -11,7 +11,7 @@ using PitWall.Core.Utilities;
 
 namespace PitWall.Core.Services
 {
-    public class LmuTelemetryReader : ILmuTelemetryReader
+    public class LmuTelemetryReader : ILmuTelemetryReader, IDisposable
     {
         private const int DefaultReadLimit = 1000;
         private readonly string _databasePath;
@@ -22,7 +22,7 @@ namespace PitWall.Core.Services
         /// Cached interpolated session data to avoid recomputing on each batch request.
         /// </summary>
         private InterpolatedSessionCache? _sessionCache;
-        private readonly object _cacheLock = new();
+        private readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
 
         private static readonly string[] RequiredTables =
         {
@@ -191,13 +191,13 @@ ORDER BY table_name, ordinal_position;";
 
         /// <summary>
         /// Gets cached interpolated data for a session, computing it if necessary.
-        /// Thread-safe: computation is serialized under the lock to prevent duplicate work.
-        /// Holding the lock during I/O-bound compute is acceptable here because callers
-        /// are on background threads and serializing avoids redundant DuckDB reads.
+        /// Thread-safe: uses SemaphoreSlim to serialize computation and prevent duplicate work.
+        /// Only one thread can compute at a time, while others wait for the result.
         /// </summary>
         private InterpolatedSessionCache GetOrComputeSessionCache(int sessionId, CancellationToken cancellationToken)
         {
-            lock (_cacheLock)
+            _cacheSemaphore.Wait(cancellationToken);
+            try
             {
                 if (_sessionCache != null && _sessionCache.SessionId == sessionId)
                 {
@@ -217,6 +217,10 @@ ORDER BY table_name, ordinal_position;";
                 _logger.LogInformation("Cached interpolated data for session {SessionId}: {GridSize} points.",
                     sessionId, computed.TimeGrid.Length);
                 return computed;
+            }
+            finally
+            {
+                _cacheSemaphore.Release();
             }
         }
 
@@ -507,6 +511,14 @@ WHERE table_schema = 'main';";
                 long l => l,
                 _ => Convert.ToDouble(value)
             };
+        }
+
+        /// <summary>
+        /// Disposes resources used by this reader.
+        /// </summary>
+        public void Dispose()
+        {
+            _cacheSemaphore?.Dispose();
         }
     }
 }

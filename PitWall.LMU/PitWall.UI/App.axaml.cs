@@ -56,27 +56,30 @@ public partial class App : Application
             var apiClient = new HttpClient { BaseAddress = new Uri(apiBase) };
             var agentClientHttp = new HttpClient { BaseAddress = new Uri(agentBase) };
 
+            appLogger.LogInformation("Starting backend services...");
+            
             var apiAutoStart = new ApiAutoStartService(
                 new ApiProbe(),
                 new ProcessLauncher(),
                 appLogger);
             var apiStartTask = apiAutoStart.EnsureApiRunningAsync(new Uri(apiBase), AppContext.BaseDirectory, CancellationToken.None);
-            apiStartTask.ContinueWith(t =>
-            {
-                if (t.IsFaulted)
-                    appLogger.LogError(t.Exception, "API auto-start failed");
-            }, TaskScheduler.Default);
 
             var agentAutoStart = new AgentAutoStartService(
                 new ApiProbe("/agent/health"),
                 new ProcessLauncher(),
                 appLogger);
             var agentStartTask = agentAutoStart.EnsureAgentRunningAsync(new Uri(agentBase), AppContext.BaseDirectory, CancellationToken.None);
-            agentStartTask.ContinueWith(t =>
+
+            // Wait for both services to start
+            try
             {
-                if (t.IsFaulted)
-                    appLogger.LogError(t.Exception, "Agent auto-start failed");
-            }, TaskScheduler.Default);
+                Task.WhenAll(apiStartTask, agentStartTask).GetAwaiter().GetResult();
+                appLogger.LogInformation("Backend services ready: API={ApiBase}, Agent={AgentBase}", apiBase, agentBase);
+            }
+            catch (Exception ex)
+            {
+                appLogger.LogError(ex, "One or more backend services failed to start. UI will continue but some features may be unavailable.");
+            }
 
             var wsBase = BuildWebSocketBase(apiBase);
             var telemetryClient = new TelemetryStreamClient(wsBase, _loggerFactory.CreateLogger<TelemetryStreamClient>());
