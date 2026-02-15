@@ -188,6 +188,7 @@ namespace PitWall.UI.Services
             info.ArgumentList.Add("run");
             info.ArgumentList.Add("--project");
             info.ArgumentList.Add(apiProjectPath);
+            info.ArgumentList.Add("--no-build");
 
             info.Environment["ASPNETCORE_URLS"] = apiBase.ToString().TrimEnd('/');
 

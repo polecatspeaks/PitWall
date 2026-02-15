@@ -747,8 +747,15 @@ public partial class MainWindowViewModel : ViewModelBase
 		Dashboard.Alerts.Insert(0, message);
 	}
 
+	private bool _isUpdatingSessionSelection = false;
+
 	partial void OnSelectedSessionIdChanged(int value)
 	{
+		// Don't auto-start from ID change if triggered by OnSelectedSessionChanged
+		// to avoid double-triggering StartReplay()
+		if (_isUpdatingSessionSelection)
+			return;
+
 		if (ReplayEnabled && IsReplayPlaying)
 		{
 			StartReplay();
@@ -760,20 +767,29 @@ public partial class MainWindowViewModel : ViewModelBase
 		if (value == null)
 			return;
 
-		SelectedSessionId = value.SessionId;
-		SessionMetadataTrack = value.Track;
-		SessionMetadataTrackId = value.TrackId ?? string.Empty;
-		SessionMetadataCar = value.Car;
-		var trackKey = value.TrackId ?? value.Track;
-		_trackMapService.Reset(trackKey);
-		UpdateCarSpec(value.Car);
-
-		// Trigger preload + map rebuild for the newly selected session.
-		// Only auto-start if replay was already playing to avoid surprising
-		// the user when they're just browsing sessions.
-		if (ReplayEnabled && IsReplayPlaying)
+		// Prevent double-triggering when we set SelectedSessionId
+		_isUpdatingSessionSelection = true;
+		try
 		{
-			StartReplay();
+			SelectedSessionId = value.SessionId;
+			SessionMetadataTrack = value.Track;
+			SessionMetadataTrackId = value.TrackId ?? string.Empty;
+			SessionMetadataCar = value.Car;
+			var trackKey = value.TrackId ?? value.Track;
+			_trackMapService.Reset(trackKey);
+			UpdateCarSpec(value.Car);
+
+			// Trigger preload + map rebuild for the newly selected session.
+			// Only auto-start if replay was already playing to avoid surprising
+			// the user when they're just browsing sessions.
+			if (ReplayEnabled && IsReplayPlaying)
+			{
+				StartReplay();
+			}
+		}
+		finally
+		{
+			_isUpdatingSessionSelection = false;
 		}
 	}
 

@@ -333,8 +333,8 @@
                         
                         <!-- Lap Selector and Controls -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                            <Button Content="◀ Prev Lap" Command="{Binding TelemetryAnalysis.PreviousSectorCommand}" Padding="8,4" />
-                            <Button Content="Next Lap ▶" Command="{Binding TelemetryAnalysis.NextSectorCommand}" Padding="8,4" />
+                            <Button Content="◀ Prev Lap" Command="{Binding TelemetryAnalysis.PreviousLapCommand}" Padding="8,4" />
+                            <Button Content="Next Lap ▶" Command="{Binding TelemetryAnalysis.NextLapCommand}" Padding="8,4" />
                             <Button Content="Zoom In" Command="{Binding TelemetryAnalysis.ZoomInCommand}" Padding="8,4" />
                             <Button Content="Zoom Out" Command="{Binding TelemetryAnalysis.ZoomOutCommand}" Padding="8,4" />
                             <Button Content="Export CSV" Classes="atlas-button-primary" 
