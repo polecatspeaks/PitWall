@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PitWall.Core\PitWall.Core.csproj" />
     <ProjectReference Include="..\PitWall.Telemetry.Live\PitWall.Telemetry.Live.csproj" />
   </ItemGroup>
 
