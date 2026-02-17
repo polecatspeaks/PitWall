@@ -1,8 +1,10 @@
 ﻿using Avalonia;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PitWall.UI;
 
+[ExcludeFromCodeCoverage]
 sealed class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any

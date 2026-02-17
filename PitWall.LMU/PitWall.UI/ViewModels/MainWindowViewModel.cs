@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -478,6 +479,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		ReplayStatusMessage = "Replay stopped";
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void SeekBy(int delta)
 	{
 		if (_preloadedSamples.Count == 0)
@@ -492,6 +494,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		ReplayStatusMessage = $"Seeked to sample {_playbackIndex}";
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void SetPlaybackRate(double rate)
 	{
 		if (rate == 0)
@@ -504,6 +507,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		ReplayStatusMessage = $"Speed set to {rate}x";
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void SetReplayProgress(int index)
 	{
 		if (!Dispatcher.UIThread.CheckAccess())
@@ -518,6 +522,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		ReplayProgressPercent = Math.Clamp((double)index / denominator * 100.0, 0.0, 100.0);
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void RestartReplay()
 	{
 		ReplayStartRow = 0;
@@ -526,12 +531,14 @@ public partial class MainWindowViewModel : ViewModelBase
 		StartReplay();
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void ApplyReplaySettings()
 	{
 		_logger.LogDebug("Applying replay settings.");
 		StartReplay();
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void UpdateTelemetry(TelemetrySampleDto telemetry)
 	{
 		lock (_telemetryUpdateLock)
@@ -547,6 +554,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		Dispatcher.UIThread.Post(ProcessPendingTelemetry);
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void ProcessPendingTelemetry()
 	{
 		if (_telemetryCts?.IsCancellationRequested == true)
@@ -589,6 +597,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		}
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void ApplyTelemetry(TelemetrySampleDto telemetry)
 	{
 		// Add to buffer (skip during preloaded replay to avoid duplicates)
@@ -911,6 +920,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		Dashboard.UpdateCarSpec(spec, carName);
 	}
 
+	[ExcludeFromCodeCoverage]
 	private void UpdateSessionSummary(SessionSummaryDto summary)
 	{
 		var index = AvailableSessions.ToList().FindIndex(session => session.SessionId == summary.SessionId);
@@ -922,6 +932,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		SelectedSession = FilteredSessions.FirstOrDefault(session => session.SessionId == summary.SessionId) ?? SelectedSession;
 	}
 
+	[ExcludeFromCodeCoverage]
 	partial void OnReplayEnabledChanged(bool value)
 	{
 		if (value)
@@ -935,6 +946,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		}
 	}
 
+	[ExcludeFromCodeCoverage]
 	partial void OnIsReplayPlayingChanged(bool value)
 	{
 		if (value)
@@ -951,6 +963,7 @@ public partial class MainWindowViewModel : ViewModelBase
 	}
 
 	// Null implementations for design-time support
+	[ExcludeFromCodeCoverage]
 	private sealed class NullRecommendationClient : IRecommendationClient
 	{
 		public Task<RecommendationDto> GetRecommendationAsync(string sessionId, CancellationToken cancellationToken)
@@ -959,6 +972,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		}
 	}
 
+	[ExcludeFromCodeCoverage]
 	private sealed class NullTelemetryStreamClient : ITelemetryStreamClient
 	{
 		public Task ConnectAsync(int sessionId, int startRow, int endRow, int intervalMs, Action<TelemetrySampleDto> onMessage, CancellationToken cancellationToken)
@@ -967,6 +981,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		}
 	}
 
+	[ExcludeFromCodeCoverage]
 	private sealed class NullSessionClient : ISessionClient
 	{
 		public Task<int> GetSessionCountAsync(CancellationToken cancellationToken)

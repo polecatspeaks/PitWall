@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -79,6 +80,7 @@ namespace PitWall.UI.Services
     /// <summary>
     /// Default process launcher implementation.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class ProcessLauncher : IProcessLauncher
     {
         /// <inheritdoc />

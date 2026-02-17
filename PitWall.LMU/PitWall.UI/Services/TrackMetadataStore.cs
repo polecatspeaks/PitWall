@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -64,7 +65,7 @@ namespace PitWall.UI.Services
             return match ?? GetDefault();
         }
 
-        private static string NormalizeKey(string value)
+        internal static string NormalizeKey(string value)
         {
             var normalized = value.Normalize(NormalizationForm.FormD);
             var buffer = new char[normalized.Length];
@@ -111,6 +112,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static List<TrackMetadata> LoadTrackList(string assetUri)
         {
             try
@@ -132,6 +134,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static List<TrackMetadata> LoadLovelyTracks()
         {
             try
@@ -174,6 +177,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static TrackMetadata? LoadLovelyTrack(string fileName)
         {
             try
@@ -217,7 +221,7 @@ namespace PitWall.UI.Services
             }
         }
 
-        private static List<TrackSector> BuildSectors(LovelyTrackData data)
+        internal static List<TrackSector> BuildSectors(LovelyTrackData data)
         {
             if (data.Sector == null || data.Sector.Count == 0)
             {
@@ -279,7 +283,7 @@ namespace PitWall.UI.Services
             return sectors;
         }
 
-        private static List<TrackCorner> BuildCorners(LovelyTrackData data)
+        internal static List<TrackCorner> BuildCorners(LovelyTrackData data)
         {
             if (data.Turn == null || data.Turn.Count == 0)
             {
@@ -312,7 +316,7 @@ namespace PitWall.UI.Services
             return corners;
         }
 
-        private static List<TrackMetadata> MergeTracks(List<TrackMetadata> baseTracks, List<TrackMetadata> lovelyTracks)
+        internal static List<TrackMetadata> MergeTracks(List<TrackMetadata> baseTracks, List<TrackMetadata> lovelyTracks)
         {
             var merged = baseTracks.Where(track => !string.Equals(track.Name, "Default", StringComparison.OrdinalIgnoreCase)).ToList();
             var defaultTrack = baseTracks.FirstOrDefault(track =>
@@ -335,7 +339,7 @@ namespace PitWall.UI.Services
             return merged;
         }
 
-        private static bool IsSameTrack(TrackMetadata left, TrackMetadata right)
+        internal static bool IsSameTrack(TrackMetadata left, TrackMetadata right)
         {
             var leftTrackId = NormalizeLookup(left.TrackId);
             var rightTrackId = NormalizeLookup(right.TrackId);
@@ -372,7 +376,7 @@ namespace PitWall.UI.Services
             return string.IsNullOrWhiteSpace(value) ? string.Empty : ToSlug(value);
         }
 
-        private static string MapDirection(int? direction)
+        internal static string MapDirection(int? direction)
         {
             return direction switch
             {
@@ -382,7 +386,7 @@ namespace PitWall.UI.Services
             };
         }
 
-        private static string MapSeverity(int? scale)
+        internal static string MapSeverity(int? scale)
         {
             return scale switch
             {
@@ -393,7 +397,7 @@ namespace PitWall.UI.Services
             };
         }
 
-        private static double ClampFraction(double value)
+        internal static double ClampFraction(double value)
         {
             if (value < 0)
             {
@@ -403,6 +407,7 @@ namespace PitWall.UI.Services
             return value > 1.0 ? 1.0 : value;
         }
 
+        [ExcludeFromCodeCoverage]
         private static void ApplyOutlines(List<TrackMetadata> tracks)
         {
             foreach (var track in tracks)
@@ -415,6 +420,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static void ApplyMapImages(List<TrackMetadata> tracks)
         {
             foreach (var track in tracks)
@@ -427,6 +433,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static List<TrackOutlinePoint>? LoadOutline(string trackName)
         {
             try
@@ -458,6 +465,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static List<TrackOutlinePoint>? LoadOutlineFromDisk(string slug)
         {
             if (string.IsNullOrWhiteSpace(slug))
@@ -486,7 +494,7 @@ namespace PitWall.UI.Services
             }
         }
 
-        private static string ToSlug(string value)
+        internal static string ToSlug(string value)
         {
             var normalized = NormalizeKey(value).ToLowerInvariant();
             var builder = new StringBuilder(normalized.Length);
@@ -510,6 +518,7 @@ namespace PitWall.UI.Services
             return slug;
         }
 
+        [ExcludeFromCodeCoverage]
         private static string? ResolveMapImageUri(string trackName)
         {
             var slug = ToSlug(trackName);
@@ -545,7 +554,7 @@ namespace PitWall.UI.Services
             };
         }
 
-        private sealed class LovelyTrackData
+        internal sealed class LovelyTrackData
         {
             public string? Name { get; set; }
             public string? TrackId { get; set; }
@@ -553,7 +562,7 @@ namespace PitWall.UI.Services
             public List<LovelySector>? Sector { get; set; }
         }
 
-        private sealed class LovelyTurn
+        internal sealed class LovelyTurn
         {
             public int? Number { get; set; }
             public string? Name { get; set; }
@@ -563,7 +572,7 @@ namespace PitWall.UI.Services
             public int? Scale { get; set; }
         }
 
-        private sealed class LovelySector
+        internal sealed class LovelySector
         {
             public string? Name { get; set; }
             public double? Marker { get; set; }

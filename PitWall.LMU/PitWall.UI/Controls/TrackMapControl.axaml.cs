@@ -8,8 +8,11 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace PitWall.UI.Controls
 {
+    [ExcludeFromCodeCoverage]
     public partial class TrackMapControl : UserControl
     {
         public static readonly StyledProperty<IReadOnlyList<Point>> TrackPointsProperty =

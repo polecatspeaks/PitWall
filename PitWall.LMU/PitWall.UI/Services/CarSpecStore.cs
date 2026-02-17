@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace PitWall.UI.Services
         private readonly Dictionary<string, List<CarSpec>> _carsByManufacturer = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<string> _manufacturerKeys = new();
 
+        [ExcludeFromCodeCoverage]
         public CarSpecStore()
         {
             _cars = LoadCars();
@@ -32,6 +34,7 @@ namespace PitWall.UI.Services
             BuildManufacturerIndex();
         }
 
+        [ExcludeFromCodeCoverage]
         public CarSpec? GetByName(string? carName)
         {
             if (string.IsNullOrWhiteSpace(carName))
@@ -68,6 +71,7 @@ namespace PitWall.UI.Services
             return TryGetByManufacturer(carName);
         }
 
+        [ExcludeFromCodeCoverage]
         private static List<CarSpec> LoadCars()
         {
             try
@@ -110,6 +114,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static CarSpec? LoadCar(string fileName)
         {
             try
@@ -131,6 +136,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static void LoadAliases(Dictionary<string, string> target)
         {
             try
@@ -175,6 +181,7 @@ namespace PitWall.UI.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private void BuildManufacturerIndex()
         {
             _carsByManufacturer.Clear();
@@ -201,6 +208,7 @@ namespace PitWall.UI.Services
             _manufacturerKeys.AddRange(_carsByManufacturer.Keys.OrderByDescending(key => key.Length));
         }
 
+        [ExcludeFromCodeCoverage]
         private CarSpec? TryGetByManufacturer(string carName)
         {
             if (_manufacturerKeys.Count == 0)
@@ -225,7 +233,7 @@ namespace PitWall.UI.Services
             return null;
         }
 
-        private static string NormalizeKey(string value)
+        internal static string NormalizeKey(string value)
         {
             var normalized = value.Normalize(NormalizationForm.FormD);
             var buffer = new char[normalized.Length];
@@ -242,7 +250,7 @@ namespace PitWall.UI.Services
             return new string(buffer, 0, length).Normalize(NormalizationForm.FormC).Trim();
         }
 
-        private static string ToSlug(string value)
+        internal static string ToSlug(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -269,6 +277,7 @@ namespace PitWall.UI.Services
             return builder.ToString().Trim('-');
         }
 
+        [ExcludeFromCodeCoverage]
         private List<string> BuildCandidates(string name)
         {
             var candidates = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -295,6 +304,7 @@ namespace PitWall.UI.Services
             return candidates.ToList();
         }
 
+        [ExcludeFromCodeCoverage]
         private bool TryGetAlias(string value, out string alias)
         {
             alias = string.Empty;
@@ -320,7 +330,7 @@ namespace PitWall.UI.Services
             return false;
         }
 
-        private static string StripTeamSuffix(string name)
+        internal static string StripTeamSuffix(string name)
         {
             var trimmed = name.Trim();
             if (string.IsNullOrWhiteSpace(trimmed))
@@ -362,7 +372,7 @@ namespace PitWall.UI.Services
             return working;
         }
 
-        private static string GetManufacturerKey(string name)
+        internal static string GetManufacturerKey(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

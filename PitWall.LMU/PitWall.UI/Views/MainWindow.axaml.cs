@@ -10,10 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace PitWall.UI.Views;
 
+[ExcludeFromCodeCoverage]
 public partial class MainWindow : Window
 {
     private CancellationTokenSource? _cts;

@@ -29,16 +29,48 @@ if (Test-Path $reportPath) {
 
 New-Item -ItemType Directory -Path $resultsPath | Out-Null
 
-Write-Host "Running tests with coverage..."
+$runsettings = Join-Path $rootPath "coverage.runsettings"
+
+Write-Host "Building solution..."
 Push-Location $rootPath
 try {
-    & dotnet test --collect:"XPlat Code Coverage" --results-directory "$resultsPath"
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warning "dotnet test reported failures. Coverage will still be generated from available results."
-    }
+    & dotnet build --no-restore -v quiet
 }
 finally {
     Pop-Location
+}
+
+Write-Host "Running tests with coverage (per-project to ensure proper instrumentation)..."
+$testProjects = @(
+    "PitWall.Tests\PitWall.Tests.csproj",
+    "PitWall.UI.Tests\PitWall.UI.Tests.csproj",
+    "PitWall.Telemetry.Live.Tests\PitWall.Telemetry.Live.Tests.csproj"
+)
+
+$anyFailed = $false
+foreach ($project in $testProjects) {
+    $projectPath = Join-Path $rootPath $project
+    if (-not (Test-Path $projectPath)) {
+        Write-Warning "Test project not found: $project"
+        continue
+    }
+    $projectName = [System.IO.Path]::GetFileNameWithoutExtension($project)
+    Write-Host "  Running $projectName..."
+    Push-Location $rootPath
+    try {
+        & dotnet test $project --no-build --collect:"XPlat Code Coverage" --results-directory "$resultsPath" --settings "$runsettings" --blame-hang-timeout 60s
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "  $projectName reported failures."
+            $anyFailed = $true
+        }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+if ($anyFailed) {
+    Write-Warning "Some test projects reported failures. Coverage will still be generated from available results."
 }
 
 $coverageFiles = Get-ChildItem -Path $resultsPath -Recurse -Filter "coverage.cobertura.xml" -File

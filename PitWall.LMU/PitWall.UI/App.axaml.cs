@@ -15,8 +15,11 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace PitWall.UI;
 
+[ExcludeFromCodeCoverage]
 public partial class App : Application
 {
     private ILoggerFactory? _loggerFactory;

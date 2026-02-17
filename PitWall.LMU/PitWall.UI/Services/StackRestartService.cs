@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace PitWall.UI.Services;
@@ -18,6 +19,7 @@ public sealed class StackRestartService : IStackRestartService
 	private const string ScriptRelativePath = "Tools\\RestartPitWallStack.ps1";
 	private const string SolutionFileName = "PitWall.LMU.sln";
 
+	[ExcludeFromCodeCoverage]
 	public StackRestartResult Restart()
 	{
 		try
@@ -65,7 +67,7 @@ public sealed class StackRestartService : IStackRestartService
 		}
 	}
 
-	private static string? FindSolutionRoot(string baseDirectory)
+	internal static string? FindSolutionRoot(string baseDirectory)
 	{
 		var directory = new DirectoryInfo(baseDirectory);
 		while (directory != null)
@@ -81,7 +83,7 @@ public sealed class StackRestartService : IStackRestartService
 		return null;
 	}
 
-	private static string ResolveBaseUri(string? envValue, int defaultPort)
+	internal static string ResolveBaseUri(string? envValue, int defaultPort)
 	{
 		if (!string.IsNullOrWhiteSpace(envValue) && Uri.TryCreate(envValue, UriKind.Absolute, out var uri))
 		{
