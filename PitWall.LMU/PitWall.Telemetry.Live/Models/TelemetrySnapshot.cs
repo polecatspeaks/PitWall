@@ -154,6 +154,7 @@ namespace PitWall.Telemetry.Live.Models
         public double BestLapTime { get; set; }
         public double LastLapTime { get; set; }
         public double CurrentLapTime { get; set; }
+        public int LapNumber { get; set; }
         
         // Position
         public int Place { get; set; }

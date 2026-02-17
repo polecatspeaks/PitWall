@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -57,6 +58,21 @@ namespace PitWall.Telemetry.Live.Services
         private TelemetrySnapshot MapToSnapshot(TelemetrySample sample)
         {
             var playerVehicle = MapPlayerVehicle(sample);
+            var playerScoring = MapPlayerScoring(sample);
+            var allVehicles = new List<VehicleTelemetry> { playerVehicle };
+            var scoringVehicles = new List<VehicleScoringInfo> { playerScoring };
+
+            // Map other vehicles if present
+            if (sample.OtherVehicles is { Count: > 0 })
+            {
+                foreach (var other in sample.OtherVehicles)
+                {
+                    allVehicles.Add(MapOtherVehicle(other));
+                    scoringVehicles.Add(MapOtherScoring(other));
+                }
+            }
+
+            var numVehicles = sample.NumVehicles > 0 ? sample.NumVehicles : allVehicles.Count;
 
             return new TelemetrySnapshot
             {
@@ -65,14 +81,20 @@ namespace PitWall.Telemetry.Live.Services
                 Session = new SessionInfo
                 {
                     StartTimeUtc = sample.Timestamp,
-                    NumVehicles = 1
+                    TrackName = sample.TrackName ?? string.Empty,
+                    SessionType = sample.SessionType ?? string.Empty,
+                    CarName = sample.VehicleClass ?? string.Empty,
+                    TrackLength = sample.TrackLength,
+                    NumVehicles = numVehicles
                 },
                 PlayerVehicle = playerVehicle,
-                AllVehicles = { playerVehicle },
+                AllVehicles = allVehicles,
                 Scoring = new ScoringInfo
                 {
-                    NumVehicles = 1,
-                    SectorFlags = new int[3]
+                    NumVehicles = numVehicles,
+                    SectorFlags = sample.SectorFlags ?? new int[3],
+                    YellowFlagState = sample.YellowFlagState,
+                    Vehicles = scoringVehicles
                 }
             };
         }
@@ -92,14 +114,81 @@ namespace PitWall.Telemetry.Live.Services
                 Throttle = sample.Throttle,
                 Steering = sample.Steering,
                 PosX = sample.Latitude,
+                PosY = sample.PosY,
                 PosZ = sample.Longitude,
-                ElapsedTime = 0
+                ElapsedTime = sample.ElapsedTime,
+                Rpm = sample.Rpm,
+                Gear = sample.Gear,
+                LastImpactMagnitude = sample.LastImpactMagnitude,
+                LastImpactTime = sample.LastImpactTime,
+                DentSeverity = DecodeDentSeverity(sample.DentSeverity)
             };
 
             // Map tyre temps to wheel data
             MapTyreTemps(vehicle.Wheels, sample.TyreTempsC);
+            MapWheelArrays(vehicle.Wheels, sample);
 
             return vehicle;
+        }
+
+        /// <summary>
+        /// Map player-specific scoring/timing data.
+        /// </summary>
+        private static VehicleScoringInfo MapPlayerScoring(TelemetrySample sample)
+        {
+            return new VehicleScoringInfo
+            {
+                VehicleId = 0,
+                DriverName = sample.DriverName ?? string.Empty,
+                VehicleClass = sample.VehicleClass ?? string.Empty,
+                BestLapTime = sample.BestLapTime,
+                LastLapTime = sample.LastLapTime,
+                Place = sample.Place,
+                LapNumber = sample.LapNumber,
+                LapDistance = sample.LapDistance,
+                TimeBehindLeader = sample.TimeBehindLeader,
+                TimeBehindNext = sample.TimeBehindNext,
+                Flag = sample.Flag,
+                PitState = sample.PitState
+            };
+        }
+
+        /// <summary>
+        /// Map a non-player vehicle's data to <see cref="VehicleTelemetry"/>.
+        /// </summary>
+        private static VehicleTelemetry MapOtherVehicle(VehicleSampleData other)
+        {
+            return new VehicleTelemetry
+            {
+                VehicleId = other.VehicleId,
+                IsPlayer = false,
+                Speed = other.Speed,
+                PosX = other.PosX,
+                PosY = other.PosY,
+                PosZ = other.PosZ
+            };
+        }
+
+        /// <summary>
+        /// Map a non-player vehicle's scoring data.
+        /// </summary>
+        private static VehicleScoringInfo MapOtherScoring(VehicleSampleData other)
+        {
+            return new VehicleScoringInfo
+            {
+                VehicleId = other.VehicleId,
+                DriverName = other.DriverName ?? string.Empty,
+                VehicleClass = other.VehicleClass ?? string.Empty,
+                Place = other.Place,
+                BestLapTime = other.BestLapTime,
+                LastLapTime = other.LastLapTime,
+                LapNumber = other.LapNumber,
+                LapDistance = other.LapDistance,
+                TimeBehindLeader = other.TimeBehindLeader,
+                TimeBehindNext = other.TimeBehindNext,
+                Flag = other.Flag,
+                PitState = other.PitState
+            };
         }
 
         /// <summary>
@@ -113,6 +202,51 @@ namespace PitWall.Telemetry.Live.Services
             for (int i = 0; i < Math.Min(tyreTemps.Length, wheels.Length); i++)
             {
                 wheels[i].TempMid = tyreTemps[i];
+            }
+        }
+
+        /// <summary>
+        /// Map per-wheel condition arrays (wear, pressure, flat, detached, brake temp, suspension)
+        /// from the core sample into wheel data. Handles null arrays gracefully.
+        /// </summary>
+        private static void MapWheelArrays(WheelData[] wheels, TelemetrySample sample)
+        {
+            for (int i = 0; i < wheels.Length; i++)
+            {
+                if (sample.TyreWear is { Length: >= 4 })
+                    wheels[i].Wear = sample.TyreWear[i];
+
+                if (sample.TyrePressure is { Length: >= 4 })
+                    wheels[i].Pressure = sample.TyrePressure[i];
+
+                if (sample.TyreFlat is { Length: >= 4 })
+                    wheels[i].Flat = sample.TyreFlat[i];
+
+                if (sample.WheelDetached is { Length: >= 4 })
+                    wheels[i].Detached = sample.WheelDetached[i];
+
+                if (sample.BrakeTempsC is { Length: >= 4 })
+                    wheels[i].BrakeTemp = sample.BrakeTempsC[i];
+
+                if (sample.SuspDeflection is { Length: >= 4 })
+                    wheels[i].SuspDeflection = sample.SuspDeflection[i];
+            }
+        }
+
+        /// <summary>
+        /// Decode a base64-encoded dent severity string into a byte array.
+        /// Returns null if the input is null or empty.
+        /// </summary>
+        private static byte[]? DecodeDentSeverity(string? base64)
+        {
+            if (string.IsNullOrEmpty(base64)) return null;
+            try
+            {
+                return Convert.FromBase64String(base64);
+            }
+            catch (FormatException)
+            {
+                return null;
             }
         }
 
