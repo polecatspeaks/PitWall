@@ -213,7 +213,7 @@ namespace PitWall.UI.Services
             return ClassifySegment(steeringAngle, lateralG);
         }
 
-        private static SegmentClassification ClassifySegment(double steeringAngle, double lateralG)
+        internal static SegmentClassification ClassifySegment(double steeringAngle, double lateralG)
         {
             var absSteer = Math.Abs(steeringAngle);
             var absLatG = Math.Abs(lateralG);
@@ -362,7 +362,7 @@ namespace PitWall.UI.Services
             return _outlineSegments.FirstOrDefault(segment => segment.Contains(lapFraction));
         }
 
-        private static TrackSegmentStatus BuildSegmentStatus(
+        internal static TrackSegmentStatus BuildSegmentStatus(
             TrackMetadata metadata,
             TrackSector? sector,
             TrackCorner? corner,
@@ -497,7 +497,7 @@ namespace PitWall.UI.Services
             });
         }
 
-        private static string GetSeverityFromAngle(double angle)
+        internal static string GetSeverityFromAngle(double angle)
         {
             return angle switch
             {
@@ -508,7 +508,7 @@ namespace PitWall.UI.Services
             };
         }
 
-        private static double GetSeverityAngle(string severity)
+        internal static double GetSeverityAngle(string severity)
         {
             return severity switch
             {
@@ -519,9 +519,9 @@ namespace PitWall.UI.Services
             };
         }
 
-        private sealed record SegmentClassification(bool IsCorner, string Direction, string Severity);
+        internal sealed record SegmentClassification(bool IsCorner, string Direction, string Severity);
 
-        private sealed class OutlineSegment
+        internal sealed class OutlineSegment
         {
             public int Number { get; init; }
             public string Name { get; init; } = string.Empty;
@@ -537,17 +537,17 @@ namespace PitWall.UI.Services
             }
         }
 
-        private sealed class TrackMapState
+        internal sealed class TrackMapState
         {
             public IReadOnlyList<Point> NormalizedPoints { get; init; } = Array.Empty<Point>();
-            private IReadOnlyList<Point> RawPoints { get; init; } = Array.Empty<Point>();
-            private IReadOnlyList<double> CumulativeDistances { get; init; } = Array.Empty<double>();
-            private double TotalDistance { get; init; }
-            private double OriginLat { get; init; }
-            private double OriginLon { get; init; }
-            private double LatScale { get; init; }
-            private double LonScale { get; init; }
-            private bool IsOutline { get; init; }
+            internal IReadOnlyList<Point> RawPoints { get; init; } = Array.Empty<Point>();
+            internal IReadOnlyList<double> CumulativeDistances { get; init; } = Array.Empty<double>();
+            internal double TotalDistance { get; init; }
+            internal double OriginLat { get; init; }
+            internal double OriginLon { get; init; }
+            internal double LatScale { get; init; }
+            internal double LonScale { get; init; }
+            internal bool IsOutline { get; init; }
 
             public static TrackMapState? Build(IReadOnlyList<TelemetrySampleDto> samples)
             {
@@ -753,7 +753,7 @@ namespace PitWall.UI.Services
                     prev.Y + (next.Y - prev.Y) * t);
             }
 
-            private int FindNearestIndex(Point point)
+            internal int FindNearestIndex(Point point)
             {
                 var bestIndex = -1;
                 var bestDistance = double.MaxValue;
@@ -773,7 +773,7 @@ namespace PitWall.UI.Services
                 return bestIndex;
             }
 
-            private static (double minX, double minY, double maxX, double maxY) GetBounds(IReadOnlyList<Point> points)
+            internal static (double minX, double minY, double maxX, double maxY) GetBounds(IReadOnlyList<Point> points)
             {
                 var minX = double.MaxValue;
                 var minY = double.MaxValue;
@@ -791,7 +791,7 @@ namespace PitWall.UI.Services
                 return (minX, minY, maxX, maxY);
             }
 
-            private static List<Point> NormalizePoints(IReadOnlyList<Point> points)
+            internal static List<Point> NormalizePoints(IReadOnlyList<Point> points)
             {
                 var bounds = GetBounds(points);
                 var width = Math.Max(1.0, bounds.maxX - bounds.minX);
@@ -809,7 +809,7 @@ namespace PitWall.UI.Services
                     .ToList();
             }
 
-            private static Point ToMeters(double latitude, double longitude, double originLat, double originLon, double latScale, double lonScale)
+            internal static Point ToMeters(double latitude, double longitude, double originLat, double originLon, double latScale, double lonScale)
             {
                 var x = (longitude - originLon) * lonScale;
                 var y = (latitude - originLat) * latScale;
