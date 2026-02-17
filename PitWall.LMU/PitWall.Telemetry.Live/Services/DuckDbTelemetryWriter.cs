@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using DuckDB.NET.Data;
 using PitWall.Telemetry.Live.Models;
@@ -16,6 +17,8 @@ namespace PitWall.Telemetry.Live.Services
         private readonly DuckDBConnection _connection;
         private readonly int _batchSize;
         private readonly List<TelemetrySnapshot> _pendingBatch = new();
+        private readonly Timer? _flushTimer;
+        private readonly Dictionary<string, int> _lastLapByVehicle = new();
         private bool _disposed;
 
         /// <summary>
@@ -23,11 +26,25 @@ namespace PitWall.Telemetry.Live.Services
         /// </summary>
         /// <param name="connection">Open DuckDB connection (caller owns lifetime)</param>
         /// <param name="batchSize">Number of snapshots to buffer before auto-flush (default: 500)</param>
+        /// <param name="flushInterval">Optional time-based flush interval. When set, pending samples
+        /// are flushed at this interval even if batch size is not reached.</param>
         /// <exception cref="ArgumentNullException">If connection is null</exception>
-        public DuckDbTelemetryWriter(DuckDBConnection connection, int batchSize = 500)
+        public DuckDbTelemetryWriter(
+            DuckDBConnection connection,
+            int batchSize = 500,
+            TimeSpan? flushInterval = null)
         {
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
             _batchSize = batchSize;
+
+            if (flushInterval.HasValue)
+            {
+                _flushTimer = new Timer(
+                    _ => FlushAsync().GetAwaiter().GetResult(),
+                    null,
+                    flushInterval.Value,
+                    flushInterval.Value);
+            }
         }
 
         /// <inheritdoc />
@@ -56,6 +73,9 @@ namespace PitWall.Telemetry.Live.Services
         /// <inheritdoc />
         public async Task WriteSampleAsync(TelemetrySnapshot snapshot)
         {
+            // Detect lap transitions and write lap data
+            await DetectAndWriteLapTransitions(snapshot);
+
             _pendingBatch.Add(snapshot);
             if (_pendingBatch.Count >= _batchSize)
             {
@@ -106,6 +126,7 @@ namespace PitWall.Telemetry.Live.Services
         {
             if (!_disposed)
             {
+                _flushTimer?.Dispose();
                 await FlushAsync();
                 _disposed = true;
             }
@@ -232,6 +253,63 @@ namespace PitWall.Telemetry.Live.Services
             var param = cmd.CreateParameter();
             param.Value = value;
             cmd.Parameters.Add(param);
+        }
+
+        /// <summary>
+        /// Detects lap transitions for each vehicle in this snapshot's scoring data.
+        /// When a vehicle's lap number increases, writes lap data from the completed lap.
+        /// </summary>
+        private async Task DetectAndWriteLapTransitions(TelemetrySnapshot snapshot)
+        {
+            var scoring = snapshot.Scoring;
+            if (scoring?.Vehicles == null || scoring.Vehicles.Count == 0) return;
+
+            foreach (var vehicle in scoring.Vehicles)
+            {
+                var key = $"{snapshot.SessionId}_{vehicle.VehicleId}";
+                if (_lastLapByVehicle.TryGetValue(key, out var lastLap))
+                {
+                    if (vehicle.LapNumber > lastLap)
+                    {
+                        // Lap transition detected — write the completed lap
+                        await InsertLapRowAsync(
+                            snapshot.SessionId,
+                            vehicle.VehicleId,
+                            lastLap,
+                            vehicle.LastLapTime,
+                            vehicle.BestLapTime,
+                            snapshot.PlayerVehicle?.Fuel ?? 0);
+                    }
+                }
+                _lastLapByVehicle[key] = vehicle.LapNumber;
+            }
+        }
+
+        /// <summary>
+        /// Insert a completed lap into the live_laps table.
+        /// </summary>
+        private async Task InsertLapRowAsync(
+            string sessionId,
+            int vehicleId,
+            int lapNumber,
+            double lapTime,
+            double bestLapTime,
+            double fuelAtEnd)
+        {
+            using var cmd = _connection.CreateCommand();
+            cmd.CommandText = @"
+                INSERT OR IGNORE INTO live_laps 
+                (session_id, vehicle_id, lap_number, lap_time, best_lap_time, fuel_at_end)
+                VALUES (?, ?, ?, ?, ?, ?)";
+
+            AddParameter(cmd, sessionId);
+            AddParameter(cmd, vehicleId);
+            AddParameter(cmd, lapNumber);
+            AddParameter(cmd, lapTime);
+            AddParameter(cmd, bestLapTime);
+            AddParameter(cmd, fuelAtEnd);
+
+            await Task.Run(() => cmd.ExecuteNonQuery());
         }
     }
 }

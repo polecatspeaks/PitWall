@@ -404,6 +404,160 @@ namespace PitWall.Telemetry.Live.Tests
 
         #endregion
 
+        #region Time-based flushing
+
+        [Fact]
+        public async Task WriteSampleAsync_TimerFlush_FlushesPendingSamplesAfterInterval()
+        {
+            // Arrange — use a large batch size so count-based flush doesn't trigger
+            await using var writer = new DuckDbTelemetryWriter(
+                _connection,
+                batchSize: 10000,
+                flushInterval: TimeSpan.FromMilliseconds(100));
+
+            // Write a few samples
+            for (int i = 0; i < 3; i++)
+            {
+                var snapshot = CreateSnapshot(
+                    sessionId: "timer-test",
+                    timestamp: DateTime.UtcNow.AddMilliseconds(i * 10));
+                await writer.WriteSampleAsync(snapshot);
+            }
+
+            // Samples should be pending (batch size not reached)
+            Assert.Equal(3, writer.PendingCount);
+
+            // Wait for timer flush
+            await Task.Delay(300);
+
+            // Assert — timer should have flushed
+            Assert.Equal(0, writer.PendingCount);
+            var count = GetRowCount("live_telemetry_samples", "session_id = 'timer-test'");
+            Assert.Equal(3, count);
+        }
+
+        [Fact]
+        public async Task WriteSampleAsync_NoFlushInterval_DoesNotAutoFlush()
+        {
+            // Arrange — no flush interval (default behavior)
+            await using var writer = new DuckDbTelemetryWriter(_connection, batchSize: 10000);
+
+            for (int i = 0; i < 3; i++)
+            {
+                var snapshot = CreateSnapshot(
+                    sessionId: "no-timer-test",
+                    timestamp: DateTime.UtcNow.AddMilliseconds(i * 10));
+                await writer.WriteSampleAsync(snapshot);
+            }
+
+            // Wait a bit
+            await Task.Delay(200);
+
+            // Assert — still pending (no timer, no batch threshold)
+            Assert.Equal(3, writer.PendingCount);
+        }
+
+        #endregion
+
+        #region Lap transition detection
+
+        [Fact]
+        public async Task WriteSampleAsync_OnLapTransition_WritesLapData()
+        {
+            // Arrange
+            await using var writer = new DuckDbTelemetryWriter(_connection, batchSize: 1);
+
+            // Lap 1 data — finishing lap 1
+            var snap1 = CreateSnapshot(sessionId: "lap-test");
+            snap1.Scoring = new ScoringInfo
+            {
+                NumVehicles = 1,
+                SectorFlags = new int[3],
+                Vehicles = new List<VehicleScoringInfo>
+                {
+                    new VehicleScoringInfo
+                    {
+                        VehicleId = 0,
+                        LapNumber = 1,
+                        LastLapTime = 82.456,
+                        BestLapTime = 82.456
+                    }
+                }
+            };
+            snap1.PlayerVehicle!.Fuel = 60.0;
+            await writer.WriteSampleAsync(snap1);
+
+            // Lap 2 — new lap, triggers lap transition
+            var snap2 = CreateSnapshot(sessionId: "lap-test");
+            snap2.Scoring = new ScoringInfo
+            {
+                NumVehicles = 1,
+                SectorFlags = new int[3],
+                Vehicles = new List<VehicleScoringInfo>
+                {
+                    new VehicleScoringInfo
+                    {
+                        VehicleId = 0,
+                        LapNumber = 2,
+                        LastLapTime = 81.234,
+                        BestLapTime = 81.234
+                    }
+                }
+            };
+            snap2.PlayerVehicle!.Fuel = 55.0;
+            await writer.WriteSampleAsync(snap2);
+
+            // Assert — should have a lap entry for lap 1
+            using var cmd = _connection.CreateCommand();
+            cmd.CommandText = @"SELECT lap_number, lap_time, best_lap_time, fuel_at_start, fuel_at_end
+                               FROM live_laps WHERE session_id = 'lap-test'";
+            using var reader = cmd.ExecuteReader();
+            Assert.True(reader.Read());
+            Assert.Equal(1, reader.GetInt32(0));          // lap_number
+            Assert.Equal(81.234, reader.GetDouble(1), 3); // lap_time (from new LastLapTime)
+            Assert.Equal(81.234, reader.GetDouble(2), 3); // best_lap_time
+        }
+
+        [Fact]
+        public async Task WriteSampleAsync_SameLap_DoesNotWriteLapData()
+        {
+            // Arrange
+            await using var writer = new DuckDbTelemetryWriter(_connection, batchSize: 1);
+
+            // Two snapshots, same lap (lap 1)
+            var snap1 = CreateSnapshotWithLap(sessionId: "no-lap-test", lapNumber: 1);
+            var snap2 = CreateSnapshotWithLap(sessionId: "no-lap-test", lapNumber: 1);
+
+            await writer.WriteSampleAsync(snap1);
+            await writer.WriteSampleAsync(snap2);
+
+            // Assert — no lap data written
+            var count = GetRowCount("live_laps", "session_id = 'no-lap-test'");
+            Assert.Equal(0, count);
+        }
+
+        [Fact]
+        public async Task WriteSampleAsync_MultipleLapTransitions_WritesEachLap()
+        {
+            // Arrange
+            await using var writer = new DuckDbTelemetryWriter(_connection, batchSize: 1);
+
+            for (int lap = 1; lap <= 3; lap++)
+            {
+                var snap = CreateSnapshotWithLap(
+                    sessionId: "multi-lap-test",
+                    lapNumber: lap,
+                    lastLapTime: 80.0 + lap);
+                await writer.WriteSampleAsync(snap);
+            }
+
+            // Assert — laps 1 and 2 completed (transition from 1→2 and 2→3)
+            var count = GetRowCount("live_laps", "session_id = 'multi-lap-test'");
+            Assert.Equal(2, count);
+        }
+
+        #endregion
+
         #region Helpers
 
         private TelemetrySnapshot CreateSnapshot(
@@ -449,6 +603,32 @@ namespace PitWall.Telemetry.Live.Tests
                 ? $"SELECT COUNT(*) FROM {tableName} WHERE {where}"
                 : $"SELECT COUNT(*) FROM {tableName}";
             return Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        private TelemetrySnapshot CreateSnapshotWithLap(
+            string sessionId = "test-session",
+            int lapNumber = 1,
+            double lastLapTime = 82.0,
+            double fuel = 55.0)
+        {
+            var snapshot = CreateSnapshot(sessionId: sessionId);
+            snapshot.PlayerVehicle!.Fuel = fuel;
+            snapshot.Scoring = new ScoringInfo
+            {
+                NumVehicles = 1,
+                SectorFlags = new int[3],
+                Vehicles = new List<VehicleScoringInfo>
+                {
+                    new VehicleScoringInfo
+                    {
+                        VehicleId = 0,
+                        LapNumber = lapNumber,
+                        LastLapTime = lastLapTime,
+                        BestLapTime = lastLapTime
+                    }
+                }
+            };
+            return snapshot;
         }
 
         #endregion
