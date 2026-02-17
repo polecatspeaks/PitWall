@@ -1,0 +1,65 @@
+{
+  "Timestamp": "2026-02-17T14:35:12.500Z",
+  "SessionId": "fixture-damage",
+  "Session": {
+    "StartTimeUtc": "2026-02-17T14:00:00.000Z",
+    "SessionType": "Race",
+    "TrackName": "Monza",
+    "CarName": "BMW M4 GT3",
+    "NumVehicles": 20,
+    "TrackLength": 5793.0
+  },
+  "PlayerVehicle": {
+    "VehicleId": 0,
+    "IsPlayer": true,
+    "ElapsedTime": 2112.5,
+    "PosX": -45.2,
+    "PosY": 12.8,
+    "PosZ": 180.3,
+    "Speed": 85.2,
+    "LocalVelX": 23.7,
+    "LocalVelY": -1.5,
+    "LocalVelZ": 5.8,
+    "Rpm": 4500,
+    "Gear": 3,
+    "Throttle": 0.15,
+    "Brake": 0.85,
+    "Steering": 0.22,
+    "Fuel": 35.8,
+    "DentSeverity": "AwIAAAEAAAA=",
+    "LastImpactMagnitude": 1850.5,
+    "LastImpactTime": 2112.3,
+    "Wheels": [
+      { "TempInner": 102.5, "TempMid": 100.8, "TempOuter": 99.2, "Wear": 0.82, "Pressure": 178.5, "Flat": true, "Detached": false, "BrakeTemp": 520.0, "SuspDeflection": 0.035 },
+      { "TempInner": 98.1, "TempMid": 96.5, "TempOuter": 95.0, "Wear": 0.88, "Pressure": 176.2, "Flat": false, "Detached": false, "BrakeTemp": 480.5, "SuspDeflection": 0.028 },
+      { "TempInner": 95.2, "TempMid": 93.8, "TempOuter": 92.1, "Wear": 0.90, "Pressure": 172.8, "Flat": false, "Detached": false, "BrakeTemp": 400.2, "SuspDeflection": 0.025 },
+      { "TempInner": 94.8, "TempMid": 93.2, "TempOuter": 91.5, "Wear": 0.91, "Pressure": 173.5, "Flat": false, "Detached": true, "BrakeTemp": 395.0, "SuspDeflection": 0.045 }
+    ]
+  },
+  "AllVehicles": [],
+  "Scoring": {
+    "SessionType": 1,
+    "NumVehicles": 20,
+    "SectorFlags": [2, 2, 2],
+    "YellowFlagState": 0,
+    "WindSpeed": 1.5,
+    "WindDirection": 180.0,
+    "Vehicles": [
+      {
+        "VehicleId": 0,
+        "DriverName": "Player",
+        "VehicleClass": "GT3",
+        "BestLapTime": 107.234,
+        "LastLapTime": 108.567,
+        "CurrentLapTime": 62.8,
+        "LapNumber": 22,
+        "Place": 8,
+        "LapDistance": 3450.2,
+        "TimeBehindLeader": 18.234,
+        "TimeBehindNext": 2.567,
+        "Flag": 0,
+        "PitState": 0
+      }
+    ]
+  }
+}

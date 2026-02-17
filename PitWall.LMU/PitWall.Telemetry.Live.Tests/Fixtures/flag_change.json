@@ -1,0 +1,65 @@
+{
+  "Timestamp": "2026-02-17T14:42:30.000Z",
+  "SessionId": "fixture-flag-change",
+  "Session": {
+    "StartTimeUtc": "2026-02-17T14:00:00.000Z",
+    "SessionType": "Race",
+    "TrackName": "Silverstone",
+    "CarName": "Mercedes AMG GT3",
+    "NumVehicles": 22,
+    "TrackLength": 5891.0
+  },
+  "PlayerVehicle": {
+    "VehicleId": 0,
+    "IsPlayer": true,
+    "ElapsedTime": 2550.0,
+    "PosX": 200.3,
+    "PosY": 10.5,
+    "PosZ": -150.2,
+    "Speed": 195.0,
+    "LocalVelX": 54.2,
+    "LocalVelY": 0.1,
+    "LocalVelZ": 0.8,
+    "Rpm": 7200,
+    "Gear": 5,
+    "Throttle": 0.75,
+    "Brake": 0.0,
+    "Steering": 0.08,
+    "Fuel": 28.3,
+    "DentSeverity": null,
+    "LastImpactMagnitude": 0.0,
+    "LastImpactTime": 0.0,
+    "Wheels": [
+      { "TempInner": 94.0, "TempMid": 92.5, "TempOuter": 91.0, "Wear": 0.88, "Pressure": 176.0, "Flat": false, "Detached": false, "BrakeTemp": 360.0, "SuspDeflection": 0.019 },
+      { "TempInner": 93.5, "TempMid": 92.0, "TempOuter": 90.5, "Wear": 0.87, "Pressure": 175.5, "Flat": false, "Detached": false, "BrakeTemp": 355.0, "SuspDeflection": 0.017 },
+      { "TempInner": 90.0, "TempMid": 88.5, "TempOuter": 87.0, "Wear": 0.93, "Pressure": 171.0, "Flat": false, "Detached": false, "BrakeTemp": 330.0, "SuspDeflection": 0.021 },
+      { "TempInner": 89.5, "TempMid": 88.0, "TempOuter": 86.5, "Wear": 0.94, "Pressure": 172.0, "Flat": false, "Detached": false, "BrakeTemp": 335.0, "SuspDeflection": 0.019 }
+    ]
+  },
+  "AllVehicles": [],
+  "Scoring": {
+    "SessionType": 1,
+    "NumVehicles": 22,
+    "SectorFlags": [2, 11, 2],
+    "YellowFlagState": 1,
+    "WindSpeed": 5.8,
+    "WindDirection": 310.0,
+    "Vehicles": [
+      {
+        "VehicleId": 0,
+        "DriverName": "Player",
+        "VehicleClass": "GT3",
+        "BestLapTime": 118.890,
+        "LastLapTime": 119.345,
+        "CurrentLapTime": 38.5,
+        "LapNumber": 18,
+        "Place": 5,
+        "LapDistance": 1890.3,
+        "TimeBehindLeader": 12.456,
+        "TimeBehindNext": 3.210,
+        "Flag": 6,
+        "PitState": 0
+      }
+    ]
+  }
+}

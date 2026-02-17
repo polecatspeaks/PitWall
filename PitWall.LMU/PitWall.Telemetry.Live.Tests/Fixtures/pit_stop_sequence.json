@@ -1,0 +1,125 @@
+[
+  {
+    "Timestamp": "2026-02-17T14:28:30.000Z",
+    "SessionId": "fixture-pit-stop",
+    "Session": {
+      "StartTimeUtc": "2026-02-17T14:00:00.000Z",
+      "SessionType": "Race",
+      "TrackName": "Circuit de Barcelona-Catalunya",
+      "CarName": "Ferrari 296 GT3",
+      "NumVehicles": 20,
+      "TrackLength": 4655.0
+    },
+    "PlayerVehicle": {
+      "VehicleId": 0,
+      "IsPlayer": true,
+      "ElapsedTime": 1710.0,
+      "Speed": 220.0,
+      "Fuel": 12.5,
+      "Wheels": [
+        { "TempMid": 95.0, "Wear": 0.72, "Pressure": 178.0, "Flat": false, "Detached": false },
+        { "TempMid": 94.0, "Wear": 0.71, "Pressure": 177.5, "Flat": false, "Detached": false },
+        { "TempMid": 90.0, "Wear": 0.78, "Pressure": 172.0, "Flat": false, "Detached": false },
+        { "TempMid": 89.5, "Wear": 0.79, "Pressure": 173.0, "Flat": false, "Detached": false }
+      ]
+    },
+    "AllVehicles": [],
+    "Scoring": {
+      "SessionType": 1,
+      "NumVehicles": 20,
+      "SectorFlags": [2, 2, 2],
+      "YellowFlagState": 0,
+      "Vehicles": [
+        { "VehicleId": 0, "DriverName": "Player", "LapNumber": 18, "Place": 4, "PitState": 0, "Flag": 0, "LastLapTime": 98.5, "BestLapTime": 97.2 }
+      ]
+    },
+    "_comment": "Pre-pit: racing normally, low fuel"
+  },
+  {
+    "Timestamp": "2026-02-17T14:28:45.000Z",
+    "SessionId": "fixture-pit-stop",
+    "Session": null,
+    "PlayerVehicle": {
+      "VehicleId": 0,
+      "IsPlayer": true,
+      "ElapsedTime": 1725.0,
+      "Speed": 80.0,
+      "Fuel": 11.8,
+      "Wheels": [
+        { "TempMid": 88.0, "Wear": 0.72, "Pressure": 175.0, "Flat": false, "Detached": false },
+        { "TempMid": 87.0, "Wear": 0.71, "Pressure": 174.5, "Flat": false, "Detached": false },
+        { "TempMid": 85.0, "Wear": 0.78, "Pressure": 170.0, "Flat": false, "Detached": false },
+        { "TempMid": 84.5, "Wear": 0.79, "Pressure": 171.0, "Flat": false, "Detached": false }
+      ]
+    },
+    "AllVehicles": [],
+    "Scoring": {
+      "SessionType": 1,
+      "NumVehicles": 20,
+      "SectorFlags": [2, 2, 2],
+      "YellowFlagState": 0,
+      "Vehicles": [
+        { "VehicleId": 0, "DriverName": "Player", "LapNumber": 18, "Place": 4, "PitState": 2, "Flag": 0, "LastLapTime": 98.5, "BestLapTime": 97.2 }
+      ]
+    },
+    "_comment": "Pit entry: PitState 0 -> 2 (entering)"
+  },
+  {
+    "Timestamp": "2026-02-17T14:29:10.000Z",
+    "SessionId": "fixture-pit-stop",
+    "Session": null,
+    "PlayerVehicle": {
+      "VehicleId": 0,
+      "IsPlayer": true,
+      "ElapsedTime": 1750.0,
+      "Speed": 0.0,
+      "Fuel": 11.5,
+      "Wheels": [
+        { "TempMid": 75.0, "Wear": 0.72, "Pressure": 172.0, "Flat": false, "Detached": false },
+        { "TempMid": 74.0, "Wear": 0.71, "Pressure": 171.5, "Flat": false, "Detached": false },
+        { "TempMid": 73.0, "Wear": 0.78, "Pressure": 168.0, "Flat": false, "Detached": false },
+        { "TempMid": 72.5, "Wear": 0.79, "Pressure": 169.0, "Flat": false, "Detached": false }
+      ]
+    },
+    "AllVehicles": [],
+    "Scoring": {
+      "SessionType": 1,
+      "NumVehicles": 20,
+      "SectorFlags": [2, 2, 2],
+      "YellowFlagState": 0,
+      "Vehicles": [
+        { "VehicleId": 0, "DriverName": "Player", "LapNumber": 18, "Place": 6, "PitState": 4, "Flag": 0, "LastLapTime": 98.5, "BestLapTime": 97.2 }
+      ]
+    },
+    "_comment": "In pit: PitState 4 (stopped), speed 0, position dropped"
+  },
+  {
+    "Timestamp": "2026-02-17T14:29:35.000Z",
+    "SessionId": "fixture-pit-stop",
+    "Session": null,
+    "PlayerVehicle": {
+      "VehicleId": 0,
+      "IsPlayer": true,
+      "ElapsedTime": 1775.0,
+      "Speed": 60.0,
+      "Fuel": 75.0,
+      "Wheels": [
+        { "TempMid": 65.0, "Wear": 1.0, "Pressure": 175.0, "Flat": false, "Detached": false },
+        { "TempMid": 64.0, "Wear": 1.0, "Pressure": 174.5, "Flat": false, "Detached": false },
+        { "TempMid": 63.0, "Wear": 1.0, "Pressure": 170.0, "Flat": false, "Detached": false },
+        { "TempMid": 62.5, "Wear": 1.0, "Pressure": 171.0, "Flat": false, "Detached": false }
+      ]
+    },
+    "AllVehicles": [],
+    "Scoring": {
+      "SessionType": 1,
+      "NumVehicles": 20,
+      "SectorFlags": [2, 2, 2],
+      "YellowFlagState": 0,
+      "Vehicles": [
+        { "VehicleId": 0, "DriverName": "Player", "LapNumber": 19, "Place": 8, "PitState": 0, "Flag": 0, "LastLapTime": 122.8, "BestLapTime": 97.2 }
+      ]
+    },
+    "_comment": "Pit exit: PitState back to 0, fresh tires (wear 1.0), full fuel, slow exit speed"
+  }
+]

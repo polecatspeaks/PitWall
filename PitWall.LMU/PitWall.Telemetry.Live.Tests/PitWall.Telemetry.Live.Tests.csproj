@@ -29,4 +29,8 @@
     <None Include="..\native\duckdb\libduckdb.so" Link="libduckdb.so" CopyToOutputDirectory="PreserveNewest" Condition="'$(OS)' != 'Windows_NT'" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Fixtures\*.json" />
+  </ItemGroup>
+
 </Project>

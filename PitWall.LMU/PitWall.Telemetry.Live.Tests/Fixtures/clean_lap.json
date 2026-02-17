@@ -1,0 +1,65 @@
+{
+  "Timestamp": "2026-02-17T14:30:00.000Z",
+  "SessionId": "fixture-clean-lap",
+  "Session": {
+    "StartTimeUtc": "2026-02-17T14:00:00.000Z",
+    "SessionType": "Race",
+    "TrackName": "Spa-Francorchamps",
+    "CarName": "Porsche 911 GT3 R",
+    "NumVehicles": 25,
+    "TrackLength": 7004.0
+  },
+  "PlayerVehicle": {
+    "VehicleId": 0,
+    "IsPlayer": true,
+    "ElapsedTime": 1800.5,
+    "PosX": 120.5,
+    "PosY": 15.2,
+    "PosZ": -340.8,
+    "Speed": 245.6,
+    "LocalVelX": 68.2,
+    "LocalVelY": 0.3,
+    "LocalVelZ": 1.2,
+    "Rpm": 8200,
+    "Gear": 6,
+    "Throttle": 0.92,
+    "Brake": 0.0,
+    "Steering": -0.03,
+    "Fuel": 42.5,
+    "DentSeverity": null,
+    "LastImpactMagnitude": 0.0,
+    "LastImpactTime": 0.0,
+    "Wheels": [
+      { "TempInner": 96.2, "TempMid": 94.8, "TempOuter": 93.1, "Wear": 0.92, "Pressure": 175.5, "Flat": false, "Detached": false, "BrakeTemp": 380.2, "SuspDeflection": 0.018 },
+      { "TempInner": 95.8, "TempMid": 93.5, "TempOuter": 92.0, "Wear": 0.91, "Pressure": 174.8, "Flat": false, "Detached": false, "BrakeTemp": 375.4, "SuspDeflection": 0.016 },
+      { "TempInner": 91.5, "TempMid": 89.8, "TempOuter": 88.2, "Wear": 0.95, "Pressure": 170.2, "Flat": false, "Detached": false, "BrakeTemp": 340.1, "SuspDeflection": 0.022 },
+      { "TempInner": 90.8, "TempMid": 89.2, "TempOuter": 87.9, "Wear": 0.96, "Pressure": 171.0, "Flat": false, "Detached": false, "BrakeTemp": 345.8, "SuspDeflection": 0.020 }
+    ]
+  },
+  "AllVehicles": [],
+  "Scoring": {
+    "SessionType": 1,
+    "NumVehicles": 25,
+    "SectorFlags": [2, 2, 2],
+    "YellowFlagState": 0,
+    "WindSpeed": 3.2,
+    "WindDirection": 220.0,
+    "Vehicles": [
+      {
+        "VehicleId": 0,
+        "DriverName": "Player",
+        "VehicleClass": "GT3",
+        "BestLapTime": 138.456,
+        "LastLapTime": 139.012,
+        "CurrentLapTime": 45.2,
+        "LapNumber": 15,
+        "Place": 3,
+        "LapDistance": 2340.5,
+        "TimeBehindLeader": 4.532,
+        "TimeBehindNext": 1.234,
+        "Flag": 0,
+        "PitState": 0
+      }
+    ]
+  }
+}
