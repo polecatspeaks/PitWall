@@ -25,6 +25,7 @@
     <ProjectReference Include="..\PitWall.Strategy\PitWall.Strategy.csproj" />
     <ProjectReference Include="..\PitWall.Api\PitWall.Api.csproj" />
     <ProjectReference Include="..\PitWall.Agent\PitWall.Agent.csproj" />
+    <ProjectReference Include="..\PitWall.Telemetry.Live\PitWall.Telemetry.Live.csproj" />
   </ItemGroup>
 
   <ItemGroup>

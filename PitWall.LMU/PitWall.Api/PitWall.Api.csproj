@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PitWall.Core\PitWall.Core.csproj" />
     <ProjectReference Include="..\PitWall.Strategy\PitWall.Strategy.csproj" />
+    <ProjectReference Include="..\PitWall.Telemetry.Live\PitWall.Telemetry.Live.csproj" />
   </ItemGroup>
 
   <ItemGroup>
