@@ -4,11 +4,13 @@ using PitWall.Api.Services;
 using PitWall.Core.Services;
 using PitWall.Core.Storage;
 using PitWall.Telemetry.Live.Services;
+using PitWall.Telemetry.Live.Storage;
 using PitWall.Telemetry.Live.Models;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.IO;
+using DuckDB.NET.Data;
 using Serilog;
 using Serilog.Events;
 
@@ -73,10 +75,37 @@ builder.Services.AddSingleton<ITelemetryDataSource>(sp =>
     new SharedMemoryDataSource(
         sp.GetRequiredService<ISharedMemoryReader>(),
         sp.GetService<ILogger<SharedMemoryDataSource>>()));
+
+// Register live telemetry DuckDB writer (#18)
+var liveDbPath = Path.Combine(
+    Path.GetDirectoryName(dbPath) ?? AppContext.BaseDirectory,
+    "lmu_live_telemetry.db");
+builder.Services.AddSingleton<DuckDBConnection>(sp =>
+{
+    var conn = new DuckDBConnection($"DataSource={liveDbPath}");
+    conn.Open();
+    new TelemetryDatabaseSchema().CreateTables(conn);
+    sp.GetRequiredService<ILogger<Program>>()
+        .LogInformation("Live telemetry DB initialized at {Path}", liveDbPath);
+    return conn;
+});
+builder.Services.AddSingleton<PitWall.Telemetry.Live.Services.ITelemetryWriter>(sp =>
+    new PitWall.Telemetry.Live.Services.DuckDbTelemetryWriter(
+        sp.GetRequiredService<DuckDBConnection>(),
+        batchSize: 500,
+        flushInterval: TimeSpan.FromSeconds(5)));
+
+// Register event detectors (#25-28)
+builder.Services.AddSingleton<IEventDetector, LapTransitionDetector>();
+builder.Services.AddSingleton<IEventDetector, PitStopDetector>();
+builder.Services.AddSingleton<IEventDetector, DamageDetector>();
+builder.Services.AddSingleton<IEventDetector, FlagChangeDetector>();
+
 builder.Services.AddSingleton<TelemetryPipelineService>(sp =>
     new TelemetryPipelineService(
         sp.GetRequiredService<ITelemetryDataSource>(),
-        writer: null, // Persistence wired separately via #18 DuckDbTelemetryWriter
+        writer: sp.GetRequiredService<PitWall.Telemetry.Live.Services.ITelemetryWriter>(),
+        eventDetectors: sp.GetServices<IEventDetector>().ToList(),
         sp.GetService<ILogger<TelemetryPipelineService>>()));
 
 var app = builder.Build();

@@ -329,6 +329,210 @@ namespace PitWall.Telemetry.Live.Tests
 
         #endregion
 
+        #region Event detector integration
+
+        [Fact]
+        public async Task StreamForBroadcast_RunsEventDetectorsOnEachSnapshot()
+        {
+            // Arrange
+            _mockSource.Setup(s => s.IsAvailable()).Returns(true);
+            _mockSource.Setup(s => s.ReadSnapshotAsync()).ReturnsAsync(CreateSnapshot);
+
+            var mockDetector = new Mock<IEventDetector>();
+            mockDetector.Setup(d => d.Detect(It.IsAny<TelemetrySnapshot>()))
+                .Returns(new List<TelemetryEvent>());
+
+            var service = new TelemetryPipelineService(
+                _mockSource.Object,
+                _mockWriter.Object,
+                eventDetectors: new[] { mockDetector.Object },
+                readIntervalMs: 1,
+                broadcastIntervalMs: 1);
+            int count = 0;
+
+            // Act
+            await foreach (var snapshot in service.StreamForBroadcastAsync(CancellationToken.None))
+            {
+                count++;
+                if (count >= 5) break;
+            }
+
+            // Assert — detector should have been called for each snapshot
+            mockDetector.Verify(d => d.Detect(It.IsAny<TelemetrySnapshot>()), Times.AtLeast(5));
+        }
+
+        [Fact]
+        public async Task StreamForBroadcast_WritesDetectedEventsToWriter()
+        {
+            // Arrange
+            _mockSource.Setup(s => s.IsAvailable()).Returns(true);
+            _mockSource.Setup(s => s.ReadSnapshotAsync()).ReturnsAsync(CreateSnapshot);
+
+            _mockWriter.Setup(w => w.WriteEventAsync(
+                It.IsAny<string>(), It.IsAny<int>(),
+                It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var detectedEvent = new TelemetryEvent
+            {
+                SessionId = "pipeline-test",
+                VehicleId = 0,
+                EventType = "lap_complete",
+                EventDataJson = "{\"lapNumber\":1}"
+            };
+            var mockDetector = new Mock<IEventDetector>();
+            mockDetector.Setup(d => d.Detect(It.IsAny<TelemetrySnapshot>()))
+                .Returns(new List<TelemetryEvent> { detectedEvent });
+
+            var service = new TelemetryPipelineService(
+                _mockSource.Object,
+                _mockWriter.Object,
+                eventDetectors: new[] { mockDetector.Object },
+                readIntervalMs: 1,
+                broadcastIntervalMs: 1);
+
+            // Act
+            await foreach (var snapshot in service.StreamForBroadcastAsync(CancellationToken.None))
+            {
+                break;
+            }
+
+            // Assert — detected event should have been written via writer
+            _mockWriter.Verify(w => w.WriteEventAsync(
+                "pipeline-test", 0, "lap_complete", "{\"lapNumber\":1}"),
+                Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public async Task StreamForBroadcast_WithMultipleDetectors_RunsAll()
+        {
+            // Arrange
+            _mockSource.Setup(s => s.IsAvailable()).Returns(true);
+            _mockSource.Setup(s => s.ReadSnapshotAsync()).ReturnsAsync(CreateSnapshot);
+
+            _mockWriter.Setup(w => w.WriteEventAsync(
+                It.IsAny<string>(), It.IsAny<int>(),
+                It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var detector1 = new Mock<IEventDetector>();
+            detector1.Setup(d => d.Detect(It.IsAny<TelemetrySnapshot>()))
+                .Returns(new List<TelemetryEvent>());
+            var detector2 = new Mock<IEventDetector>();
+            detector2.Setup(d => d.Detect(It.IsAny<TelemetrySnapshot>()))
+                .Returns(new List<TelemetryEvent>());
+
+            var service = new TelemetryPipelineService(
+                _mockSource.Object,
+                _mockWriter.Object,
+                eventDetectors: new[] { detector1.Object, detector2.Object },
+                readIntervalMs: 1,
+                broadcastIntervalMs: 1);
+
+            // Act
+            await foreach (var snapshot in service.StreamForBroadcastAsync(CancellationToken.None))
+            {
+                break;
+            }
+
+            // Assert
+            detector1.Verify(d => d.Detect(It.IsAny<TelemetrySnapshot>()), Times.AtLeastOnce);
+            detector2.Verify(d => d.Detect(It.IsAny<TelemetrySnapshot>()), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public async Task StreamForBroadcast_DetectorThrows_ContinuesStreaming()
+        {
+            // Arrange
+            _mockSource.Setup(s => s.IsAvailable()).Returns(true);
+            _mockSource.Setup(s => s.ReadSnapshotAsync()).ReturnsAsync(CreateSnapshot);
+
+            var faultyDetector = new Mock<IEventDetector>();
+            faultyDetector.Setup(d => d.Detect(It.IsAny<TelemetrySnapshot>()))
+                .Throws(new InvalidOperationException("Detector crashed"));
+
+            var service = new TelemetryPipelineService(
+                _mockSource.Object,
+                _mockWriter.Object,
+                eventDetectors: new[] { faultyDetector.Object },
+                readIntervalMs: 1,
+                broadcastIntervalMs: 1);
+
+            var received = new List<TelemetrySnapshot>();
+
+            // Act — should not throw despite detector failure
+            await foreach (var snapshot in service.StreamForBroadcastAsync(CancellationToken.None))
+            {
+                received.Add(snapshot);
+                if (received.Count >= 3) break;
+            }
+
+            // Assert — pipeline continues despite detector failure
+            Assert.Equal(3, received.Count);
+        }
+
+        [Fact]
+        public async Task StreamForBroadcast_WithNoWriter_SkipsEventPersistence()
+        {
+            // Arrange — no writer but with detector
+            _mockSource.Setup(s => s.IsAvailable()).Returns(true);
+            _mockSource.Setup(s => s.ReadSnapshotAsync()).ReturnsAsync(CreateSnapshot);
+
+            var detectedEvent = new TelemetryEvent
+            {
+                SessionId = "test", VehicleId = 0,
+                EventType = "flag_change", EventDataJson = "{}"
+            };
+            var mockDetector = new Mock<IEventDetector>();
+            mockDetector.Setup(d => d.Detect(It.IsAny<TelemetrySnapshot>()))
+                .Returns(new List<TelemetryEvent> { detectedEvent });
+
+            var service = new TelemetryPipelineService(
+                _mockSource.Object,
+                writer: null,
+                eventDetectors: new[] { mockDetector.Object },
+                readIntervalMs: 1,
+                broadcastIntervalMs: 1);
+
+            // Act — should not throw
+            await foreach (var snapshot in service.StreamForBroadcastAsync(CancellationToken.None))
+            {
+                break;
+            }
+
+            // Assert — detector still runs (no exception), but nothing to verify on writer
+            mockDetector.Verify(d => d.Detect(It.IsAny<TelemetrySnapshot>()), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public async Task StreamForBroadcast_WithNullDetectorList_WorksNormally()
+        {
+            // Arrange
+            _mockSource.Setup(s => s.IsAvailable()).Returns(true);
+            _mockSource.Setup(s => s.ReadSnapshotAsync()).ReturnsAsync(CreateSnapshot);
+
+            var service = new TelemetryPipelineService(
+                _mockSource.Object,
+                _mockWriter.Object,
+                eventDetectors: null,
+                readIntervalMs: 1,
+                broadcastIntervalMs: 1);
+
+            var received = new List<TelemetrySnapshot>();
+
+            // Act
+            await foreach (var snapshot in service.StreamForBroadcastAsync(CancellationToken.None))
+            {
+                received.Add(snapshot);
+                if (received.Count >= 3) break;
+            }
+
+            // Assert
+            Assert.Equal(3, received.Count);
+        }
+
+        #endregion
+
         #region Helpers
 
         private TelemetryPipelineService CreateService(

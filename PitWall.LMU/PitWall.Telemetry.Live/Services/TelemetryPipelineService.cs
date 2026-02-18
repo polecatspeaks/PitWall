@@ -17,6 +17,7 @@ namespace PitWall.Telemetry.Live.Services
     {
         private readonly LiveTelemetryReader _reader;
         private readonly ITelemetryWriter? _writer;
+        private readonly IReadOnlyList<IEventDetector> _eventDetectors;
         private readonly ILogger<TelemetryPipelineService> _logger;
         private readonly int _broadcastIntervalMs;
         private string? _currentSessionId;
@@ -41,6 +42,7 @@ namespace PitWall.Telemetry.Live.Services
         /// </summary>
         /// <param name="dataSource">Live telemetry data source (e.g., SharedMemoryDataSource)</param>
         /// <param name="writer">Optional writer for persisting samples to storage</param>
+        /// <param name="eventDetectors">Optional list of event detectors to run on each snapshot</param>
         /// <param name="logger">Optional logger</param>
         /// <param name="readIntervalMs">Polling interval for reading from source (default: 10ms = 100Hz)</param>
         /// <param name="broadcastIntervalMs">Throttle interval for yielding to UI (default: 100ms = 10Hz)</param>
@@ -48,6 +50,7 @@ namespace PitWall.Telemetry.Live.Services
         public TelemetryPipelineService(
             ITelemetryDataSource dataSource,
             ITelemetryWriter? writer = null,
+            IReadOnlyList<IEventDetector>? eventDetectors = null,
             ILogger<TelemetryPipelineService>? logger = null,
             int readIntervalMs = 10,
             int broadcastIntervalMs = 100,
@@ -56,6 +59,7 @@ namespace PitWall.Telemetry.Live.Services
             if (dataSource == null) throw new ArgumentNullException(nameof(dataSource));
             _reader = new LiveTelemetryReader(dataSource, readIntervalMs: readIntervalMs, channelCapacity: channelCapacity);
             _writer = writer;
+            _eventDetectors = eventDetectors ?? Array.Empty<IEventDetector>();
             _logger = logger ?? NullLogger<TelemetryPipelineService>.Instance;
             _broadcastIntervalMs = broadcastIntervalMs;
         }
@@ -108,6 +112,31 @@ namespace PitWall.Telemetry.Live.Services
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Failed to write telemetry sample");
+                        }
+                    }
+
+                    // Run event detectors and persist detected events
+                    foreach (var detector in _eventDetectors)
+                    {
+                        try
+                        {
+                            var events = detector.Detect(snapshot);
+                            if (_writer != null && events.Count > 0)
+                            {
+                                foreach (var evt in events)
+                                {
+                                    await _writer.WriteEventAsync(
+                                        evt.SessionId, evt.VehicleId,
+                                        evt.EventType, evt.EventDataJson);
+                                }
+                                _logger.LogDebug("Detected {Count} event(s) from {Detector}",
+                                    events.Count, detector.GetType().Name);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Event detector {Detector} failed",
+                                detector.GetType().Name);
                         }
                     }
 
