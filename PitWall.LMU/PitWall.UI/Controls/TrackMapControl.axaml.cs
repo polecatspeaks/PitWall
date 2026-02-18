@@ -7,6 +7,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using PitWall.UI.Models;
 
 using System.Diagnostics.CodeAnalysis;
 
@@ -30,6 +31,11 @@ namespace PitWall.UI.Controls
         public static readonly StyledProperty<string?> CornerLabelProperty =
             AvaloniaProperty.Register<TrackMapControl, string?>(nameof(CornerLabel));
 
+        public static readonly StyledProperty<IReadOnlyList<CarMapMarker>> VehicleMarkersProperty =
+            AvaloniaProperty.Register<TrackMapControl, IReadOnlyList<CarMapMarker>>(nameof(VehicleMarkers), Array.Empty<CarMapMarker>());
+
+        private readonly List<Ellipse> _vehicleEllipses = new();
+
         public TrackMapControl()
         {
             InitializeComponent();
@@ -39,6 +45,11 @@ namespace PitWall.UI.Controls
                 if (args.Property == TrackPointsProperty || args.Property == CurrentPointProperty)
                 {
                     UpdateVisuals();
+                }
+
+                if (args.Property == VehicleMarkersProperty)
+                {
+                    UpdateVehicleMarkers();
                 }
 
                 if (args.Property == MapImageUriProperty)
@@ -81,6 +92,12 @@ namespace PitWall.UI.Controls
         {
             get => GetValue(CornerLabelProperty);
             set => SetValue(CornerLabelProperty, value);
+        }
+
+        public IReadOnlyList<CarMapMarker> VehicleMarkers
+        {
+            get => GetValue(VehicleMarkersProperty);
+            set => SetValue(VehicleMarkersProperty, value);
         }
 
         private void UpdateVisuals()
@@ -199,6 +216,58 @@ namespace PitWall.UI.Controls
 
             Canvas.SetLeft(SegmentLabel, x);
             Canvas.SetTop(SegmentLabel, y);
+        }
+
+        private void UpdateVehicleMarkers()
+        {
+            // Remove old vehicle markers from canvas
+            foreach (var ellipse in _vehicleEllipses)
+            {
+                MapCanvas.Children.Remove(ellipse);
+            }
+            _vehicleEllipses.Clear();
+
+            var markers = VehicleMarkers;
+            if (markers == null || markers.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var marker in markers)
+            {
+                var point = ScalePoint(marker.Position);
+                var size = marker.IsPlayer ? 8.0 : 6.0;
+                var fill = marker.IsPlayer
+                    ? Brushes.Gold
+                    : GetClassBrush(marker.VehicleClass);
+
+                var ellipse = new Ellipse
+                {
+                    Width = size,
+                    Height = size,
+                    Fill = fill,
+                    Opacity = marker.IsPlayer ? 1.0 : 0.8
+                };
+
+                Canvas.SetLeft(ellipse, point.X - size / 2);
+                Canvas.SetTop(ellipse, point.Y - size / 2);
+
+                MapCanvas.Children.Add(ellipse);
+                _vehicleEllipses.Add(ellipse);
+            }
+        }
+
+        private static IBrush GetClassBrush(string vehicleClass)
+        {
+            // Color code by vehicle class — common sim racing convention
+            return vehicleClass?.ToUpperInvariant() switch
+            {
+                "LMP1" or "HYPERCAR" or "GTP" => new SolidColorBrush(Color.Parse("#FF4444")),
+                "LMP2" or "LMP3" => new SolidColorBrush(Color.Parse("#4488FF")),
+                "GTE" or "LMGTE" or "GT3" => new SolidColorBrush(Color.Parse("#44FF44")),
+                "GT4" => new SolidColorBrush(Color.Parse("#FF8844")),
+                _ => new SolidColorBrush(Color.Parse("#AAAAAA"))
+            };
         }
 
         private Point ScalePoint(Point point)

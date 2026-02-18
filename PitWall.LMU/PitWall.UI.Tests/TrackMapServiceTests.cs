@@ -1025,5 +1025,116 @@ namespace PitWall.UI.Tests
         }
 
         #endregion
+
+        #region ComputeVehicleMarkers Tests
+
+        [Fact]
+        public void ComputeVehicleMarkers_NullMapState_ReturnsEmpty()
+        {
+            // Arrange — service with no map built
+            var buffer = new TelemetryBuffer();
+            var store = CreateMetadataStore();
+            var service = new TrackMapService(buffer, store);
+
+            var vehicles = new List<VehiclePositionInput>
+            {
+                new VehiclePositionInput { VehicleId = 1, LapFraction = 0.5, Label = "P1" }
+            };
+
+            // Act
+            var markers = service.ComputeVehicleMarkers(vehicles);
+
+            // Assert — no map built yet, should be empty
+            Assert.Empty(markers);
+        }
+
+        [Fact]
+        public void ComputeVehicleMarkers_NullInput_ReturnsEmpty()
+        {
+            var buffer = new TelemetryBuffer();
+            var store = CreateMetadataStore();
+            var service = new TrackMapService(buffer, store);
+
+            var markers = service.ComputeVehicleMarkers(null!);
+            Assert.Empty(markers);
+        }
+
+        [Fact]
+        public void ComputeVehicleMarkers_EmptyList_ReturnsEmpty()
+        {
+            var buffer = new TelemetryBuffer();
+            var store = CreateMetadataStore();
+            var service = new TrackMapService(buffer, store);
+
+            var markers = service.ComputeVehicleMarkers(new List<VehiclePositionInput>());
+            Assert.Empty(markers);
+        }
+
+        [Fact]
+        public void ComputeVehicleMarkers_WithBuiltMap_ReturnsPositionedMarkers()
+        {
+            // Arrange — build a track map first
+            var buffer = new TelemetryBuffer();
+            var store = CreateMetadataStore();
+            var service = new TrackMapService(buffer, store);
+
+            var lapData = CreateLapData(1, 100);
+            foreach (var sample in lapData)
+            {
+                buffer.Add(sample);
+            }
+            service.Reset("Default");
+            service.Update(lapData[50], "Default");
+
+            var vehicles = new List<VehiclePositionInput>
+            {
+                new VehiclePositionInput { VehicleId = 0, LapFraction = 0.25, Label = "P1", IsPlayer = true, Place = 1 },
+                new VehiclePositionInput { VehicleId = 1, LapFraction = 0.50, Label = "P2", IsPlayer = false, Place = 2, VehicleClass = "GT3" },
+                new VehiclePositionInput { VehicleId = 2, LapFraction = 0.75, Label = "P3", IsPlayer = false, Place = 3, VehicleClass = "LMP2" }
+            };
+
+            // Act
+            var markers = service.ComputeVehicleMarkers(vehicles);
+
+            // Assert
+            Assert.Equal(3, markers.Count);
+            Assert.True(markers[0].IsPlayer);
+            Assert.Equal("P1", markers[0].Label);
+            Assert.Equal(1, markers[0].Place);
+            Assert.Equal("GT3", markers[1].VehicleClass);
+            Assert.Equal("LMP2", markers[2].VehicleClass);
+        }
+
+        [Fact]
+        public void ComputeVehicleMarkers_MarkersHaveDistinctPositions()
+        {
+            // Arrange
+            var buffer = new TelemetryBuffer();
+            var store = CreateMetadataStore();
+            var service = new TrackMapService(buffer, store);
+
+            var lapData = CreateLapData(1, 100);
+            foreach (var sample in lapData)
+            {
+                buffer.Add(sample);
+            }
+            service.Reset("Default");
+            service.Update(lapData[50], "Default");
+
+            var vehicles = new List<VehiclePositionInput>
+            {
+                new VehiclePositionInput { VehicleId = 0, LapFraction = 0.0, Label = "Start" },
+                new VehiclePositionInput { VehicleId = 1, LapFraction = 0.5, Label = "Mid" }
+            };
+
+            // Act
+            var markers = service.ComputeVehicleMarkers(vehicles);
+
+            // Assert — positions at 0.0 and 0.5 should differ
+            Assert.Equal(2, markers.Count);
+            Assert.NotEqual(markers[0].Position, markers[1].Position);
+        }
+
+        #endregion
     }
 }

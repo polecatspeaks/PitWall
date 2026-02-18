@@ -14,6 +14,9 @@ namespace PitWall.UI.ViewModels
         private Point? currentPoint;
 
         [ObservableProperty]
+        private IReadOnlyList<CarMapMarker> vehicleMarkers = System.Array.Empty<CarMapMarker>();
+
+        [ObservableProperty]
         private string trackName = "TRACK";
 
         [ObservableProperty]
@@ -32,6 +35,7 @@ namespace PitWall.UI.ViewModels
         {
             TrackPoints = frame.TrackPoints;
             CurrentPoint = frame.CurrentPoint;
+            VehicleMarkers = frame.VehicleMarkers;
             MapImageUri = frame.MapImageUri;
 
             if (frame.SegmentStatus != null)

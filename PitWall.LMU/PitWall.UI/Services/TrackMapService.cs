@@ -128,6 +128,40 @@ namespace PitWall.UI.Services
             };
         }
 
+        /// <summary>
+        /// Computes vehicle markers for all provided vehicles using their lap fractions.
+        /// Requires a track map to have been built (call Update first with at least one full lap).
+        /// </summary>
+        /// <param name="vehicles">Vehicle position inputs with lap fractions (0.0–1.0)</param>
+        /// <returns>List of positioned CarMapMarkers, or empty if map not ready</returns>
+        public IReadOnlyList<CarMapMarker> ComputeVehicleMarkers(IReadOnlyList<VehiclePositionInput> vehicles)
+        {
+            if (_mapState == null || vehicles == null || vehicles.Count == 0)
+            {
+                return Array.Empty<CarMapMarker>();
+            }
+
+            var markers = new List<CarMapMarker>(vehicles.Count);
+            foreach (var v in vehicles)
+            {
+                var point = _mapState.GetNormalizedPointByFraction(v.LapFraction);
+                if (point.HasValue)
+                {
+                    markers.Add(new CarMapMarker
+                    {
+                        Position = point.Value,
+                        VehicleId = v.VehicleId,
+                        Label = v.Label,
+                        VehicleClass = v.VehicleClass,
+                        IsPlayer = v.IsPlayer,
+                        Place = v.Place
+                    });
+                }
+            }
+
+            return markers;
+        }
+
         private void TryBuildMapIfNeeded(int lapNumber, TrackMetadata metadata)
         {
             if (lapNumber < 0)
