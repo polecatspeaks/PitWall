@@ -83,3 +83,7 @@ PitWall.LMU/session-metadata.json
 # BFG jar
 PitWall.LMU/bfg-1.14.0.jar
 bfg.jar
+
+# DuckDB database files (generated at runtime)
+*.db
+*.db.wal
