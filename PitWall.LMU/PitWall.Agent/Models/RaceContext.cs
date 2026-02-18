@@ -30,5 +30,20 @@ namespace PitWall.Agent.Models
 
         public bool InPitLane { get; set; }
         public bool IsActivelyRacing => !InPitLane && CurrentLap > 0;
+
+        // Live telemetry fields (populated from TelemetrySnapshot when available)
+        public double Speed { get; set; }
+        public double Rpm { get; set; }
+        public int Gear { get; set; }
+        public double[] TireTemps { get; set; } = System.Array.Empty<double>();
+        public double[] TireWear { get; set; } = System.Array.Empty<double>();
+        public double[] BrakeTemps { get; set; } = System.Array.Empty<double>();
+        public double DamageLevel { get; set; }
+        public int YellowFlagState { get; set; }
+
+        /// <summary>
+        /// True when context was populated from live telemetry snapshot (vs. request dictionary).
+        /// </summary>
+        public bool IsLiveData { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using PitWall.Agent.Services;
 using PitWall.Core.Models;
 using PitWall.Core.Storage;
 using PitWall.Strategy;
+using PitWall.Telemetry.Live.Models;
 using Xunit;
 
 namespace PitWall.Tests
@@ -429,6 +430,328 @@ namespace PitWall.Tests
                     ? samples 
                     : new List<TelemetrySample>();
             }
+        }
+
+        #region Live telemetry tests
+
+        [Fact]
+        public async Task BuildAsync_WithLiveProvider_PrefersLiveData()
+        {
+            var writer = new FakeTelemetryWriter();
+            var engine = new StrategyEngine();
+            var liveProvider = new FakeLiveTelemetryProvider(CreateLiveSnapshot());
+            var provider = new RaceContextProvider(writer, engine, liveProvider);
+
+            var request = new AgentRequest { Context = new Dictionary<string, object>() };
+            var context = await provider.BuildAsync(request);
+
+            Assert.True(context.IsLiveData);
+            Assert.Equal(42.5, context.FuelLevel);
+            Assert.Equal("Spa", context.TrackName);
+            Assert.Equal("Formula Pro", context.CarName);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_MapsVehicleMotion()
+        {
+            var snapshot = CreateLiveSnapshot();
+            snapshot.PlayerVehicle!.Speed = 285.3;
+            snapshot.PlayerVehicle!.Rpm = 8500;
+            snapshot.PlayerVehicle!.Gear = 5;
+
+            var provider = CreateProviderWithLive(snapshot);
+            var request = new AgentRequest { Context = new Dictionary<string, object>() };
+            var context = await provider.BuildAsync(request);
+
+            Assert.Equal(285.3, context.Speed);
+            Assert.Equal(8500, context.Rpm);
+            Assert.Equal(5, context.Gear);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_MapsTireData()
+        {
+            var snapshot = CreateLiveSnapshot();
+            snapshot.PlayerVehicle!.Wheels = new WheelData[]
+            {
+                new() { TempMid = 90.0, Wear = 0.15, BrakeTemp = 400 },
+                new() { TempMid = 92.0, Wear = 0.18, BrakeTemp = 420 },
+                new() { TempMid = 88.0, Wear = 0.12, BrakeTemp = 380 },
+                new() { TempMid = 91.0, Wear = 0.16, BrakeTemp = 410 },
+            };
+
+            var provider = CreateProviderWithLive(snapshot);
+            var request = new AgentRequest { Context = new Dictionary<string, object>() };
+            var context = await provider.BuildAsync(request);
+
+            Assert.Equal(new[] { 90.0, 92.0, 88.0, 91.0 }, context.TireTemps);
+            Assert.Equal(new[] { 0.15, 0.18, 0.12, 0.16 }, context.TireWear);
+            Assert.Equal(new[] { 400.0, 420.0, 380.0, 410.0 }, context.BrakeTemps);
+            Assert.Equal(0.1525, context.AverageTireWear, 4);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_MapsScoringData()
+        {
+            var snapshot = CreateLiveSnapshot();
+            snapshot.Scoring = new ScoringInfo
+            {
+                YellowFlagState = 2,
+                Vehicles = new List<VehicleScoringInfo>
+                {
+                    new() { VehicleId = 1, Place = 3, LapNumber = 12, LastLapTime = 91.2, BestLapTime = 89.5, TimeBehindNext = 1.8, PitState = 0 },
+                    new() { VehicleId = 2, Place = 4, TimeBehindNext = 2.1 },
+                }
+            };
+
+            var provider = CreateProviderWithLive(snapshot);
+            var request = new AgentRequest { Context = new Dictionary<string, object>() };
+            var context = await provider.BuildAsync(request);
+
+            Assert.Equal(3, context.Position);
+            Assert.Equal(12, context.CurrentLap);
+            Assert.Equal(91.2, context.LastLapTime);
+            Assert.Equal(89.5, context.BestLapTime);
+            Assert.Equal(1.8, context.GapToAhead);
+            Assert.Equal(2.1, context.GapToBehind);
+            Assert.False(context.InPitLane);
+            Assert.Equal(2, context.YellowFlagState);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_InPitLane_DetectedFromScoring()
+        {
+            var snapshot = CreateLiveSnapshot();
+            snapshot.Scoring = new ScoringInfo
+            {
+                Vehicles = new List<VehicleScoringInfo>
+                {
+                    new() { VehicleId = 1, PitState = 1 },
+                }
+            };
+
+            var provider = CreateProviderWithLive(snapshot);
+            var request = new AgentRequest { Context = new Dictionary<string, object>() };
+            var context = await provider.BuildAsync(request);
+
+            Assert.True(context.InPitLane);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_FallsBackToContextForMissingFields()
+        {
+            var snapshot = CreateLiveSnapshot();
+            var provider = CreateProviderWithLive(snapshot);
+
+            var request = new AgentRequest
+            {
+                Context = new Dictionary<string, object>
+                {
+                    ["totalLaps"] = 50.0,
+                    ["optimalPitLap"] = 25.0,
+                    ["currentWeather"] = "Rain",
+                    ["trackTemp"] = 32.0,
+                    ["tireLapsOnSet"] = 8.0,
+                }
+            };
+            var context = await provider.BuildAsync(request);
+
+            Assert.Equal(50, context.TotalLaps);
+            Assert.Equal(25, context.OptimalPitLap);
+            Assert.Equal("Rain", context.CurrentWeather);
+            Assert.Equal(32.0, context.TrackTemp);
+            Assert.Equal(8, context.TireLapsOnSet);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProviderReturnsNull_FallsBackToStored()
+        {
+            var writer = new FakeTelemetryWriter();
+            writer.AddSample("session1", CreateSample(fuelLiters: 30.0));
+            var engine = new StrategyEngine();
+            var liveProvider = new FakeLiveTelemetryProvider(null);
+            var provider = new RaceContextProvider(writer, engine, liveProvider);
+
+            var request = new AgentRequest
+            {
+                Context = new Dictionary<string, object> { ["sessionId"] = "session1" }
+            };
+            var context = await provider.BuildAsync(request);
+
+            Assert.False(context.IsLiveData);
+            Assert.Equal(30.0, context.FuelLevel);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveSnapshotNoPlayerVehicle_FallsBackToStored()
+        {
+            var snapshot = new TelemetrySnapshot { PlayerVehicle = null };
+            var writer = new FakeTelemetryWriter();
+            writer.AddSample("s1", CreateSample(fuelLiters: 40.0));
+            var engine = new StrategyEngine();
+            var liveProvider = new FakeLiveTelemetryProvider(snapshot);
+            var provider = new RaceContextProvider(writer, engine, liveProvider);
+
+            var request = new AgentRequest
+            {
+                Context = new Dictionary<string, object> { ["sessionId"] = "s1" }
+            };
+            var context = await provider.BuildAsync(request);
+
+            Assert.False(context.IsLiveData);
+            Assert.Equal(40.0, context.FuelLevel);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_FuelLapsRemainingCalculated()
+        {
+            var snapshot = CreateLiveSnapshot();
+            snapshot.PlayerVehicle!.Fuel = 36.0;
+            var provider = CreateProviderWithLive(snapshot);
+
+            var request = new AgentRequest { Context = new Dictionary<string, object>() };
+            var context = await provider.BuildAsync(request);
+
+            Assert.Equal(36.0, context.FuelLevel);
+            Assert.Equal(20.0, context.FuelLapsRemaining);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_NullScoring_HandledGracefully()
+        {
+            var snapshot = CreateLiveSnapshot();
+            snapshot.Scoring = null;
+            var provider = CreateProviderWithLive(snapshot);
+
+            var request = new AgentRequest { Context = new Dictionary<string, object>() };
+            var context = await provider.BuildAsync(request);
+
+            Assert.True(context.IsLiveData);
+            Assert.Equal(0, context.Position);
+            Assert.Equal(0, context.CurrentLap);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_GapBehind_NobodyBehind_ReturnsZero()
+        {
+            var snapshot = CreateLiveSnapshot();
+            snapshot.Scoring = new ScoringInfo
+            {
+                Vehicles = new List<VehicleScoringInfo>
+                {
+                    new() { VehicleId = 1, Place = 5 }, // player is last
+                }
+            };
+            var provider = CreateProviderWithLive(snapshot);
+
+            var request = new AgentRequest { Context = new Dictionary<string, object>() };
+            var context = await provider.BuildAsync(request);
+
+            Assert.Equal(0.0, context.GapToBehind);
+        }
+
+        [Fact]
+        public async Task BuildAsync_LiveProvider_StrategyConfidence_FromEngine()
+        {
+            var snapshot = CreateLiveSnapshot();
+            var writer = new FakeTelemetryWriter();
+            writer.AddSample("live-session", CreateSample());
+            var engine = new StrategyEngine();
+            var liveProvider = new FakeLiveTelemetryProvider(snapshot);
+            var provider = new RaceContextProvider(writer, engine, liveProvider);
+
+            var request = new AgentRequest
+            {
+                Context = new Dictionary<string, object> { ["sessionId"] = "live-session" }
+            };
+            var context = await provider.BuildAsync(request);
+
+            Assert.True(context.IsLiveData);
+            Assert.True(context.StrategyConfidence >= 0.0);
+            Assert.True(context.StrategyConfidence <= 1.0);
+        }
+
+        private static TelemetrySnapshot CreateLiveSnapshot()
+        {
+            return new TelemetrySnapshot
+            {
+                Timestamp = DateTime.UtcNow,
+                SessionId = "live-session-1",
+                Session = new SessionInfo
+                {
+                    TrackName = "Spa",
+                    CarName = "Formula Pro",
+                    NumVehicles = 20,
+                    TrackLength = 7004.0,
+                },
+                PlayerVehicle = new VehicleTelemetry
+                {
+                    VehicleId = 1,
+                    IsPlayer = true,
+                    Speed = 250.0,
+                    Rpm = 7500,
+                    Gear = 4,
+                    Fuel = 42.5,
+                    Wheels = new WheelData[]
+                    {
+                        new() { TempMid = 85, Wear = 0.10, BrakeTemp = 350 },
+                        new() { TempMid = 86, Wear = 0.11, BrakeTemp = 360 },
+                        new() { TempMid = 84, Wear = 0.09, BrakeTemp = 340 },
+                        new() { TempMid = 85, Wear = 0.10, BrakeTemp = 350 },
+                    },
+                },
+                Scoring = new ScoringInfo
+                {
+                    Vehicles = new List<VehicleScoringInfo>
+                    {
+                        new() { VehicleId = 1, Place = 5, LapNumber = 10, LastLapTime = 92.5, BestLapTime = 90.1, TimeBehindNext = 2.0, PitState = 0 },
+                    }
+                },
+            };
+        }
+
+        private static RaceContextProvider CreateProviderWithLive(TelemetrySnapshot snapshot)
+        {
+            return new RaceContextProvider(
+                new FakeTelemetryWriter(),
+                new StrategyEngine(),
+                new FakeLiveTelemetryProvider(snapshot));
+        }
+
+        private class FakeLiveTelemetryProvider : ILiveTelemetryProvider
+        {
+            private readonly TelemetrySnapshot? _snapshot;
+            public FakeLiveTelemetryProvider(TelemetrySnapshot? snapshot) => _snapshot = snapshot;
+            public TelemetrySnapshot? GetLatestSnapshot() => _snapshot;
+        }
+
+        #endregion
+    }
+
+    public class LiveTelemetryProviderAdapterTests
+    {
+        [Fact]
+        public void GetLatestSnapshot_ReturnsPipelineSnapshot()
+        {
+            var source = new FakeDataSource();
+            var pipeline = new PitWall.Telemetry.Live.Services.TelemetryPipelineService(source);
+            var adapter = new LiveTelemetryProviderAdapter(pipeline);
+
+            // Initially null
+            Assert.Null(adapter.GetLatestSnapshot());
+        }
+
+        [Fact]
+        public void Constructor_NullPipeline_Throws()
+        {
+            Assert.Throws<ArgumentNullException>(() => new LiveTelemetryProviderAdapter(null!));
+        }
+
+        private class FakeDataSource : PitWall.Telemetry.Live.Services.ITelemetryDataSource
+        {
+            public TelemetrySnapshot? Read() => null;
+            public bool IsAvailable() => false;
+            public Task<TelemetrySnapshot?> ReadSnapshotAsync() => Task.FromResult<TelemetrySnapshot?>(null);
         }
     }
 }
